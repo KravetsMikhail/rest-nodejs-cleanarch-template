@@ -1,0 +1,14 @@
+{
+  "name": "rest-nodejs-cleanarch-template",
+  "version": "0.0.1",
+  "description": "Шаблон REST API сервера на чистой архитектуре",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kravets Mikhail",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^2.5.11"
+  }
+}
