@@ -1,6 +1,7 @@
 const { config } = require('../config/environments/' + process.env.ENV)
 import expressWinston from 'express-winston'
 import winston from 'winston'
+import DailyRotateFile from 'winston-daily-rotate-file'
 const { createLogger, format, transports } = winston
 
 class Logger {
@@ -34,8 +35,17 @@ class Logger {
     }
 
     public getRequestLogger() {
+        let transport: DailyRotateFile = new DailyRotateFile({
+            filename: 'logs/info-%DATE%.log',
+            datePattern: 'YYYY-MM-DD-HH',
+            zippedArchive: true,
+            maxSize: '20m',
+            maxFiles: '14d'
+        })
+
         return expressWinston.logger({
             transports: [
+                transport,
                 new winston.transports.Console(),
             ],
             format: winston.format.combine(
@@ -51,8 +61,18 @@ class Logger {
     }
 
     public getRequestErrorLogger() {
+        let transport: DailyRotateFile = new DailyRotateFile({
+            level: 'error',
+            filename: 'logs/info-%DATE%.log',
+            datePattern: 'YYYY-MM-DD-HH',
+            zippedArchive: true,
+            maxSize: '20m',
+            maxFiles: '14d'
+        })
+
         return expressWinston.errorLogger({
             transports: [
+                transport,
                 new winston.transports.Console(),
             ],
             format: winston.format.combine(
