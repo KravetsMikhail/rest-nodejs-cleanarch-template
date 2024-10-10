@@ -6,13 +6,13 @@
 [https://db-migrate.readthedocs.io/en/latest/](https://db-migrate.readthedocs.io/en/latest/)
 [https://coding-overhead.com/post/db-migrate](https://coding-overhead.com/post/db-migrate)
 ### Создание миграции (для Windows выполнить в Git bash)
-    node_modules/.bin/db-migrate create v0_0_1 --config ./src/config/database.json --sql-file
+    node_modules/.bin/db-migrate create v0_0_1 --config ./src/core/config/database.json --sql-file
 ### Создание БД
-    node_modules/.bin/db-migrate db:create test --config ./src/config/database.json
+    node_modules/.bin/db-migrate db:create test --config ./src/core/config/database.json
 ### Откат БД
-    node_modules/.bin/db-migrate down --config ./src/config/database.json
+    node_modules/.bin/db-migrate down --config ./src/core/config/database.json
 ### Новая миграция
-    node_modules/.bin/db-migrate up --config ./src/config/database.json
+    node_modules/.bin/db-migrate up --config ./src/core/config/database.json
 
 ## ЗАПУСК
 ### запуск debug 
