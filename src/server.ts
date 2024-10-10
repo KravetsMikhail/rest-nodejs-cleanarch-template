@@ -11,7 +11,7 @@ import serveFavicon = require('serve-favicon')
 import path = require('path')
 
 interface ServerOptions {
-    port: string
+    port: number
     routes: Router
     apiPrefix: string
 }
@@ -19,7 +19,7 @@ interface ServerOptions {
 export class Server {
     private readonly app = express()
     private readonly logger = new Logger()
-    private readonly port: string
+    private readonly port: number
     private readonly routes: Router
     private readonly apiPrefix: string
 
