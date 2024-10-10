@@ -4,9 +4,11 @@ import rateLimit from 'express-rate-limit'
 
 import { ONE_HUNDRED, ONE_THOUSAND, SIXTY } from './core/constants/constatnts'
 import { HttpCode } from './core/constants/httpcodes'
-import { ErrorMiddleware } from './presentation/middlewares/errors/error.middleware'
+import { ErrorMiddleware } from './interface/middlewares/errors/error.middleware'
 import { AppError } from './core/errors/custom.error'
 import { Logger } from './core/logger/logger'
+import serveFavicon = require('serve-favicon')
+import path = require('path')
 
 interface ServerOptions {
     port: string
@@ -57,6 +59,8 @@ export class Server {
             res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
             next()
         })
+
+        this.app.use(serveFavicon(path.join(__dirname, '..', '/public/favicon.ico')))
 
         //* Routes  
         this.app.use(this.apiPrefix, this.routes)
