@@ -5,10 +5,10 @@ export interface GetTasksUseCase {
     execute: (email: string, status: string) => Promise<TaskEntity[]>;
 }
 
-export class GetTodos implements GetTasksUseCase {
+export class GetTasks implements GetTasksUseCase {
     constructor(private readonly repository: TaskRepository) { }
 
     async execute(email: string, status: string): Promise<TaskEntity[]> {
-        return await this.repository.getTasks(email, status);
+        return await this.repository.getTasks(email, status)
     }
 }

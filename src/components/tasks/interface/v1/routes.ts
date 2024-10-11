@@ -12,7 +12,7 @@ export class TaskRoutes {
         const repository = new TaskRepositoryImpl(datasource)
         const controller = new TaskController(repository)
 
-        router.get('/', controller.getAll)
+        router.get('/', controller.getTasks)
 
         return router
     }

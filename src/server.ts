@@ -48,7 +48,7 @@ export class Server {
         // CORS  
         this.app.use((req, res, next) => {
             // Add your origins  
-            const allowedOrigins = ['http://localhost:3000']
+            const allowedOrigins = ['http://localhost:1234']
             const origin = req.headers.origin
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion  
             if (allowedOrigins.includes(origin!)) {
@@ -63,7 +63,11 @@ export class Server {
         this.app.use(serveFavicon(path.join(__dirname, '..', '/public/favicon.ico')))
 
         //* Routes  
-        this.app.use(this.apiPrefix, this.routes)
+        //this.app.use(this.apiPrefix, this.routes)
+        this.app.use('/api', this.routes)
+        this.app.get('/health', (_req: Request, res: Response) => {
+            return res.status(HttpCode.OK).json({ status: true, message: 'Health OK!' }) as any
+        })
 
         // Test rest api  
         this.app.get('/', (_req: Request, res: Response)  => {

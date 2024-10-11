@@ -14,7 +14,7 @@ const pool = new Pool({
 class PostgreDbService {
     public static logger: any = new Logger()
 
-    public static async query(text: string, params: string[]): Promise<QueryArrayResult> {
+    public static async query(text: string, params?: string[]): Promise<QueryArrayResult> {
         return pool.query(text, params).catch(err => {
 
             PostgreDbService.logger.log({
