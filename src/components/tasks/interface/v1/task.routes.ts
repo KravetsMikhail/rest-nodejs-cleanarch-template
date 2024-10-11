@@ -1,14 +1,14 @@
 import { Router } from 'express'
-import { TaskDatasourceImpl } from '../../infrastructure/datasource'
-import { TaskRepositoryImpl } from '../../infrastructure/repository'
-import { TaskController } from './controllers'
+import { PostgreTaskDatasource } from '../../infrastructure/postgresql.datasource'
+import { TaskRepositoryImpl } from '../../infrastructure/task.repository'
+import { TaskController } from './task.controller'
 
-export class TaskRoutes {
+export class TaskRoutesV1 {
     static get routes(): Router {
         const router = Router()
 
         //* This datasource can be change  
-        const datasource = new TaskDatasourceImpl()
+        const datasource = new PostgreTaskDatasource()
         const repository = new TaskRepositoryImpl(datasource)
         const controller = new TaskController(repository)
 

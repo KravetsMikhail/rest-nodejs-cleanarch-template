@@ -7,7 +7,6 @@ const pool = new Pool({
     user: envs.dbUser,
     host: envs.dbHost,
     password: envs.dbPass,
-    //password: 'lalKHfhs8JYIbDXqLOqzFuqMCxGJMK',
     database: envs.dbName,
     port: envs.dbPort
 })

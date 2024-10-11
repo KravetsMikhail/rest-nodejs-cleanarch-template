@@ -1,5 +1,5 @@
 import { type NextFunction, type Request, type Response } from 'express'
-import { type TaskRepository } from '../../domain/repositories/task.repository'
+import { type TaskRepository } from '../../domain/repositories/i.task.repository'
 import { type TaskEntity } from '../../domain/entities/task.entity'
 import { GetTasks } from '../../domain/usecases/get-tasks.usecase'
 
@@ -9,8 +9,8 @@ type QueryParams = {
 }
 
 export class TaskController {
-    //* Dependency injection  
-    constructor(private readonly repository: TaskRepository) { }
+    //* Dependency injection
+    constructor(private readonly repository:TaskRepository) { }
 
     public getTasks = (
         _req: Request<unknown, unknown, unknown, QueryParams>,
