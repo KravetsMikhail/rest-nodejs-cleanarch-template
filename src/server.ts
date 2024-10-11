@@ -63,8 +63,7 @@ export class Server {
         this.app.use(serveFavicon(path.join(__dirname, '..', '/public/favicon.ico')))
 
         //* Routes  
-        //this.app.use(this.apiPrefix, this.routes)
-        this.app.use('/api', this.routes)
+        this.app.use(this.apiPrefix, this.routes)
         this.app.get('/health', (_req: Request, res: Response) => {
             return res.status(HttpCode.OK).json({ status: true, message: 'Health OK!' }) as any
         })

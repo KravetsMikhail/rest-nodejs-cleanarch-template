@@ -9,7 +9,7 @@ export class envs {
 	public static dbHost = <string>process.env.DB_HOST
 	public static dbPort = <number>Number(process.env.DB_PORT) || 5432
 	public static dbUser = <string>process.env.DB_USER
-	public static dbPass = <string>process.env.DB_PAS
+	public static dbPass = <string>process.env.DB_PASS
 	public static dbSchema = <string>process.env.DB_SCHEMA
     public static apiPrefix = <string>process.env.API_PREFIX || '123'
 }

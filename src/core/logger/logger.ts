@@ -34,6 +34,10 @@ class Logger {
         this.logger.log(level, msg)
     }
 
+    public error(...msg: any[]){
+        this.logger.error(msg)
+    }
+
     public getRequestLogger() {
         let transport: DailyRotateFile = new DailyRotateFile({
             filename: 'logs/info-%DATE%.log',

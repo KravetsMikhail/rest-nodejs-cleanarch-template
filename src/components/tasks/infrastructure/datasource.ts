@@ -6,8 +6,8 @@ import { QueryResult } from 'pg'
 
 export class TaskDatasourceImpl implements TaskDatasource {
     public async getTasks(email: string, status: string): Promise<TaskEntity[]> {
-        
-        const response: QueryResult = await PostgreDbService.query('SELECT * FROM tasks')    
+
+        const response: QueryResult = await PostgreDbService.query(`SELECT * FROM ${envs.dbSchema}."Task"`)    
         return response.rows
     }
 }
