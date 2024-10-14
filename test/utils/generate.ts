@@ -1,17 +1,17 @@
-import faker from "faker"
+import { faker } from '@faker-js/faker'
+import { TaskEntity } from "../../src/components/tasks/domain/entities/task.entity"
 
 export function generateTaskData(overide = {}) {
-  return {
-    id: faker.random.number(),
-    name: faker.name.firstName(),
-    search: faker.name.firstName(),
-    //email: faker.internet.email(),
-    //posts: [],
-    //comments: [],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    ...overide,
-  };
+  const t = new TaskEntity(
+    faker.number.int(),
+    faker.person.firstName(),
+    faker.person.firstName(),
+    "Иванов",
+    (new Date()).toDateString(),
+    "Петров",
+    (new Date()).toDateString(),
+  )
+  return t
 }
 
 export function generateTasksData(n: number = 1, overide = {}) {
