@@ -1,4 +1,4 @@
-import { type TaskEntity } from '../entities/task.entity'
+import { type TaskEntity } from '../entities/v1/task.entity'
 import { type TaskRepository } from '../repositories/i.task.repository'
 
 export interface GetTasksUseCase {

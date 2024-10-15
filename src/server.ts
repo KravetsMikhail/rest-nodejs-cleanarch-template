@@ -1,6 +1,8 @@
 import express, { type Router, type Request, type Response, type NextFunction } from 'express'
 import compression from 'compression'
 import rateLimit from 'express-rate-limit'
+import swaggerUi from 'swagger-ui-express'
+import * as swaggerDocumentV1 from '../src/openapi/v1/openapi.json'
 
 import { ONE_HUNDRED, ONE_THOUSAND, SIXTY } from './core/constants/constatnts'
 import { HttpCode } from './core/constants/httpcodes'
@@ -74,6 +76,8 @@ export class Server {
                 message: `Welcome to Initial API! n Endpoints available at http://localhost:${this.port}/`
             }) as any
         })
+
+        this.app.use('/api-docs/v1', swaggerUi.serve, swaggerUi.setup(swaggerDocumentV1))
 
         //* Handle not found routes in /api/v1/* (only if 'Public content folder' is not available)  
         this.routes.all('*', (req: Request, _: Response, next: NextFunction): void => {
