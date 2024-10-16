@@ -2,7 +2,7 @@ import express, { type Router, type Request, type Response, type NextFunction } 
 import compression from 'compression'
 import rateLimit from 'express-rate-limit'
 import swaggerUi from 'swagger-ui-express'
-import * as swaggerDocumentV1 from '../src/openapi/v1/openapi.json'
+//import * as swaggerDocumentV1 from '../src/openapi/v1/openapi.json'
 
 import { ONE_HUNDRED, ONE_THOUSAND, SIXTY } from './core/constants/constatnts'
 import { HttpCode } from './core/constants/httpcodes'
@@ -11,6 +11,8 @@ import { AppError } from './core/errors/custom.error'
 import { Logger } from './core/logger/logger'
 import serveFavicon = require('serve-favicon')
 import path = require('path')
+import YAML from 'yaml'
+import fs from 'fs'
 
 interface ServerOptions {
     port: number
@@ -77,6 +79,8 @@ export class Server {
             }) as any
         })
 
+        const file  = fs.readFileSync('./src/openapi/v1/openapi.yaml', 'utf8')
+        const swaggerDocumentV1 = YAML.parse(file)
         this.app.use('/api-docs/v1', swaggerUi.serve, swaggerUi.setup(swaggerDocumentV1))
 
         //* Handle not found routes in /api/v1/* (only if 'Public content folder' is not available)  

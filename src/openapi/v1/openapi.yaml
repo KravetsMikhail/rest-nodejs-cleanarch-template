@@ -1,0 +1,81 @@
+openapi: 3.0.1
+info:
+  title: REST API for Royalty
+  version: v1
+paths:
+  /Tasks:
+    get:
+      servers:
+        - url: https://roualty.rasu.local/api/v1/
+      description: Список задач
+      tags:
+        - Tasks
+      parameters:
+        - in: path
+          name: email
+          schema:
+            type: string
+          required: true
+          description: E-mail адрес пользователя
+          example: 123@123.ru
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tasks'
+              examples:
+                sample:
+                  $ref: '#/components/examples/tesksExample'
+components:
+  schemas:
+    Tasks:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: false
+        search:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+          nullable: false
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: string
+          nullable: false
+      additionalProperties: false
+  securitySchemes:
+    basicAuth:
+      type: http
+      description: Basic Authorization header.
+      scheme: basic
+  examples:
+    tesksExample:
+      summary: Пример ответа
+      value:
+        - id: 1
+          name: задача 1
+          search: задача 1 иванов петров
+          createdAt: '2024-10-10T10:00:01'
+          createdBy: Иванов
+          updateAt: '2024-09-09T09:09:09'
+          updateBy: Петров
+        - id: 2
+          name: задача 2
+          search: задача 2 сидоров травкин
+          createdAt: '2024-10-10T10:00:01'
+          createdBy: Травкин
+          updateAt: '2024-09-09T09:09:09'
+          updateBy: Сидоров
+security:
+  - basicAuth: []
