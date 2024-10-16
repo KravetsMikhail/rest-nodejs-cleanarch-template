@@ -6,7 +6,7 @@ import swaggerUi from 'swagger-ui-express'
 
 import { ONE_HUNDRED, ONE_THOUSAND, SIXTY } from './core/constants/constatnts'
 import { HttpCode } from './core/constants/httpcodes'
-import { ErrorMiddleware } from './interface/middlewares/errors/error.middleware'
+import { ErrorMiddleware } from './core/middlewares/errors/error.middleware'
 import { AppError } from './core/errors/custom.error'
 import { Logger } from './core/logger/logger'
 import serveFavicon = require('serve-favicon')
@@ -79,7 +79,7 @@ export class Server {
             }) as any
         })
 
-        const file  = fs.readFileSync('./src/openapi/v1/openapi.yaml', 'utf8')
+        const file  = fs.readFileSync('./src/api/v1/openapi/openapi.yaml', 'utf8')
         const swaggerDocumentV1 = YAML.parse(file)
         this.app.use('/api-docs/v1', swaggerUi.serve, swaggerUi.setup(swaggerDocumentV1))
 

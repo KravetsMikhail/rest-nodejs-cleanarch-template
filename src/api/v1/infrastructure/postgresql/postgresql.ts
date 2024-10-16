@@ -1,6 +1,6 @@
 import { Pool } from 'pg'
-import { envs } from '../../core/config/env'
-import { Logger } from '../../core/logger/logger'
+import { envs } from '../../../../core/config/env'
+import { Logger } from '../../../../core/logger/logger'
 import { QueryArrayResult } from "pg"
 
 const pool = new Pool({

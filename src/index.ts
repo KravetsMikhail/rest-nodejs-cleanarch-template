@@ -1,5 +1,5 @@
 import { envs } from './core/config/env'
-import { AppRoutes } from './interface/v1/routes'
+import { AppRoutes } from './api/v1/interface/routes'
 import { Server } from './server'
 
 (() => {

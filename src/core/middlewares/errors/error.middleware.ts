@@ -1,8 +1,8 @@
 import { type Response, type NextFunction, type Request } from 'express'
 
-import { ValidationError } from '../../../core/errors/validation.error'
-import { HttpCode } from '../../../core/constants/httpcodes'
-import { AppError } from '../../../core/errors/custom.error'
+import { ValidationError } from '../../errors/validation.error'
+import { HttpCode } from '../../constants/httpcodes'
+import { AppError } from '../../errors/custom.error'
 
 export class ErrorMiddleware {
     //* Dependency injection  
