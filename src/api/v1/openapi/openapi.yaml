@@ -3,13 +3,16 @@ info:
   title: REST API for Royalty
   version: v1
 paths:
-  /Tasks:
+  /tasks:
     get:
       servers:
         - url: https://roualty.rasu.local/api/v1/
       description: Список задач
       tags:
-        - Tasks
+        - tasks
+      security:
+        - authJWT:
+          - read
       parameters:
         - in: path
           name: email
@@ -20,19 +23,52 @@ paths:
           example: 123@123.ru
       responses:
         '200':
-          description: Success
+          description: Выполнено
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Tasks'
+                  $ref: '#/components/schemas/task'
               examples:
                 sample:
-                  $ref: '#/components/examples/tesksExample'
+                  $ref: '#/components/examples/tasksExample'
+        '400':
+          description: Ошибка
+        '401':
+          description: Ошибка авторизации
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      servers:
+        - url: https://roualty.rasu.local/api/v1/
+      summary: Добавление новой задачи
+      description: >-
+        Создает новую задачу из данных тела запроса
+      tags:
+        - tasks
+      security:
+        - authJWT:
+          - read
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/task"
+            examples:
+              sample:
+                $ref: "#/components/examples/taskExample"
+      responses:
+        '200':
+          description: Выполнено
+        '400':
+          description: Ошибка
+        '401':
+          description: Ошибка авторизации
+          $ref: '#/components/responses/Unauthorized'
 components:
   schemas:
-    Tasks:
+    task:
       type: object
       properties:
         name:
@@ -55,13 +91,24 @@ components:
           nullable: false
       additionalProperties: false
   securitySchemes:
-    basicAuth:
+    authJWT:
       type: http
-      description: Basic Authorization header.
-      scheme: basic
+      description: Авторизация JWT
+      scheme: bearer
+      bearerFormat: JWT
   examples:
-    tesksExample:
-      summary: Пример ответа
+    taskExample:
+      summary: Пример объекта новой задачи
+      value:
+        id: 1
+        name: задача 1
+        search: задача 1 иванов петров
+        createdAt: '2024-10-10T10:00:01'
+        createdBy: Иванов
+        updateAt: '2024-09-09T09:09:09'
+        updateBy: Петров
+    tasksExample:
+      summary: Пример ответа на запрос списка задач
       value:
         - id: 1
           name: задача 1
@@ -77,5 +124,22 @@ components:
           createdBy: Травкин
           updateAt: '2024-09-09T09:09:09'
           updateBy: Сидоров
+  responses:
+    Unauthorized:
+      description: Ошибка авторизации
+      content:
+        application/json:
+          schema:
+            properties:
+              Error:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
 security:
   - basicAuth: []
