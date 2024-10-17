@@ -1,4 +1,4 @@
-import { ValidationError } from '../../../../../../../core/errors/validation.error'
+import { ValidationError } from '../../../../../../core/errors/validation.error'
 
 export class TaskEntity {
     constructor(public id: number,

@@ -1,5 +1,5 @@
 import { type TaskDatasource } from '../../domain/datasources/i.task.datasource'
-import { type TaskEntity } from '../../domain/entities/v1/task.entity'
+import { type TaskEntity } from '../../domain/entities/task.entity'
 import { type TaskRepository } from '../../domain/repositories/i.task.repository'
 
 export class TaskRepositoryImpl implements TaskRepository {

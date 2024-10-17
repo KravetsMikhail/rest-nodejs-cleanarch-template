@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { TaskEntity } from "../../src/v1/components/tasks/domain/entities/v1/task.entity"
+import { TaskEntity } from "../../src/api/v1/components/tasks/domain/entities/task.entity"
 
 export function generateTaskData(overide = {}) {
   const t = new TaskEntity(

@@ -1,6 +1,6 @@
 import { type NextFunction, type Request, type Response } from 'express'
 import { type TaskRepository } from '../domain/repositories/i.task.repository'
-import { type TaskEntity } from '../domain/entities/v1/task.entity'
+import { type TaskEntity } from '../domain/entities/task.entity'
 import { GetTasks } from '../domain/usecases/get-tasks.usecase'
 import { CreateTask } from '../domain/usecases/create-task.usecase'
 

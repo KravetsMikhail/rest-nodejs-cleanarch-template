@@ -1,5 +1,5 @@
 import { type TaskDatasource } from '../../domain/datasources/i.task.datasource'
-import { TaskEntity } from '../../domain/entities/v1/task.entity'
+import { TaskEntity } from '../../domain/entities/task.entity'
 import { PostgreDbService } from '../../../../infrastructure/postgresql/postgresql'
 import { envs } from '../../../../../../core/config/env'
 import { QueryResult } from 'pg'

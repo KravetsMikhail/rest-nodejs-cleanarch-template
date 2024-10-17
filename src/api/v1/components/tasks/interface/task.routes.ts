@@ -13,7 +13,7 @@ export class TaskRoutesV1 {
         const controller = new TaskController(repository)
 
         router.get('/', controller.getTasks)
-        router.put('/', controller.createTask)
+        router.post('/', controller.createTask)
 
         return router
     }
