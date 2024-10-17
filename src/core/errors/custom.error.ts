@@ -23,22 +23,22 @@ export class AppError extends Error {
     }
 
     static badRequest(message: string): AppError {
-        return new AppError({ message, statusCode: HttpCode.BAD_REQUEST });
+        return new AppError({ message, statusCode: HttpCode.BAD_REQUEST })
     }
 
     static unauthorized(message: string): AppError {
-        return new AppError({ message, statusCode: HttpCode.UNAUTHORIZED });
+        return new AppError({ message, statusCode: HttpCode.UNAUTHORIZED })
     }
 
     static forbidden(message: string): AppError {
-        return new AppError({ message, statusCode: HttpCode.FORBIDDEN });
+        return new AppError({ message, statusCode: HttpCode.FORBIDDEN })
     }
 
     static notFound(message: string): AppError {
-        return new AppError({ message, statusCode: HttpCode.NOT_FOUND });
+        return new AppError({ message, statusCode: HttpCode.NOT_FOUND })
     }
 
     static internalServer(message: string): AppError {
-        return new AppError({ message, statusCode: HttpCode.INTERNAL_SERVER_ERROR });
+        return new AppError({ message, statusCode: HttpCode.INTERNAL_SERVER_ERROR })
     }
 }
