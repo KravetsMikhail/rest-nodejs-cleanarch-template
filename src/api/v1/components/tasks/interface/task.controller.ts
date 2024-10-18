@@ -3,6 +3,7 @@ import { type TaskRepository } from '../domain/repositories/i.task.repository'
 import { type TaskEntity } from '../domain/entities/task.entity'
 import { GetTasks } from '../domain/usecases/get-tasks.usecase'
 import { CreateTask } from '../domain/usecases/create-task.usecase'
+import { CustomRequest } from 'src/core/interfaces/customrequest'
 
 type QueryParams = {
     email: string
@@ -36,8 +37,9 @@ export class TaskController {
         res: Response<TaskEntity>,
         next: NextFunction
     ): void => {
+        const userId = ((_req as unknown) as CustomRequest).payload.userId
         new CreateTask(this.repository)
-        .execute(_req.body.name, _req.body.search)
+        .execute(_req.body.name, _req.body.search, userId)
         .then((result) => res.json(result))
         .catch((error) => {
             next(error)

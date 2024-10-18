@@ -8,7 +8,7 @@ export class TaskRepositoryImpl implements TaskRepository {
     async getTasks(email: string, status: string): Promise<TaskEntity[]> {
         return await this.datasource.getTasks(email, status)
     }
-    async createTask(name: string, search: string): Promise<TaskEntity> {
-        return await this.datasource.createTask(name, search)
+    async createTask(name: string, search: string, userId: number): Promise<TaskEntity> {
+        return await this.datasource.createTask(name, search, userId)
     }
 }
