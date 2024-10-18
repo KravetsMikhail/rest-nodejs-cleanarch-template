@@ -17,4 +17,12 @@ export class PostgreTaskDatasource implements TaskDatasource {
                                         VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`, values)
         return response.rows[0]
     }
+    public async deleteTask(id: number): Promise<TaskEntity> {
+        console.log(id)
+        const values = [id ? id.toString() : '0']
+        const response: QueryResult = await PostgreDbService.query(`DELETE FROM ${envs.dbSchema}."Task" n 
+                                        WHERE n."id"=$1 RETURNING *;`, values)
+        return response.rows[0]
+    }
+
 }

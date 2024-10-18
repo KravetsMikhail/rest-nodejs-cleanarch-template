@@ -8,6 +8,14 @@ class Logger {
     private logger: any
 
     constructor() {
+        let transport: DailyRotateFile = new DailyRotateFile({
+            filename: 'logs/info-%DATE%.log',
+            datePattern: 'YYYY-MM-DD-HH',
+            zippedArchive: true,
+            maxSize: '20m',
+            maxFiles: '14d'
+        })
+
         this.logger = createLogger({
             level: config.logLevel,
             format: format.combine(
@@ -18,11 +26,17 @@ class Logger {
                 format.splat(),
                 format.simple(),
             ),
+            transports: [
+                transport,
+            ],
         })
 
         if (process.env.ENV !== 'production') {
             this.logger.add(new transports.Console({
                 format: format.combine(
+                    format.timestamp({
+                        format: 'YYYY-MM-DD HH:mm:ss',
+                    }),
                     format.colorize(),
                     format.simple(),
                 ),
@@ -53,6 +67,9 @@ class Logger {
                 new winston.transports.Console(),
             ],
             format: winston.format.combine(
+                format.timestamp({
+                    format: 'YYYY-MM-DD HH:mm:ss',
+                }),
                 winston.format.colorize(),
                 winston.format.simple(),
             ),
@@ -80,6 +97,9 @@ class Logger {
                 new winston.transports.Console(),
             ],
             format: winston.format.combine(
+                format.timestamp({
+                    format: 'YYYY-MM-DD HH:mm:ss',
+                }),
                 winston.format.colorize(),
                 winston.format.simple(),
             ),

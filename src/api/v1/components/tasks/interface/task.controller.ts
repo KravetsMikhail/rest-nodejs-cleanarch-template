@@ -3,6 +3,7 @@ import { type TaskRepository } from '../domain/repositories/i.task.repository'
 import { type TaskEntity } from '../domain/entities/task.entity'
 import { GetTasks } from '../domain/usecases/get-tasks.usecase'
 import { CreateTask } from '../domain/usecases/create-task.usecase'
+import { DeleteTask } from '../domain/usecases/delete-task.usecase'
 import { CustomRequest } from 'src/core/interfaces/customrequest'
 
 type QueryParams = {
@@ -23,7 +24,8 @@ export class TaskController {
         _req: Request<unknown, unknown, unknown, QueryParams>,
         res: Response<TaskEntity[]>,
         next: NextFunction
-    ): void => {        
+    ): void => {   
+        console.log(_req.route)     
         new GetTasks(this.repository)
             .execute(_req.route.email, _req.route.status)
             .then((result) => res.json(result))
@@ -46,4 +48,17 @@ export class TaskController {
         })
     }
 
+    public deleteTask = (
+        _req: Request<any, unknown, unknown, QueryParams>,
+        res: Response<TaskEntity>,
+        next: NextFunction
+    ): void => {
+        console.log(_req.params)
+        new DeleteTask(this.repository)
+        .execute(_req.params.id)
+        .then((result) => res.json(result))
+        .catch((error) => {
+            next(error)
+        })
+    }
 }

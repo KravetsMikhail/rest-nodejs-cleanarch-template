@@ -15,7 +15,8 @@ class PostgreDbService {
     public static logger: any = new Logger()
 
     public static async query(text: string, params?: string[]): Promise<QueryArrayResult> {
-        return pool.query(text, params).catch(err => {            
+        return pool.query(text, params).catch(err => {  
+            console.log("query error => ", err)          
             PostgreDbService.logger.error(err.message)
             return {
                 rows: [],

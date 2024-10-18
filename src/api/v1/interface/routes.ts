@@ -5,7 +5,7 @@ export class AppRoutes {
  static get routes(): Router {  
   const router = Router()
   
-  router.use('/v1/tasks/', TaskRoutesV1.routes)
+  router.use('/v1/tasks', TaskRoutesV1.routes)
   
   return router
  }  

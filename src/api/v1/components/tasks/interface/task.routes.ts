@@ -14,6 +14,7 @@ export class TaskRoutesV1 {
 
         router.get('/', controller.getTasks)
         router.post('/', controller.createTask)
+        router.delete('/:id', controller.deleteTask)
 
         return router
     }

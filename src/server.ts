@@ -41,6 +41,7 @@ export class Server {
         this.app.use(express.urlencoded({ extended: true })) // allow x-www-form-urlencoded  
         this.app.use(compression())
         this.app.use(this.logger.getRequestLogger())
+        
         //  limit repeated requests to public APIs  
         this.app.use(
             rateLimit({
@@ -89,10 +90,10 @@ export class Server {
             next(AppError.notFound(`Cant find ${req.originalUrl} on this server!`))
         })
 
-        this.app.use(this.logger.getRequestErrorLogger())
-
         // Handle errors middleware  
-        this.routes.use(ErrorMiddleware.handleError)
+        ErrorMiddleware.initialize(this.logger)
+        this.routes.use(ErrorMiddleware.handleError)        
+        this.app.use(this.logger.getRequestErrorLogger())
         
         this.app.listen(this.port, () => {
             console.log(`Server running on port ${this.port}...`)

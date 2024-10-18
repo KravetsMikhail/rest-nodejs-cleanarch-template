@@ -1,6 +1,7 @@
 import jwt, { Secret } from 'jsonwebtoken'
 import { Request, Response, NextFunction } from 'express'
 import { AppError } from '../../../core/errors/custom.error'
+import { ErrorMiddleware } from '../errors/error.middleware'
 import { CustomRequest, TokenPayload } from '../../../core/interfaces/customrequest'
 
 export const SECRET_KEY: Secret = '112233445566'
@@ -24,7 +25,8 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
 
         next()
     } catch (err) {
-        res.status(401).send("Ошибка авторизации!")
+        res.status(401)
+        ErrorMiddleware.handleError(AppError.unauthorized("Ошибка авторизации!"), req, res, next)
         //next(AppError.unauthorized("Ошибка авторизации!"))
     }
 }

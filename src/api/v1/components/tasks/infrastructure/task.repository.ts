@@ -11,4 +11,7 @@ export class TaskRepositoryImpl implements TaskRepository {
     async createTask(name: string, search: string, userId: number): Promise<TaskEntity> {
         return await this.datasource.createTask(name, search, userId)
     }
+    async deleteTask(id: number): Promise<TaskEntity> {
+        return await this.datasource.deleteTask(id)
+    }
 }
