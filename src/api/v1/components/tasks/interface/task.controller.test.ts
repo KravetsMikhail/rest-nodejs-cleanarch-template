@@ -1,6 +1,6 @@
-import { TaskRepositoryImpl } from "../infrastructure/v1/task.repository"
-import { PostgreTaskDatasource } from "../infrastructure/v1/postgresql.datasource"
-import { generateTasksData } from "../../../../../test/utils/generate"
+import { TaskRepositoryImpl } from "../infrastructure/task.repository"
+import { PostgreTaskDatasource } from "../infrastructure/postgresql.datasource"
+import { generateTasksData } from "../../../../../../test/utils/generate"
 
 afterEach(() => {
     jest.resetAllMocks()

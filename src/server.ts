@@ -81,7 +81,7 @@ export class Server {
             }) as any
         })
 
-        const file  = fs.readFileSync('./src/api/v1/openapi/openapi.yaml', 'utf8')
+        const file  = fs.readFileSync('./dist/api/v1/openapi/openapi.yaml', 'utf8')
         const swaggerDocumentV1 = YAML.parse(file)
         this.app.use('/api-docs/v1', swaggerUi.serve, swaggerUi.setup(swaggerDocumentV1))
 

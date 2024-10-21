@@ -12,8 +12,15 @@ export class TaskRoutesV1 {
         const repository = new TaskRepositoryImpl(datasource)
         const controller = new TaskController(repository)
 
-        router.get('/', controller.getTasks)
+        //query параметры
+        router.get('', controller.getTasks)
+        //path параметры
+        router.get('/:email/:status', controller.getTasks)
+        //body параметры
         router.post('/', controller.createTask)
+        //query параметры
+        router.delete('', controller.deleteTask)
+        //path параметры
         router.delete('/:id', controller.deleteTask)
 
         return router

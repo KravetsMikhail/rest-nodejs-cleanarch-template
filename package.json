@@ -8,7 +8,9 @@
     "dev": "concurrently \"tsc --watch\" \"nodemon dist/index.js\"",
     "build": "tsc",
     "serve": "node dist/index.js",
-    "test": "jest --watch"
+    "test": "jest --watch",
+    "copySpecialFiles": "copyfiles --error --up 1 src/api/**/*.yaml* dist",
+    "postbuild": "npm run copySpecialFiles"
   },
   "author": "Kravets Mikhail",
   "license": "MIT",
@@ -42,6 +44,7 @@
     "@types/node": "^22.7.5",
     "@types/pg": "^8.11.10",
     "@types/swagger-ui-express": "^4.1.6",
+    "copyfiles": "^2.4.1",
     "jest": "^29.7.0",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",

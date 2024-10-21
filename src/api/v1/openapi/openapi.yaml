@@ -14,13 +14,18 @@ paths:
         - authJWT:
           - read
       parameters:
-        - in: path
+        - in: query
           name: email
           schema:
             type: string
           required: true
           description: E-mail адрес пользователя
           example: 123@123.ru
+        - in: query
+          name: status
+          schema: 
+            type: string
+          required: true
       responses:
         '200':
           description: Выполнено
@@ -35,9 +40,12 @@ paths:
                   $ref: '#/components/examples/tasksExample'
         '400':
           description: Ошибка
+          $ref: '#/components/responses/Error400'
         '401':
           description: Ошибка авторизации
           $ref: '#/components/responses/Unauthorized'
+        '500':
+          description: Ошибка сервера
     post:
       servers:
         - url: https://roualty.rasu.local/api/v1/
@@ -63,9 +71,49 @@ paths:
           description: Выполнено
         '400':
           description: Ошибка
+          $ref: '#/components/responses/Error400'
         '401':
           description: Ошибка авторизации
           $ref: '#/components/responses/Unauthorized'
+        '500':
+          description: Ошибка сервера
+    delete:
+      servers:
+        - url: https://roualty.rasu.local/api/v1/
+      description: Удаление задачи
+      tags:
+        - tasks
+      security:
+        - authJWT:
+          - read
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: number
+          required: true
+          description: id задачи
+          example: 123
+      responses:
+        '200':
+          description: Выполнено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/task'
+              examples:
+                sample:
+                  $ref: '#/components/examples/taskExample'
+        '400':
+          description: Ошибка
+          $ref: '#/components/responses/Error400'
+        '401':
+          description: Ошибка авторизации
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          description: Ошибка сервера
 components:
   schemas:
     task:
@@ -141,5 +189,23 @@ components:
                 required:
                   - code
                   - message
+    Error400:
+      description: Ошибка
+      content:
+        application/json:
+          schema:
+            properties:
+              Error:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                  stack:
+                    type: string
+                required:
+                  - code
+                  - message
 security:
-  - basicAuth: []
+  - JWT: []
