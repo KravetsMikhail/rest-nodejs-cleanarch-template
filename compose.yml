@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     image: local/restapi_sevice:test-000
     container_name: restapi-service-test
-    restart: always
+    # restart: always
     volumes:
       - ./:/app
     environment:
