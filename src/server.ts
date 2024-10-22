@@ -54,7 +54,7 @@ export class Server {
         // CORS  
         this.app.use((req, res, next) => {
             // Add your origins  
-            const allowedOrigins = ['http://localhost:1234']
+            const allowedOrigins = ['http://localhost:1234', 'http://192.168.33.8:1234']
             const origin = req.headers.origin
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion  
             if (allowedOrigins.includes(origin!)) {
