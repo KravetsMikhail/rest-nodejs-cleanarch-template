@@ -37,7 +37,7 @@ RUN npm install
 # Install ts-node globally for running TypeScript code
 RUN npm install -g ts-node
 # Copy the entire application code into the container
-COPY . .
+COPY . /app
 # Build the application 
 RUN npm run build
 
@@ -55,7 +55,7 @@ COPY package.json package-lock.json ./
 # Install only production dependencies
 RUN npm install --only=production
 # Copy the entire application code into the container
-COPY . .
+COPY . /app
 # Copy the build artifacts from the development stage to the production stage
 COPY --from=development /app/dist ./dist
 # Default command to run when the container starts in production mode
