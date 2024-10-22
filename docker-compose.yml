@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: local/restapi_sevice:test-000
+    container_name: restapi-service-test
+    restart: always
+    volumes:
+      - ./:/app
+    environment:
+      NODE_ENV: development
+    command: npm run dev
+    ports:
+      - "1234:1234"
+    networks:
+      - app-network

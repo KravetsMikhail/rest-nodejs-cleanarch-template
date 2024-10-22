@@ -10,6 +10,7 @@
     "serve": "node dist/index.js",
     "test": "jest --watch",
     "copySpecialFiles": "copyfiles --error --up 1 src/api/**/*.yaml* dist",
+    "prod": "node -r ts-node/register/transpile-only dist/index.js",
     "postbuild": "npm run copySpecialFiles"
   },
   "author": "Kravets Mikhail",
