@@ -59,4 +59,4 @@ COPY . .
 # Copy the build artifacts from the development stage to the production stage
 COPY --from=development /app/dist ./dist
 # Default command to run when the container starts in production mode
-CMD npm run serve
+# CMD npm run serve
