@@ -10,7 +10,7 @@ services:
       - ./:/app
     environment:
       NODE_ENV: production
-    command: npm run build
+    command: npm run serve
     ports:
       - "1234:1234"
 

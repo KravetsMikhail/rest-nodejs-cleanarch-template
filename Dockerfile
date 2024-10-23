@@ -25,7 +25,7 @@
 #CMD chmod a+x ./run_in_docker.sh && /bin/bash ./run_in_docker.sh
 
 # .......Development Stage.......
-FROM node:20.18.0 as development
+FROM node:20.18.0 AS development
 # Set the working directory in the container
 WORKDIR /app
 # Copy package.json and package-lock.json to the working directory
@@ -36,13 +36,13 @@ RUN npm install -g npm@latest
 RUN npm install
 # Install ts-node globally for running TypeScript code
 RUN npm install -g ts-node
-# Copy the entire application code into the container
-COPY . .
 # Build the application 
 RUN npm run build
+# Copy the entire application code into the container
+COPY . .
 
 # .......Production Stage.......
-FROM node:20.18.0 as production
+FROM node:20.18.0 AS production
 # Define an argument for the Node environment 
 # with a default value of "production"
 ARG NODE_ENV=production
@@ -59,4 +59,4 @@ COPY . .
 # Copy the build artifacts from the development stage to the production stage
 COPY --from=development /app/dist ./dist
 # Default command to run when the container starts in production mode
-# CMD npm run serve
+CMD npm run serve
