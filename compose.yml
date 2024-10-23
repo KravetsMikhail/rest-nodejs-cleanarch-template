@@ -6,11 +6,10 @@ services:
     image: local/restapi_sevice:test-000
     container_name: restapi-service-test
     restart: always
-    # volumes:
-    #   - ./:/app
     environment:
       NODE_ENV: production
-    # command: npm run start
     ports:
       - "1234:1234"
+    env_file:
+      - ./.env
 
