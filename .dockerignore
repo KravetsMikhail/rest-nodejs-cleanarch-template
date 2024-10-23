@@ -1,0 +1,31 @@
+# all git and gitlab
+.git
+.git*
+git_*
+
+# all utility
+*docker-compose*.yml
+service_*.sh
+
+# work files
+
+#
+logs
+log
+
+# env
+.env.*
+
+# nodejs
+**/node_modules/
+**/README.md
+**/LICENSE
+**/.vscode
+**/npm-debug.log
+**/coverage
+**/.env
+**/.editorconfig
+**/.aws
+**/dist
+
+#

@@ -28,8 +28,10 @@
 FROM node:20.18.0 AS development
 # Set the working directory in the container
 WORKDIR /app
+# Copy the entire application code into the container
+COPY . .
 # Copy package.json and package-lock.json to the working directory
-COPY package.json package-lock.json ./
+# COPY package.json package-lock.json ./
 # Upgrade npm to the latest version globally
 RUN npm install -g npm@latest
 # Install project dependencies
@@ -38,25 +40,27 @@ RUN npm install
 RUN npm install -g ts-node
 # Build the application 
 RUN npm run build
-# Copy the entire application code into the container
-COPY . .
 
-# .......Production Stage.......
-FROM node:20.18.0 AS production
-# Define an argument for the Node environment 
-# with a default value of "production"
-ARG NODE_ENV=production
-# Set the environment variable for the Node environment
-ENV NODE_ENV=${NODE_ENV}
-# Set the working directory in the container
-WORKDIR /app
-# Copy package.json and package-lock.json to the working directory
-COPY package.json package-lock.json ./
-# Install only production dependencies
-RUN npm install --only=production
-# Copy the entire application code into the container
-COPY . .
-# Copy the build artifacts from the development stage to the production stage
-COPY --from=development /app/dist ./dist
-# Default command to run when the container starts in production mode
+EXPOSE 1234
+
 CMD npm run serve
+
+# # .......Production Stage.......
+# FROM node:20.18.0 AS production
+# # Define an argument for the Node environment 
+# # with a default value of "production"
+# ARG NODE_ENV=production
+# # Set the environment variable for the Node environment
+# ENV NODE_ENV=${NODE_ENV}
+# # Set the working directory in the container
+# WORKDIR /app
+# # Copy package.json and package-lock.json to the working directory
+# COPY package.json package-lock.json ./
+# # Install only production dependencies
+# RUN npm install --only=production
+# # Copy the entire application code into the container
+# COPY . .
+# # Copy the build artifacts from the development stage to the production stage
+# COPY --from=development /app/dist ./dist
+# # Default command to run when the container starts in production mode
+# CMD npm run serve
