@@ -58,6 +58,7 @@ COPY package*.json ./
 RUN npm ci --production
 
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/public ./public
 
 EXPOSE 1234
 
