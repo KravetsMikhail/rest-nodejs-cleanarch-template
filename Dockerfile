@@ -24,8 +24,7 @@
 # run
 #CMD chmod a+x ./run_in_docker.sh && /bin/bash ./run_in_docker.sh
 
-# .......Development Stage.......
-FROM node:20.18.0 AS development
+FROM node:20.18.0 AS builder
 # Set the working directory in the container
 WORKDIR /app
 # Copy the entire application code into the container
@@ -41,9 +40,28 @@ RUN npm install -g ts-node
 # Build the application 
 RUN npm run build
 
+# EXPOSE 1234
+
+# CMD npm run start
+
+FROM node:slim
+
+ENV NODE_ENV production
+USER node
+
+# Create app directory
+WORKDIR /app
+
+# Install app dependencies
+COPY package*.json ./
+
+RUN npm ci --production
+
+COPY --from=builder /app/dist ./dist
+
 EXPOSE 1234
 
-CMD npm run start
+CMD [ "node", "dist/index.js" ]
 
 # # .......Production Stage.......
 # FROM node:20.18.0 AS production
