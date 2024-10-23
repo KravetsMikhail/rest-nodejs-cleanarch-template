@@ -43,7 +43,7 @@ RUN npm run build
 
 EXPOSE 1234
 
-CMD npm run serve
+CMD npm run start
 
 # # .......Production Stage.......
 # FROM node:20.18.0 AS production
