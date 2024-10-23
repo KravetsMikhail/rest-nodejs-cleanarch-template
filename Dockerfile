@@ -33,5 +33,6 @@ COPY --from=builder /app/public ./public
 
 EXPOSE 1234
 
-CMD chmod a+x ./run_in_docker.sh && /bin/bash ./run_in_docker.sh
+CMD /bin/bash ./run_in_docker.sh
+# CMD chmod a+x ./run_in_docker.sh && /bin/bash ./run_in_docker.sh
 # CMD [ "node", "dist/index.js" ]
