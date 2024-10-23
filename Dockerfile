@@ -24,7 +24,7 @@ WORKDIR /app
 
 # Install app dependencies
 COPY package*.json ./
-COPY run_in_docker.sh ./
+COPY --chmod=755 run_in_docker.sh ./
 
 RUN npm ci --production
 
