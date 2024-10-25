@@ -1,4 +1,6 @@
-const { config } = require('../config/environments/' + process.env.NODE_ENV)
+//const { config } = require('../config/environments/' + process.env.NODE_ENV)
+import { config } from '../config/environments/development'
+//import { config } from '../config/environments/development'
 import expressWinston from 'express-winston'
 import winston from 'winston'
 import DailyRotateFile from 'winston-daily-rotate-file'
