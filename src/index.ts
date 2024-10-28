@@ -8,6 +8,7 @@ import { Server } from './server'
 
 function main(): void {
     const server = new Server({
+        host: envs.host,
         routes: AppRoutes.routes,
         apiPrefix: envs.apiPrefix,
         port: envs.port

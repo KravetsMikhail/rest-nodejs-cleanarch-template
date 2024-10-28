@@ -16,8 +16,8 @@ class PostgreDbService {
 
     public static async query(text: string, params?: string[]): Promise<QueryArrayResult> {
         return pool.query(text, params).catch(err => {  
-            console.log("query error => ", err)          
             PostgreDbService.logger.error(err.message)
+            PostgreDbService.logger.debug("Error in PostgreDbService in pool.query")
             return {
                 rows: [],
                 fields: [],

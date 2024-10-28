@@ -16,6 +16,7 @@ import YAML from 'yaml'
 import fs from 'fs'
 
 interface ServerOptions {
+    host: String
     port: number
     routes: Router
     apiPrefix: string
@@ -27,9 +28,11 @@ export class Server {
     private readonly port: number
     private readonly routes: Router
     private readonly apiPrefix: string
+    private readonly host: String
 
     constructor(options: ServerOptions) {
-        const { port, routes, apiPrefix } = options
+        const { host, port, routes, apiPrefix } = options
+        this.host = host
         this.port = port
         this.routes = routes
         this.apiPrefix = apiPrefix
@@ -54,7 +57,7 @@ export class Server {
         // CORS  
         this.app.use((req, res, next) => {
             // Add your origins  
-            const allowedOrigins = ['http://localhost:1234', 'http://192.168.33.8:1234']
+            const allowedOrigins = [`http://localhost:${this.port}`, `http://${this.host}:${this.port}`]
             const origin = req.headers.origin
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion  
             if (allowedOrigins.includes(origin!)) {
@@ -77,7 +80,7 @@ export class Server {
         // Test rest api  
         this.app.get('/', (_req: Request, res: Response)  => {
             return res.status(HttpCode.OK).send({
-                message: `Welcome to Initial API! n Endpoints available at http://localhost:${this.port}/`
+                message: `Welcome to Initial API! n Endpoints available at http://${this.host}:${this.port}/`
             }) as any
         })
 

@@ -1,5 +1,5 @@
 const config: any = {}
 
-config.logLevel = 'info'
+config.logLevel = 'debug'
 
 export { config }

@@ -1,6 +1,4 @@
-//const { config } = require('../config/environments/' + process.env.NODE_ENV)
-import { config } from '../config/environments/development'
-//import { config } from '../config/environments/development'
+const { config } = require('../config/environments/' + process.env.TEST_ENV)
 import expressWinston from 'express-winston'
 import winston from 'winston'
 import DailyRotateFile from 'winston-daily-rotate-file'
@@ -52,6 +50,10 @@ class Logger {
 
     public error(...msg: any[]){
         this.logger.error(msg)
+    }
+
+    public debug(...msg: any[]){
+        this.logger.debug(msg)
     }
 
     public getRequestLogger() {
