@@ -1,4 +1,4 @@
-import { TaskRepositoryImpl } from "../infrastructure/task.repository"
+import { TaskRepository } from "../infrastructure/task.repository"
 import { PostgreTaskDatasource } from "../infrastructure/postgresql.datasource"
 import { generateTasksData } from "../../../../../../test/utils/generate"
 
@@ -6,10 +6,10 @@ afterEach(() => {
     jest.resetAllMocks()
 })
 
-describe("TaskRepositoryImpl", () => {
+describe("TaskRepository", () => {
     describe("getTasks", () => {
         test("should return empty array", async () => {
-            const repo = new TaskRepositoryImpl(new PostgreTaskDatasource)
+            const repo = new TaskRepository(new PostgreTaskDatasource)
             const spy = jest
                 .spyOn(repo, "getTasks")
                 .mockResolvedValueOnce([])
@@ -22,7 +22,7 @@ describe("TaskRepositoryImpl", () => {
 
         test("should return tasks list", async () => {
             const tasksData = generateTasksData(10)
-            const repo = new TaskRepositoryImpl(new PostgreTaskDatasource)
+            const repo = new TaskRepository(new PostgreTaskDatasource)
             const spy = jest
                 .spyOn(repo, "getTasks")
                 .mockResolvedValueOnce(tasksData)

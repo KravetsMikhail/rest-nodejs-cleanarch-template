@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { PostgreTaskDatasource } from '../infrastructure/postgresql.datasource'
-import { TaskRepositoryImpl } from '../infrastructure/task.repository'
+import { OracleTaskDatasource } from '../infrastructure/oracldb.datasource'
+import { TaskRepository } from '../infrastructure/task.repository'
 import { TaskController } from './task.controller'
 
 export class TaskRoutesV1 {
@@ -8,8 +9,9 @@ export class TaskRoutesV1 {
         const router = Router()
 
         //* This datasource can be change  
-        const datasource = new PostgreTaskDatasource()
-        const repository = new TaskRepositoryImpl(datasource)
+        //const datasource = new PostgreTaskDatasource()
+        const datasource = new OracleTaskDatasource()
+        const repository = new TaskRepository(datasource)
         const controller = new TaskController(repository)
 
         //query параметры
