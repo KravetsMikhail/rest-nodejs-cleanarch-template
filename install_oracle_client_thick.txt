@@ -1,0 +1,20 @@
+Установка клиента Oracle для режима Thick
+
+WINDOWS
+1 Download oracle instant client from www.oracle.com/in/database/technologies/instant-client/winx64-64-downloads.html
+2 Extract the the files in C:\oracle
+3 Add instantclient directory in environment variable and the same in path variable.
+ORACLE_HOME="C:\oracle\instantclient"
+
+set PATH=%PATH%;C:\oracle\instantclient
+
+4 If it still doesn't work then copy all .dll files in C:\oracle\instantclient" folder to "C:\Program Files\nodejs"
+
+DOCKER
+RUN wget https://download.oracle.com/otn_software/linux/instantclient/instantclient-basiclite-linuxx64.zip && \
+    unzip instantclient-basiclite-linuxx64.zip && \
+    rm -f instantclient-basiclite-linuxx64.zip && \
+    cd instantclient* && \
+    rm -f *jdbc* *occi* *mysql* *jar uidrvci genezi adrci && \
+    echo /opt/oracle/instantclient* > /etc/ld.so.conf.d/oracle-instantclient.conf && \
+    ldconfig

@@ -3,10 +3,13 @@ import { TaskEntity } from '../domain/entities/task.entity'
 import { OracleDbService } from '../../../infrastructure/oracle/oracledb' 
 import { envs } from '../../../../../core/config/env'
 import { QueryResult } from 'pg'
+import sql from '../../../../../core/utils/sqltemplatetags'
 
 export class OracleTaskDatasource implements TaskDatasource {
     public async getTasks(email: string, status: string): Promise<TaskEntity[]> {
-        const response: QueryResult = await OracleDbService.query(`SELECT * FROM TASK`)    
+        let _options = { maxRows: 100 }
+        const _query = sql`SELECT * FROM TASKS`
+        const response: QueryResult = await OracleDbService.query(_query, _options)    
         return response.rows
     }
     public async createTask(name: string, search: string, userId: number): Promise<TaskEntity> {

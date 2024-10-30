@@ -53,10 +53,10 @@ class OracleDbService {
             OracleDbService.logger.debug("=> Запуск пул Oracle <=")
             this.pool = await oracledb.createPool(_config)
             OracleDbService.logger.debug("=> Создан пул Oracle <=")
-        } catch(err) {
-            OracleDbService.logger.error(err)
+        } catch(err) {            
             OracleDbService.logger.debug("Error in OracleDbService in _initialize")
             OracleDbService.logger.debug("Не удалось создать пул Oracle")
+            OracleDbService.logger.error(err)
         } /*finally {
             OracleDbService.logger.debug("=> Закрытие пула Oracle в finally <=")
             await OracleDbService.closePool()
@@ -64,22 +64,30 @@ class OracleDbService {
         }*/
     }
 
-    public static async query(sql: string, params?: any): Promise<any> {
+    public static async query(sql: any, params?: any): Promise<any> {
         const connection = await this.pool.getConnection()
         try {
+            OracleDbService.logger.debug(`=> Запрос в Oracle: ${sql}`)
             const result = await connection.execute(sql, params)
+            OracleDbService.logger.debug(`<= Ответ из Oracle: ${result}`)
             return result
-        } finally {
+        } catch(err){            
+            OracleDbService.logger.debug("Не удалось выполнить запрос в Oracle")
+            OracleDbService.logger.error(err)
+        }
+        finally {
             await connection.release()
         }
     }
 
     public static async closePool() {
         try {
+            OracleDbService.logger.debug("=> Закрытие пула Oracle в finally <=")
             await this.pool.terminate()
+            OracleDbService.logger.debug("=> Закрыт пул Oracle <=")
         } catch (err) {
             OracleDbService.logger.error(err)
-            OracleDbService.logger.debug("Error in OracleDbService in closePool")
+            OracleDbService.logger.debug("Error in OracleDbService in closePool")            
         }
     }
 }
