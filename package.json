@@ -10,7 +10,8 @@
     "serve": "node dist/index.js",
     "test": "jest --watch",
     "copySpecialFiles": "copyfiles --error --up 1 src/api/**/*.yaml* dist",
-    "postbuild": "npm run copySpecialFiles"
+    "postbuild": "npm run copySpecialFiles",
+    "oraclemigrate": "node src/api/v1/infrastructure/oracle/migration.js"
   },
   "author": "Kravets Mikhail",
   "license": "MIT",

@@ -57,11 +57,7 @@ class OracleDbService {
             OracleDbService.logger.debug("Error in OracleDbService in _initialize")
             OracleDbService.logger.debug("Не удалось создать пул Oracle")
             OracleDbService.logger.error(err)
-        } /*finally {
-            OracleDbService.logger.debug("=> Закрытие пула Oracle в finally <=")
-            await OracleDbService.closePool()
-            OracleDbService.logger.debug("=> Закрыт пул Oracle <=")
-        }*/
+        } 
     }
 
     public static async query(sql: any, params?: any): Promise<any> {
