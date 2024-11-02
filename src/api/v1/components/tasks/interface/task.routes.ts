@@ -9,8 +9,8 @@ export class TaskRoutesV1 {
         const router = Router()
 
         //* This datasource can be change  
-        //const datasource = new PostgreTaskDatasource()
-        const datasource = new OracleTaskDatasource()
+        const datasource = new PostgreTaskDatasource()
+        //const datasource = new OracleTaskDatasource()
         const repository = new TaskRepository(datasource)
         const controller = new TaskController(repository)
 
