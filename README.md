@@ -52,8 +52,6 @@
 
     sudo bash service_down.sh
 
-
-
 ### Стандалоне - запуск debug 
 #### Windows
     SET DEBUG=rest-nodejs-cleanarch-template:* & npm run dev
@@ -62,11 +60,7 @@
 
 ### Сиандалоне - запуск production
 #### Windows
-    SET NODE_ENV=production & npm run start
+    SET NODE_ENV=production & npm run serve
 #### Linux
-    NODE_ENV=production npm run start
-
-### Запуск проекта из pm2
-    sudo su
-    pm2 start src/index.js --name restnodejscleanarch -- start
+    NODE_ENV=production npm run serve
 
