@@ -2,7 +2,7 @@ import jwt, { Secret } from 'jsonwebtoken'
 import { Request, Response, NextFunction } from 'express'
 import { AppError } from '../../../core/errors/custom.error'
 import { ErrorMiddleware } from '../errors/error.middleware'
-import { CustomRequest, TokenPayload } from '../../../core/interfaces/customrequest'
+import { CustomRequest, TokenPayload } from '../../types/custom.request'
 import { Logger } from '../../logger/logger'
 
 export const SECRET_KEY: Secret = '112233445566'

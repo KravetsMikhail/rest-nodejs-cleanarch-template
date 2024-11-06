@@ -1,7 +1,6 @@
 import oracledb from 'oracledb'
 import { envs } from '../../../../core/config/env'
 import { Logger } from '../../../../core/logger/logger'
-import * as migraition from './migration'
 
 class OraclePoolConfig implements oracledb.PoolAttributes {
     public readonly user: string
@@ -42,12 +41,6 @@ class OracleDbService {
 
     public static async _initialize() {
         let _config = new OraclePoolConfig()
-       /*  try {
-            //migration
-            OracleDbService.logger.debug(`=> Старт миграции Oracle на ${_config.connectString} <=`)
-            await migraition.migration(_config)
-            OracleDbService.logger.debug(`=> Миграция выполнена на ${_config.connectString} <=`)
-        } catch(err){} */
 
         try {
             OracleDbService.logger.debug("=> Запуск пул Oracle <=")

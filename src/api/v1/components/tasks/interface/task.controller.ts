@@ -1,10 +1,10 @@
 import { type NextFunction, type Request, type Response } from 'express'
 import { type ITaskRepository } from '../domain/repositories/i.task.repository'
 import { type TaskEntity } from '../domain/entities/task.entity'
-import { GetTasks } from '../domain/usecases/get-tasks.usecase'
-import { CreateTask } from '../domain/usecases/create-task.usecase'
-import { DeleteTask } from '../domain/usecases/delete-task.usecase'
-import { CustomRequest } from 'src/core/interfaces/customrequest'
+import { GetTasks } from '../usecases/get-tasks.usecase'
+import { CreateTask } from '../usecases/create-task.usecase'
+import { DeleteTask } from '../usecases/delete-task.usecase'
+import { CustomRequest } from 'src/core/types/custom.request'
 
 type QueryParams = {
     id: number

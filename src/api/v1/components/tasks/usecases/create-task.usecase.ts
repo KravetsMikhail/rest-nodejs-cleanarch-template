@@ -1,5 +1,5 @@
-import { type TaskEntity } from '../entities/task.entity'
-import { type ITaskRepository } from '../repositories/i.task.repository'
+import { type TaskEntity } from '../domain/entities/task.entity'
+import { type ITaskRepository } from '../domain/repositories/i.task.repository'
 
 export interface CreateTasksUseCase {
     execute: (name: string, search: string, userId: number) => Promise<TaskEntity>

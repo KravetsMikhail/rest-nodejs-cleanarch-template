@@ -1,11 +1,33 @@
-import { type TaskDatasource } from '../domain/datasources/i.task.datasource'
+import { type ITaskDatasource } from '../domain/datasources/i.task.datasource'
 import { TaskEntity } from '../domain/entities/task.entity'
 import { OracleDbService } from '../../../infrastructure/oracle/oracledb' 
 import { envs } from '../../../../../core/config/env'
 import { QueryResult } from 'pg'
 import sql from '../../../../../core/utils/sqltemplatetags'
+import { ID, IFindOptions } from 'src/core/types/types'
 
-export class OracleTaskDatasource implements TaskDatasource {
+export class OracleTaskDatasource implements ITaskDatasource {
+    create(value: Partial<TaskEntity>): Promise<TaskEntity> {
+        throw new Error('Method not implemented.')
+    }
+    createMany(values: Partial<TaskEntity>[]): Promise<TaskEntity[]> {
+        throw new Error('Method not implemented.')
+    }
+    update(id: ID, newValue: Partial<TaskEntity>): Promise<TaskEntity> {
+        throw new Error('Method not implemented.')
+    }
+    delete(id: ID): Promise<any> {
+        throw new Error('Method not implemented.')
+    }
+    find(value: Partial<TaskEntity>, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
+        throw new Error('Method not implemented.')
+    }
+    findOne(id: Partial<TaskEntity> | ID, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity> {
+        throw new Error('Method not implemented.')
+    }
+    exist(id: Partial<TaskEntity> | ID): Promise<boolean> {
+        throw new Error('Method not implemented.')
+    }
     public async getTasks(email: string, status: string): Promise<TaskEntity[]> {
         let _options = { maxRows: 100 }
         const _query = sql`SELECT * FROM TASKS`
