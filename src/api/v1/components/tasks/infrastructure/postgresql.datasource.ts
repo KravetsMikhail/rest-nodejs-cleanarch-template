@@ -1,9 +1,9 @@
 import { type ITaskDatasource } from '../domain/datasources/i.task.datasource'
 import { TaskEntity } from '../domain/entities/task.entity'
 import { PostgreDbService } from '../../../infrastructure/postgresql/postgresql'
-import { envs } from '../../../../../core/config/env'
+import { envs } from '../../../../../config/env'
 import { QueryResult } from 'pg'
-import { ID, IFindOptions } from 'src/core/types/types'
+import { ID, IFindOptions } from 'src/core/domain/types/types'
 
 export class PostgreTaskDatasource implements ITaskDatasource {
     create(value: Partial<TaskEntity>): Promise<TaskEntity> {

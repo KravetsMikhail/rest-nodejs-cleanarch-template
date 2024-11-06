@@ -1,5 +1,5 @@
 import oracledb from 'oracledb'
-import { envs } from '../../../../core/config/env'
+import { envs } from '../../../../config/env'
 import { Logger } from '../../../../core/logger/logger'
 
 class OraclePoolConfig implements oracledb.PoolAttributes {

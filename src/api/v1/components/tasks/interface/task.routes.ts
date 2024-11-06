@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { PostgreTaskDatasource } from '../infrastructure/postgresql.datasource'
 import { OracleTaskDatasource } from '../infrastructure/oracldb.datasource'
-import { TaskRepository } from '../infrastructure/task.repository'
+import { TaskRepository } from '../domain/repositories/task.repository'
 import { TaskController } from './task.controller'
 
 export class TaskRoutesV1 {

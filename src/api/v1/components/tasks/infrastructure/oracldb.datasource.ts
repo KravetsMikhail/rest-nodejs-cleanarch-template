@@ -1,10 +1,10 @@
 import { type ITaskDatasource } from '../domain/datasources/i.task.datasource'
 import { TaskEntity } from '../domain/entities/task.entity'
 import { OracleDbService } from '../../../infrastructure/oracle/oracledb' 
-import { envs } from '../../../../../core/config/env'
+import { envs } from '../../../../../config/env'
 import { QueryResult } from 'pg'
 import sql from '../../../../../core/utils/sqltemplatetags'
-import { ID, IFindOptions } from 'src/core/types/types'
+import { ID, IFindOptions } from 'src/core/domain/types/types'
 
 export class OracleTaskDatasource implements ITaskDatasource {
     create(value: Partial<TaskEntity>): Promise<TaskEntity> {

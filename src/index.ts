@@ -1,4 +1,4 @@
-import { envs } from './core/config/env'
+import { envs } from './config/env'
 import { AppRoutes } from './api/v1/interface/routes'
 import { Server } from './server'
 

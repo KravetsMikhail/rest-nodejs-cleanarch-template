@@ -1,5 +1,5 @@
 import { Pool } from 'pg'
-import { envs } from '../../../../core/config/env'
+import { envs } from '../../../../config/env'
 import { Logger } from '../../../../core/logger/logger'
 import { QueryArrayResult } from "pg"
 

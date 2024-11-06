@@ -1,7 +1,7 @@
-import { ID, IFindOptions } from 'src/core/types/types'
-import { type ITaskDatasource } from '../domain/datasources/i.task.datasource'
-import { type TaskEntity } from '../domain/entities/task.entity'
-import { type ITaskRepository } from '../domain/repositories/i.task.repository'
+import { ID, IFindOptions } from 'src/core/domain/types/types'
+import { type ITaskDatasource } from '../datasources/i.task.datasource'
+import { type TaskEntity } from '../entities/task.entity'
+import { type ITaskRepository } from './i.task.repository'
 
 export class TaskRepository implements ITaskRepository {
     constructor(private readonly datasource: ITaskDatasource) { }
