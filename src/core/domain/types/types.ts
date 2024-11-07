@@ -1,4 +1,5 @@
 export type AnyObject = Record<string, any>
+
 export type ColumnData = string | {
   name: string
   hidden?: boolean

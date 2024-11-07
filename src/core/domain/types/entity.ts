@@ -15,7 +15,6 @@ export abstract class Entity<T> {
     }
 
     public equals(object?: Entity<T>): boolean {
-
         if (object == null || object == undefined) {
             return false;
         }
