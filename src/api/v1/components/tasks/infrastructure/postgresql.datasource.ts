@@ -6,8 +6,17 @@ import { QueryResult } from 'pg'
 import { ID, IFindOptions } from 'src/core/domain/types/types'
 
 export class PostgreTaskDatasource implements ITaskDatasource {
-    create(value: Partial<TaskEntity>): Promise<TaskEntity> {
-        throw new Error('Method not implemented.')
+    async create(value: Partial<TaskEntity>): Promise<TaskEntity> {
+        const _currentDate = new Date().toISOString().replace('T', ' ')
+        let _name = value.name?.value ? value.name.value : "<Нет наименования>"
+        let _search = value.search?.value ? value.search.value : ""
+        let _createdBy = value?.createdBy ? value.createdBy : ""
+        let _updatedBy = value?.updatedBy ? value.updatedBy : ""
+        const values = [_name, _search, _createdBy, _updatedBy, _currentDate, _currentDate ]
+        const response: QueryResult = await PostgreDbService.query(`INSERT INTO ${envs.dbSchema}."Task"(
+            "name", "search", "createdBy", "updatedBy", "createdAt", "updatedAt")
+            VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`, values)
+        return response.rows[0]
     }
     createMany(values: Partial<TaskEntity>[]): Promise<TaskEntity[]> {
         throw new Error('Method not implemented.')
@@ -31,14 +40,14 @@ export class PostgreTaskDatasource implements ITaskDatasource {
         const response: QueryResult = await PostgreDbService.query(`SELECT * FROM ${envs.dbSchema}."Task"`)    
         return response.rows
     }
-    public async createTask(name: string, search: string, userId: number): Promise<TaskEntity> {
+  /*   public async createTask(name: string, search: string, userId: number): Promise<TaskEntity> {
         const _currentDate = new Date().toISOString().replace('T', ' ')
         const values = [name, search, userId.toString(), userId.toString(), _currentDate, _currentDate ]
         const response: QueryResult = await PostgreDbService.query(`INSERT INTO ${envs.dbSchema}."Task"(
             "name", "search", "createdBy", "updatedBy", "createdAt", "updatedAt")
             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`, values)
         return response.rows[0]
-    }
+    } */
     public async deleteTask(id: number): Promise<TaskEntity> {
         const values = [id ? id.toString() : '0']
         const response: QueryResult = await PostgreDbService.query(`DELETE FROM ${envs.dbSchema}."Task" n 

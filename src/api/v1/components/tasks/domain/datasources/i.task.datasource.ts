@@ -11,6 +11,6 @@ export interface ITaskDatasource extends IDataSource<TaskEntity, any> {
     findOne(id: Partial<TaskEntity> | ID, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity> 
     exist(id: Partial<TaskEntity> | ID): Promise<boolean> 
     getTasks(email: string, status: string): Promise<TaskEntity[]>
-    createTask(name: string, search: string, userId: number): Promise<TaskEntity>
+    //createTask(name: string, search: string, userId: number): Promise<TaskEntity>
     deleteTask(id: number): Promise<TaskEntity>
 }

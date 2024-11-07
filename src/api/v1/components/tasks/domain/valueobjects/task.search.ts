@@ -10,8 +10,7 @@ export class TaskSearch extends ValueObject<ITaskSearchProps> {
     }
 
     private constructor( props: ITaskSearchProps) {
-        super(props)
-        
+        super(props)        
     }
 
     public static create( name: string, createdBy: string, updatedBy: string): TaskSearch {

@@ -26,6 +26,18 @@ export class TaskEntity extends AggregateRoot<ITaskProps> {
     get search(): TaskSearch {
         return TaskSearch.create(this.props.name.value, this.props?.createdBy, this.props?.createdBy)
     }
+    get createdBy(): string {
+        return this.props.createdBy
+    }
+    get createdAt(): string {
+        return this.props.createdAt
+    }
+    get updatedBy(): string {
+        return this.props?.updatedBy ? this.props.updatedBy : ""
+    }
+    get updatedAt(): string {
+        return this.props?.updatedAt ? this.props.updatedAt : ""
+    }
 
     private constructor(props: ITaskProps, id?: UniqueEntityId) {
         super(props, id)
