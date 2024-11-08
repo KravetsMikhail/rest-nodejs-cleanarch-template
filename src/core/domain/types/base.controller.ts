@@ -3,8 +3,8 @@ import * as express from 'express'
 
 export abstract class BaseController {
     // or even private
-    protected req: express.Request
-    protected res: express.Response
+    protected req: express.Request | undefined
+    protected res: express.Response | undefined
 
     protected abstract executeImpl(): Promise<void | any>
 
@@ -15,8 +15,8 @@ export abstract class BaseController {
         this.executeImpl()
     }
 
-    public static jsonResponse(res: express.Response, code: number, message: string) {
-        return res.status(code).json({ message })
+    public static jsonResponse(res: express.Response | undefined, code: number, message: string) {
+        return res?.status(code).json({ message })
     }
 
     public ok<T>(res: express.Response, dto?: T) {
@@ -64,8 +64,8 @@ export abstract class BaseController {
     }
 
     public fail(error: Error | string) {
-        console.log(error);
-        return this.res.status(500).json({
+        console.log(error)
+        return this.res?.status(500).json({
             message: error.toString()
         })
     }

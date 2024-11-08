@@ -4,7 +4,7 @@ import { type TaskEntity } from '../domain/entities/task.entity'
 import { GetTasks } from '../usecases/get-tasks.usecase'
 import { CreateTasksUseCase } from '../usecases/create-task.usecase'
 import { DeleteTask } from '../usecases/delete-task.usecase'
-import { CustomRequest } from 'src/core/domain/types/custom.request'
+import { CustomRequest } from '../../../../../core/domain/types/custom.request'
 
 type QueryParams = {
     id: number
@@ -49,8 +49,8 @@ export class TaskController {
     ): void => {
         const userId = ((_req as unknown) as CustomRequest).payload.userId
         new CreateTasksUseCase(this.repository)
-            .execute(_req.body.name, _req.body.search, userId)
-            .then((result) => res.json(result))
+            .execute(_req.body.name, userId)
+            .then((result) => res.json(result.value.getValue()))
             .catch((error) => {
                 next(error)
             })

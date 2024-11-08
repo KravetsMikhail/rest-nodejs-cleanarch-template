@@ -28,6 +28,14 @@ export class Guard {
         }
     }
 
+    public static againstNullOrUndefinedOrEmpty(argument: any, argumentName: string): IGuardResult {
+        if (argument === null || argument === undefined || argument === "") {
+            return { succeeded: false, message: `${argumentName} is null or undefined` }
+        } else {
+            return { succeeded: true }
+        }
+    }
+
     public static againstNullOrUndefinedBulk(args: GuardArgumentCollection): IGuardResult {
         for (let arg of args) {
             const result = this.againstNullOrUndefined(arg.argument, arg.argumentName)
@@ -75,6 +83,14 @@ export class Guard {
             return { succeeded: false, message: `${argumentName} is not within the range.` }
         } else {
             return { succeeded: true }
+        }
+    }
+
+    public static toClearString(value: any){
+        if(value){
+            return value.toString().replace(/<[^>]*>/g, "")
+        }else {
+            return ""
         }
     }
 }

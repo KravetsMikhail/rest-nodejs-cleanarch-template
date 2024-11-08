@@ -1,6 +1,6 @@
-import { ID, IFindOptions } from 'src/core/domain/types/types'
+import { ID, IFindOptions } from '../../../../../../core/domain/types/types'
 import { type TaskEntity } from '../entities/task.entity'
-import { IDataSource } from 'src/core/domain/types/i.datasource'
+import { IDataSource } from '../../../../../../core/domain/types/i.datasource'
 
 export interface ITaskDatasource extends IDataSource<TaskEntity, any> {
     create(value: Partial<TaskEntity>): Promise<TaskEntity> 

@@ -3,7 +3,7 @@ import { TaskEntity } from '../domain/entities/task.entity'
 import { PostgreDbService } from '../../../infrastructure/postgresql/postgresql'
 import { envs } from '../../../../../config/env'
 import { QueryResult } from 'pg'
-import { ID, IFindOptions } from 'src/core/domain/types/types'
+import { ID, IFindOptions } from '../../../../../core/domain/types/types'
 
 export class PostgreTaskDatasource implements ITaskDatasource {
     async create(value: Partial<TaskEntity>): Promise<TaskEntity> {

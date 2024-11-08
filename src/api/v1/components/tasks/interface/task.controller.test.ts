@@ -1,4 +1,4 @@
-import { TaskRepository } from "../infrastructure/task.repository"
+import { TaskRepository } from "../domain/repositories/task.repository"
 import { PostgreTaskDatasource } from "../infrastructure/postgresql.datasource"
 import { generateTasksData } from "../../../../../../test/utils/generate"
 

@@ -4,7 +4,7 @@ import { OracleDbService } from '../../../infrastructure/oracle/oracledb'
 import { envs } from '../../../../../config/env'
 import { QueryResult } from 'pg'
 import sql from '../../../../../core/utils/sqltemplatetags'
-import { ID, IFindOptions } from 'src/core/domain/types/types'
+import { ID, IFindOptions } from '../../../../../core/domain/types/types'
 
 export class OracleTaskDatasource implements ITaskDatasource {
     create(value: Partial<TaskEntity>): Promise<TaskEntity> {

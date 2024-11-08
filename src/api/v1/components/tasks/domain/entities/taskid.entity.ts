@@ -1,6 +1,6 @@
 
-import { Entity } from "src/core/domain/types/entity"
-import { UniqueEntityId } from "src/core/domain/types/uniqueentityid"
+import { Entity } from "../../../../../../core/domain/types/entity"
+import { UniqueEntityId } from "../../../../../../core/domain/types/uniqueentityid"
 
 export class UserId extends Entity<any> {
 

@@ -1,4 +1,4 @@
-import { ID, IFindOptions } from 'src/core/domain/types/types'
+import { ID, IFindOptions } from '../../../../../../core/domain/types/types'
 import { type ITaskDatasource } from '../datasources/i.task.datasource'
 import { TaskEntity } from '../entities/task.entity'
 import { type ITaskRepository } from './i.task.repository'

@@ -1,37 +1,27 @@
 import { TaskEntity } from '../domain/entities/task.entity'
 import { type ITaskRepository } from '../domain/repositories/i.task.repository'
-import { UseCase } from 'src/core/domain/types/i.usecase'
-import { Result, Either, left, right } from 'src/core/domain/types/result'
-import { GenericAppError } from 'src/core/errors/app.error'
+import { IUseCase } from '../../../../../core/domain/types/i.usecase'
+import { Result, Either, left, right } from '../../../../../core/domain/types/result'
+import { GenericAppError } from '../../../../../core/errors/app.error'
 import { TaskSearch } from '../domain/valueobjects/task.search'
 import { TaskName } from '../domain/valueobjects/task.name'
-
-// export interface CreateTasksUseCase {
-//     execute: (name: string, search: string, userId: number) => Promise<TaskEntity>
-// }
-
-//export class CreateTask implements CreateTasksUseCase {
-
-interface CreateTaskDTO {
-    name: string,
-    search: string,
-    createdBy: string,
-    updatedBy: string
-}
 
 type Response = Either<
     GenericAppError.UnexpectedError |
     Result<any>,
-    Result<void>
+    Result<TaskEntity>
 >
 
-export class CreateTasksUseCase implements UseCase<CreateTaskDTO, Promise<Response>> {
+export class CreateTasksUseCase implements IUseCase<Promise<Response>> {
     constructor(private readonly repository: ITaskRepository) { }
 
-    async execute(req: CreateTaskDTO): Promise<Response> {
-        const { name, createdBy, updatedBy } = req
+    async execute(name: string, userId: number): Promise<Response> {
+        const _createdBy = userId.toString()
+        const _updatedBy = userId.toString()
         const _name = TaskName.create(name)
-        const _search = TaskSearch.create(name, createdBy, updatedBy)
+        const _nameString = _name.getValue()?.value as string
+        console.log(_nameString)
+        const _search = TaskSearch.create(_nameString, _createdBy, _updatedBy)
 
         const combinedPropsResult = Result.combine([_name])
 
@@ -40,10 +30,10 @@ export class CreateTasksUseCase implements UseCase<CreateTaskDTO, Promise<Respon
         }
 
         const _task = TaskEntity.create({
-            name: _name?.getValue as TaskName,
+            name: _name?.getValue() as TaskName,
             search: _search.value,
-            createdBy: createdBy,
-            updatedBy: updatedBy,
+            createdBy: _createdBy,
+            updatedBy: _updatedBy,
         })
 
         if (_task.isFailure) {
@@ -59,8 +49,6 @@ export class CreateTasksUseCase implements UseCase<CreateTaskDTO, Promise<Respon
             return left(new GenericAppError.UnexpectedError(err)) as Response
         }
 
-        return right(Result.ok<void>()) as Response
-
-        //return await this.repository.createTask(name, search, userId)
+        return right(Result.ok<TaskEntity>(newTask as TaskEntity)) as Response
     }
 }
