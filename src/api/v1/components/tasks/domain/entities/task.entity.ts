@@ -1,6 +1,6 @@
 import { IDomainEvent } from '../../../../../../core/domain/events/i.domain.event'
 import { UniqueEntityId } from '../../../../../../core/domain/types/uniqueentityid'
-import { ValidationError } from '../../../../../../core/errors/validation.error'
+import { ValidationError, ValidationType } from '../../../../../../core/errors/validation.error'
 import { AggregateRoot } from '../../../../../../core/domain/types/aggregate.root'
 import { TaskName } from '../valueobjects/task.name'
 import { TaskSearch } from '../valueobjects/task.search'
@@ -44,25 +44,23 @@ export class TaskEntity extends AggregateRoot<ITaskProps> {
     }
 
     public static create(props: ITaskProps, id?: UniqueEntityId): Result<TaskEntity> {
+        const guardedProps = [
+            { argument: props.name, argumentName: 'name' },
+        ]
 
-        // const guardedProps = [
-        //     { argument: props.name, argumentName: 'name' },
-        //     // { argument: props.lastName, argumentName: 'lastName' },
-        //     // { argument: props.email, argumentName: 'email' },
-        //     // { argument: props.isEmailVerified, argumentName: 'isEmailVerified' }
-        // ]
-
-        // const guardResult = Guard.againstNullOrUndefinedBulk(guardedProps)
-
-        // if (!guardResult.succeeded) {
-        //     return Result.fail<TaskEntity>(guardResult.message)
-        // }
-        // else {
+        const guardResult = Guard.againstNullOrUndefinedBulk(guardedProps)
+        
+        if (!guardResult.succeeded) {
+            return Result.fail<TaskEntity, ValidationError>(
+                new ValidationError([{fields: ["name"], constraint: guardResult.message as string}])
+            )
+        }
+        else {
             const task = new TaskEntity({
                 ...props,
             }, id)
 
             return Result.ok<TaskEntity>(task)
-        //}
+        }
     }
 }

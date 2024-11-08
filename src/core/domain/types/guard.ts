@@ -22,7 +22,7 @@ export class Guard {
 
     public static againstNullOrUndefined(argument: any, argumentName: string): IGuardResult {
         if (argument === null || argument === undefined) {
-            return { succeeded: false, message: `${argumentName} is null or undefined` }
+            return { succeeded: false, message: `Поле ${argumentName} не может быть пустым или отсутствовать` }
         } else {
             return { succeeded: true }
         }
@@ -30,7 +30,7 @@ export class Guard {
 
     public static againstNullOrUndefinedOrEmpty(argument: any, argumentName: string): IGuardResult {
         if (argument === null || argument === undefined || argument === "") {
-            return { succeeded: false, message: `${argumentName} is null or undefined` }
+            return { succeeded: false, message: `Поле ${argumentName} не может отсутствовать` }
         } else {
             return { succeeded: true }
         }
@@ -58,7 +58,7 @@ export class Guard {
         } else {
             return {
                 succeeded: false,
-                message: `${argumentName} isn't oneOf the correct types in ${JSON.stringify(validValues)}. Got "${value}".`
+                message: `Поле ${argumentName} не является одним из правильных типов в ${JSON.stringify(validValues)}. Значение "${value}".`
             }
         }
     }
@@ -66,7 +66,7 @@ export class Guard {
     public static inRange(num: number, min: number, max: number, argumentName: string): IGuardResult {
         const isInRange = num >= min && num <= max
         if (!isInRange) {
-            return { succeeded: false, message: `${argumentName} is not within range ${min} to ${max}.` }
+            return { succeeded: false, message: `Поле ${argumentName} не находится в пределах диапозона с ${min} по ${max}.` }
         } else {
             return { succeeded: true }
         }

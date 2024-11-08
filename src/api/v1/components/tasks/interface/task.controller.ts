@@ -5,6 +5,7 @@ import { GetTasks } from '../usecases/get-tasks.usecase'
 import { CreateTasksUseCase } from '../usecases/create-task.usecase'
 import { DeleteTask } from '../usecases/delete-task.usecase'
 import { CustomRequest } from '../../../../../core/domain/types/custom.request'
+import { error } from 'console'
 
 type QueryParams = {
     id: number
@@ -50,7 +51,17 @@ export class TaskController {
         const userId = ((_req as unknown) as CustomRequest).payload.userId
         new CreateTasksUseCase(this.repository)
             .execute(_req.body.name, userId)
-            .then((result) => res.json(result.value.getValue()))
+            .then((result) => {
+                console.log(result)
+                if (result.isLeft()) {                    
+                    const error = result.value
+                    next(error.errorValue())
+                    //console.log(error)
+                    //let _err = new Error(error.error)
+                    //return res.status(400).json(error.error)
+                } 
+                return res.json((result as any).value.getValue())                               
+            })
             .catch((error) => {
                 next(error)
             })
@@ -67,7 +78,7 @@ export class TaskController {
             _id = _req.params.id
         } else if (_req && _req.query) {
             //console.log("query => ", _req.query)      
-            _id = (_req.query as QueryParams).id      
+            _id = (_req.query as QueryParams).id
         }
         else {
             return

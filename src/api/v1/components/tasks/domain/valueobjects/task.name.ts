@@ -19,7 +19,7 @@ export class TaskName extends ValueObject<TaskNameProps> {
     public static create(name: string): Result<TaskName> {
         const guardResult = Guard.againstNullOrUndefinedOrEmpty(name, 'name')
         if (!guardResult.succeeded) {
-            return Result.fail<TaskName>(guardResult.message)
+            return Result.fail<TaskName, any>(guardResult.message)
         } else {
             return Result.ok<TaskName>(new TaskName({ value: Guard.toClearString(name) }))
         }

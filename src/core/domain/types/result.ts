@@ -5,7 +5,7 @@ export class Result<T> {
     public error: T | string | undefined
     private _value: T | undefined
 
-    public constructor(isSuccess: boolean, error?: T | string, value?: T) {
+    public constructor(isSuccess: boolean, error?: T | any | string, value?: T) {
         if (isSuccess && error) {
             throw new Error("InvalidOperation: A result cannot be successful and contain an error");
         }
@@ -38,15 +38,15 @@ export class Result<T> {
         return new Result<U>(true, undefined, value)
     }
 
-    public static fail<U>(error: any): Result<U> {
-        return new Result<U>(false, error)
+    public static fail<U, E>(error: any): Result<U> {
+        return new Result<U>(false, error as E)
     }
 
     public static combine(results: Result<any>[]): Result<any> {
         for (let result of results) {
             if (result.isFailure) return result
         }
-        return Result.ok();
+        return Result.ok()
     }
 }
 

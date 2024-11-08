@@ -19,14 +19,16 @@ export class CreateTasksUseCase implements IUseCase<Promise<Response>> {
         const _createdBy = userId.toString()
         const _updatedBy = userId.toString()
         const _name = TaskName.create(name)
+        if(_name.isFailure) {
+            return left(Result.fail<void, void>(_name.error)) as Response
+        }
         const _nameString = _name.getValue()?.value as string
-        console.log(_nameString)
         const _search = TaskSearch.create(_nameString, _createdBy, _updatedBy)
 
         const combinedPropsResult = Result.combine([_name])
 
         if (combinedPropsResult.isFailure) {
-            return left(Result.fail<void>(combinedPropsResult.error)) as Response
+            return left(Result.fail<void, void>(combinedPropsResult.error)) as Response
         }
 
         const _task = TaskEntity.create({
@@ -37,7 +39,7 @@ export class CreateTasksUseCase implements IUseCase<Promise<Response>> {
         })
 
         if (_task.isFailure) {
-            return left(Result.fail<void>(combinedPropsResult.error)) as Response
+            return left(Result.fail<void, void>(combinedPropsResult.error)) as Response
         }
 
         const task: TaskEntity = _task.getValue() as TaskEntity
