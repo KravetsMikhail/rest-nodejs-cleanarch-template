@@ -1,0 +1,1 @@
+export type KafkaChannel = 'growth' | 'support'

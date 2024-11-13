@@ -56,9 +56,6 @@ export class TaskController {
                 if (result.isLeft()) {                    
                     const error = result.value
                     next(error.errorValue())
-                    //console.log(error)
-                    //let _err = new Error(error.error)
-                    //return res.status(400).json(error.error)
                 } 
                 return res.json((result as any).value.getValue())                               
             })
@@ -74,10 +71,8 @@ export class TaskController {
     ): void => {
         let _id = 0
         if (_req && _req.query && _req.params && Object.keys(_req.query).length === 0 && _req.query.constructor === Object) {
-            //console.log("params => ", _req.params)   
             _id = _req.params.id
         } else if (_req && _req.query) {
-            //console.log("query => ", _req.query)      
             _id = (_req.query as QueryParams).id
         }
         else {
