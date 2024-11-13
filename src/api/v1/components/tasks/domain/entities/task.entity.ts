@@ -1,4 +1,3 @@
-import { IDomainEvent } from '../../../../../../core/domain/events/i.domain.event'
 import { UniqueEntityId } from '../../../../../../core/domain/types/uniqueentityid'
 import { ValidationError, ValidationType } from '../../../../../../core/errors/validation.error'
 import { AggregateRoot } from '../../../../../../core/domain/types/aggregate.root'
@@ -6,8 +5,9 @@ import { TaskName } from '../valueobjects/task.name'
 import { TaskSearch } from '../valueobjects/task.search'
 import { Result } from '../../../../../../core/domain/types/result'
 import { Guard } from '../../../../../../core/domain/types/guard'
+import { TaskCreatedEvent } from '../events/task.created.events'
 
-interface ITaskProps {
+export interface ITaskProps {
     name: TaskName,
     search: string,
     createdBy: string,
@@ -59,6 +59,8 @@ export class TaskEntity extends AggregateRoot<ITaskProps> {
             const task = new TaskEntity({
                 ...props,
             }, id)
+
+            task.addDomainEvent(new TaskCreatedEvent(task))
 
             return Result.ok<TaskEntity>(task)
         }

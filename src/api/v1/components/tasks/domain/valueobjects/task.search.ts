@@ -10,12 +10,12 @@ export class TaskSearch extends ValueObject<ITaskSearchProps> {
         return this.props.value
     }
 
-    private constructor( props: ITaskSearchProps) {
-        super(props)        
+    private constructor(props: ITaskSearchProps) {
+        super(props)
     }
 
-    public static create( name: string, createdBy: string, updatedBy: string): TaskSearch {
+    public static create(name: string, createdBy: string, updatedBy: string): TaskSearch {
         let _value = `${Helpers.toStrToLowAndRemSpaces(name)}${Helpers.toStrToLowAndRemSpaces(createdBy)}${Helpers.toStrToLowAndRemSpaces(updatedBy)}`
-        return new TaskSearch(new TaskSearch({value: _value}))
+        return new TaskSearch(new TaskSearch({ value: _value }))
     }
 }

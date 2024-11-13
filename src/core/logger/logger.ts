@@ -1,5 +1,5 @@
 //const { config } = require('../config/environments/' + process.env.TEST_ENV)
-const { config } = require('../config/logconfig')
+const { config } = require('../../config/logconfig')
 import expressWinston from 'express-winston'
 import winston from 'winston'
 import DailyRotateFile from 'winston-daily-rotate-file'
