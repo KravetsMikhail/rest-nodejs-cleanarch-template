@@ -49,7 +49,7 @@ export class DomainEvents {
 
         if (aggregate) {
             this.dispatchAggregateEvents(aggregate)
-            aggregate.clearEvents();
+            aggregate.clearEvents()
             this.removeAggregateFromMarkedDispatchList(aggregate)
         }
     }

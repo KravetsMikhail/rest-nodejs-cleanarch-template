@@ -4,11 +4,11 @@ import { TaskEntity } from "../entities/task.entity"
 
 export class TaskCreatedEvent implements IDomainEvent {
     public dateTimeOccurred: Date
-    private task: TaskEntity | undefined
+    public task: TaskEntity
 
-    constructor(task?: TaskEntity) {
+    constructor(task: TaskEntity) {
         this.dateTimeOccurred = new Date()
-        this.task = task ? task : undefined
+        this.task = task
     }
 
     getAggregateId(): UniqueEntityId {

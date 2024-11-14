@@ -52,7 +52,6 @@ export class TaskController {
         new CreateTasksUseCase(this.repository)
             .execute(_req.body.name, userId)
             .then((result) => {
-                console.log(result)
                 if (result.isLeft()) {                    
                     const error = result.value
                     next(error.errorValue())

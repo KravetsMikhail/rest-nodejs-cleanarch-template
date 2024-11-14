@@ -14,6 +14,7 @@ import serveFavicon = require('serve-favicon')
 import path = require('path')
 import YAML from 'yaml'
 import fs from 'fs'
+import "./core/subscribers"
 
 interface ServerOptions {
     host: String

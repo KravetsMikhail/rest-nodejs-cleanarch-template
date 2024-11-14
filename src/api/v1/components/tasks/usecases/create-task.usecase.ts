@@ -5,6 +5,8 @@ import { Result, Either, left, right } from '../../../../../core/domain/types/re
 import { GenericAppError } from '../../../../../core/errors/app.error'
 import { TaskSearch } from '../domain/valueobjects/task.search'
 import { TaskName } from '../domain/valueobjects/task.name'
+import { UniqueEntityId } from '../../../../../core/domain/types/uniqueentityid'
+import { DomainEvents } from '../../../../../core/domain/events/domain.events'
 
 type Response = Either<
     GenericAppError.UnexpectedError |
@@ -30,13 +32,13 @@ export class CreateTasksUseCase implements IUseCase<Promise<Response>> {
         if (combinedPropsResult.isFailure) {
             return left(Result.fail<void, void>(combinedPropsResult.error)) as Response
         }
-
+        const _id = new UniqueEntityId()
         const _task = TaskEntity.create({
             name: _name?.getValue() as TaskName,
             search: _search.value,
             createdBy: _createdBy,
             updatedBy: _updatedBy,
-        })
+        }, _id)
 
         if (_task.isFailure) {
             return left(Result.fail<void, void>(combinedPropsResult.error)) as Response
@@ -47,6 +49,7 @@ export class CreateTasksUseCase implements IUseCase<Promise<Response>> {
 
         try {
             newTask = await this.repository.create(task)
+            DomainEvents.dispatchEventsForAggregate(_id)
         }catch(err){
             return left(new GenericAppError.UnexpectedError(err)) as Response
         }

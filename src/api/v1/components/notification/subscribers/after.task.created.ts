@@ -4,6 +4,7 @@ import { DomainEvents } from "../../../../../core/domain/events/domain.events"
 import { TaskCreatedEvent } from "../../tasks/domain/events/task.created.events"
 import { NotifyKafkaChannel } from "../usecases/notify.kafka.channel"
 import { TaskEntity } from "../../tasks/domain/entities/task.entity"
+import { IDomainEvent } from "src/core/domain/events/i.domain.event"
 
 export class AfterTaskCreated implements IHandle<TaskCreatedEvent> {
     private notifyKafkaChannel: NotifyKafkaChannel
@@ -15,16 +16,14 @@ export class AfterTaskCreated implements IHandle<TaskCreatedEvent> {
 
     setupSubscriptions(): void {
         DomainEvents.register(this.onTaskCreatedEvent.bind(this), TaskCreatedEvent.name)
-       // DomainEvents.register(() => this.onTaskCreatedEvent(), TaskCreatedEvent.name)
     }
 
     private craftKafkaMessage(task: TaskEntity): string {
-        return `Создана новая задача => ${task.name}\n
-      Создал: ${task.createdBy}.`
+        return `Создана новая задача => ${task.name}\nСоздал: ${task.createdBy}.`
     }
 
-    private async onTaskCreatedEvent(event: TaskCreatedEvent): Promise<void> {
-        const { task } = event
+    private async onTaskCreatedEvent(event: IDomainEvent): Promise<void> {
+        const { task } = event as TaskCreatedEvent
 
         try {
             await this.notifyKafkaChannel.execute(
