@@ -19,7 +19,7 @@ export class AfterTaskCreated implements IHandle<TaskCreatedEvent> {
     }
 
     private craftKafkaMessage(task: TaskEntity): string {
-        return `Создана новая задача => ${task.name}\nСоздал: ${task.createdBy}.`
+        return `Создана новая задача => ${task.name.value} Создал: ${task.createdBy}.`
     }
 
     private async onTaskCreatedEvent(event: IDomainEvent): Promise<void> {
@@ -27,7 +27,7 @@ export class AfterTaskCreated implements IHandle<TaskCreatedEvent> {
 
         try {
             await this.notifyKafkaChannel.execute(
-                'growth', this.craftKafkaMessage(task)
+                'createtask', this.craftKafkaMessage(task)
             )
         } catch (err) {
 

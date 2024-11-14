@@ -23,4 +23,6 @@ export class envs {
 	public static oracleDbPoolincrement = <number>Number(process.env.ORACLE_DB_POOLINCREMENT)
 	public static oracleDbPoolpinginterval = <number>Number(process.env.ORACLE_DB_POOLPINGINTERVAL)
 	public static oracleDbPooltimeout = <number>Number(process.env.ORACLE_DB_POOLTIMEOUT)
+	public static kafkaClientId = <string>process.env.KAFKA_CLIENTID
+	public static kafkaBrokers = JSON.parse(process.env.KAFKA_BROKERS as string) as Array<string>
 }

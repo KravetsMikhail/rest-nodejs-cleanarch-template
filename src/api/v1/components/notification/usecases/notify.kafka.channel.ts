@@ -1,6 +1,6 @@
 
 import { IUseCase } from "../../../../../core/domain/types/i.usecase"
-import { KafkaChannel } from "../domain/kafka.channel"
+import { KafkaTopic } from "../domain/kafka.topic"
 import { IKafkaService } from "../services/kafka.service"
 
 export class NotifyKafkaChannel implements IUseCase<Promise<void>> {
@@ -10,7 +10,7 @@ export class NotifyKafkaChannel implements IUseCase<Promise<void>> {
         this.kafkaService = kafkaService
     }
 
-    async execute(channel: KafkaChannel, message: string): Promise<void> {
-        await this.kafkaService.sendMessage(message, channel)
+    async execute(topic: KafkaTopic, message: string): Promise<void> {
+        await this.kafkaService.sendMessage(message, topic)
     }
 }
