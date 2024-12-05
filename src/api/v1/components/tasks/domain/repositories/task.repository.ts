@@ -14,8 +14,8 @@ export class TaskRepository implements ITaskRepository {
     update(id: ID, newValue: Partial<TaskEntity>): Promise<TaskEntity> {
         throw new Error('Method not implemented.')
     }
-    delete(id: ID): Promise<any> {
-        throw new Error('Method not implemented.')
+    async delete(id: ID): Promise<any> {
+        return await this.datasource.delete(id)
     }
     find(value: Partial<TaskEntity>, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
         throw new Error('Method not implemented.')
@@ -32,7 +32,7 @@ export class TaskRepository implements ITaskRepository {
     // async createTask(name: string, search: string, userId: number): Promise<TaskEntity> {
     //     return await this.datasource.createTask(name, search, userId)
     // }
-    async deleteTask(id: number): Promise<TaskEntity> {
-        return await this.datasource.deleteTask(id)
-    }
+    //async deleteTask(id: number): Promise<TaskEntity> {
+    //    return await this.datasource.deleteTask(id)
+    //}
 }

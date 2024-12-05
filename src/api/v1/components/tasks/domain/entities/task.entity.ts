@@ -6,6 +6,7 @@ import { TaskSearch } from '../valueobjects/task.search'
 import { Result } from '../../../../../../core/domain/types/result'
 import { Guard } from '../../../../../../core/domain/types/guard'
 import { TaskCreatedEvent } from '../events/task.created.events'
+import { TaskDeletedEvent } from '../events/task.deleted.events'
 
 export interface ITaskProps {
     name: TaskName,
@@ -14,6 +15,11 @@ export interface ITaskProps {
     createdAt?: Date,
     updatedBy?: string,
     updatedAt?: Date
+}
+
+export interface IDeletedTaskProps {
+    deletedBy: string,
+    deletedAt: Date
 }
 
 export class TaskEntity extends AggregateRoot<ITaskProps> {
@@ -66,3 +72,38 @@ export class TaskEntity extends AggregateRoot<ITaskProps> {
         }
     }
 }
+
+export class DeletedTaskEntity extends AggregateRoot<IDeletedTaskProps> {
+    get id(): UniqueEntityId {
+        return this._id
+    }
+    get deletedBy(): string {
+        return this.props.deletedBy
+    }
+    get deletedAt(): Date {
+        return this.props?.deletedAt ? this.props.deletedAt : new Date()
+    }
+
+    private constructor(props: IDeletedTaskProps, id?: UniqueEntityId) {
+        super(props, id)
+    }
+
+    public static delete(id: UniqueEntityId, userId: string): Result<DeletedTaskEntity> {
+        const guardResult =  Guard.againstNullOrUndefinedOrEmpty(id, "id")
+
+        if (!guardResult.succeeded) {
+            return Result.fail<DeletedTaskEntity, ValidationError>(
+                new ValidationError([{fields: ["id"], constraint: guardResult.message as string}])
+            )
+        }
+        else {
+            const deltask = new DeletedTaskEntity({
+                deletedAt: new Date(),
+                deletedBy: userId,
+            }, id)
+            deltask.addDomainEvent(new TaskDeletedEvent(deltask))
+            return Result.ok<DeletedTaskEntity>(deltask)
+        }
+    }
+}
+

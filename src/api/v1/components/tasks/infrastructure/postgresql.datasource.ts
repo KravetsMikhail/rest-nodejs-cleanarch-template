@@ -24,8 +24,11 @@ export class PostgreTaskDatasource implements ITaskDatasource {
     update(id: ID, newValue: Partial<TaskEntity>): Promise<TaskEntity> {
         throw new Error('Method not implemented.')
     }
-    delete(id: ID): Promise<any> {
-        throw new Error('Method not implemented.')
+    async delete(id: ID): Promise<any> {
+        const values = [id ? id.toString() : '0']
+        const response: QueryResult = await PostgreDbService.query(`DELETE FROM ${envs.dbSchema}."Task" n 
+                                        WHERE n."id"=$1 RETURNING *;`, values)
+        return response.rows[0]
     }
     find(value: Partial<TaskEntity>, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
         throw new Error('Method not implemented.')
@@ -40,11 +43,11 @@ export class PostgreTaskDatasource implements ITaskDatasource {
         const response: QueryResult = await PostgreDbService.query(`SELECT * FROM ${envs.dbSchema}."Task"`)    
         return response.rows
     }
-    public async deleteTask(id: number): Promise<TaskEntity> {
-        const values = [id ? id.toString() : '0']
-        const response: QueryResult = await PostgreDbService.query(`DELETE FROM ${envs.dbSchema}."Task" n 
-                                        WHERE n."id"=$1 RETURNING *;`, values)
-        return response.rows[0]
-    }
+    // public async deleteTask(id: number): Promise<TaskEntity> {
+    //     const values = [id ? id.toString() : '0']
+    //     const response: QueryResult = await PostgreDbService.query(`DELETE FROM ${envs.dbSchema}."Task" n 
+    //                                     WHERE n."id"=$1 RETURNING *;`, values)
+    //     return response.rows[0]
+    // }
 
 }

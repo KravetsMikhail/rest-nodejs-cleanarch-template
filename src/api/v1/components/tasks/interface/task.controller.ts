@@ -3,7 +3,7 @@ import { type ITaskRepository } from '../domain/repositories/i.task.repository'
 import { type TaskEntity } from '../domain/entities/task.entity'
 import { GetTasks } from '../usecases/get-tasks.usecase'
 import { CreateTasksUseCase } from '../usecases/create-task.usecase'
-import { DeleteTask } from '../usecases/delete-task.usecase'
+import { DeleteTasksUseCase } from '../usecases/delete-task.usecase'
 import { CustomRequest } from '../../../../../core/domain/types/custom.request'
 import { error } from 'console'
 
@@ -77,9 +77,16 @@ export class TaskController {
         else {
             return
         }
-        new DeleteTask(this.repository)
-            .execute(_req.params.id)
-            .then((result) => res.json(result))
+        const userId = ((_req as unknown) as CustomRequest).payload.userId
+        new DeleteTasksUseCase(this.repository)
+            .execute(_req.params.id, userId)
+            .then((result) => {
+                if (result.isLeft()) {                    
+                    const error = result.value
+                    next(error.errorValue())
+                } 
+                return res.json((result as any).value.getValue())                               
+            })
             .catch((error) => {
                 next(error)
             })

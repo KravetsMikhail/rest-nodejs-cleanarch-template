@@ -8,7 +8,7 @@ afterEach(() => {
 
 describe("TaskRepository", () => {
     describe("getTasks", () => {
-        test("should return empty array", async () => {
+        test("Должен вернуть пустой объект", async () => {
             const repo = new TaskRepository(new PostgreTaskDatasource)
             const spy = jest
                 .spyOn(repo, "getTasks")
@@ -20,7 +20,7 @@ describe("TaskRepository", () => {
             spy.mockRestore()
         })
 
-        test("should return tasks list", async () => {
+        test("Должен вернуть список задач", async () => {
             const tasksData = generateTasksData(10)
             const repo = new TaskRepository(new PostgreTaskDatasource)
             const spy = jest
