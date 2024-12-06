@@ -1,11 +1,11 @@
 import { type NextFunction, type Request, type Response } from 'express'
 import { type ITaskRepository } from '../domain/repositories/i.task.repository'
 import { type TaskEntity } from '../domain/entities/task.entity'
-import { GetTasks } from '../usecases/get-tasks.usecase'
+import { GetTasksUseCase } from '../usecases/get-tasks.usecase'
 import { CreateTasksUseCase } from '../usecases/create-task.usecase'
 import { DeleteTasksUseCase } from '../usecases/delete-task.usecase'
 import { CustomRequest } from '../../../../../core/domain/types/custom.request'
-import { error } from 'console'
+import { Helpers } from '../../../../../core/utils/helpers'
 
 type QueryParams = {
     id: number
@@ -28,16 +28,29 @@ export class TaskController {
         next: NextFunction
     ): void => {
         if (_req && _req.query && _req.params && Object.keys(_req.query).length === 0 && _req.query.constructor === Object) {
-            //console.log("params => ", _req.params)   
+            console.log("params => ", _req.params)   
         } else if (_req && _req.query) {
-            //console.log("query => ", _req.query)            
+            console.log("query => ", _req.query)            
         }
         else {
             return
         }
-        new GetTasks(this.repository)
+
+        let findOptions = Helpers.getFilters(_req.query)
+
+        console.log("findOptions = ", findOptions)
+
+        return 
+
+        new GetTasksUseCase(this.repository)
             .execute(_req.route.email, _req.route.status)
-            .then((result) => res.json(result))
+            .then((result) => {
+                if (result.isLeft()) {                    
+                    const error = result.value
+                    next(error.errorValue())
+                } 
+                return res.json((result as any).value.getValue())            
+            })
             .catch((error) => {
                 next(error)
             })

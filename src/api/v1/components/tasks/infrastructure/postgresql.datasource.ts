@@ -6,6 +6,9 @@ import { QueryResult } from 'pg'
 import { ID, IFindOptions } from '../../../../../core/domain/types/types'
 
 export class PostgreTaskDatasource implements ITaskDatasource {
+    findAll(options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
+        throw new Error('Method not implemented.')
+    }
     async create(value: Partial<TaskEntity>): Promise<TaskEntity> {
         const _currentDate = new Date().toISOString().replace('T', ' ')
         let _name = value.name?.value ? value.name.value : "<Нет наименования>"
