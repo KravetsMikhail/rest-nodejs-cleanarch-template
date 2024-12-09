@@ -4,11 +4,9 @@ import { PostgreDbService } from '../../../infrastructure/postgresql/postgresql'
 import { envs } from '../../../../../config/env'
 import { QueryResult } from 'pg'
 import { ID, IFindOptions } from '../../../../../core/domain/types/types'
+import { GetReflectionTypes } from '../../../../../core/domain/types/reflections'
 
 export class PostgreTaskDatasource implements ITaskDatasource {
-    findAll(options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
-        throw new Error('Method not implemented.')
-    }
     async create(value: Partial<TaskEntity>): Promise<TaskEntity> {
         const _currentDate = new Date().toISOString().replace('T', ' ')
         let _name = value.name?.value ? value.name.value : "<Нет наименования>"
@@ -33,8 +31,16 @@ export class PostgreTaskDatasource implements ITaskDatasource {
                                         WHERE n."id"=$1 RETURNING *;`, values)
         return response.rows[0]
     }
-    find(value: Partial<TaskEntity>, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
-        throw new Error('Method not implemented.')
+    // find(value: Partial<TaskEntity>, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
+    //     throw new Error('Method not implemented.')
+    // }
+    async find(options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
+        console.log(options)
+
+        GetReflectionTypes(TaskEntity)
+        
+        const response: QueryResult = await PostgreDbService.query(`SELECT * FROM ${envs.dbSchema}."Task"`)    
+        return response.rows
     }
     findOne(id: Partial<TaskEntity> | ID, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity> {
         throw new Error('Method not implemented.')

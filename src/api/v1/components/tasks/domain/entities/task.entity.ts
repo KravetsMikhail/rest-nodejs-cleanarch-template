@@ -7,6 +7,7 @@ import { Result } from '../../../../../../core/domain/types/result'
 import { Guard } from '../../../../../../core/domain/types/guard'
 import { TaskCreatedEvent } from '../events/task.created.events'
 import { TaskDeletedEvent } from '../events/task.deleted.events'
+import { Types, Type, ID } from '../../../../../../core/domain/types/reflections'
 
 export interface ITaskProps {
     name: TaskName,
@@ -23,24 +24,31 @@ export interface IDeletedTaskProps {
 }
 
 export class TaskEntity extends AggregateRoot<ITaskProps> {
+    @ID
     get id(): UniqueEntityId {
         return this._id
     }
+    @Type(Types.String)
     get name(): TaskName {
         return this.props.name
     }
+    @Type(Types.String)
     get search(): TaskSearch {
         return TaskSearch.create(this.props.name.value, this.props?.createdBy, this.props?.createdBy)
     }
+    @Type(Types.String)
     get createdBy(): string {
         return this.props.createdBy
     }
+    @Type(Types.Date)
     get createdAt(): Date {
         return this.props?.createdAt ? this.props.createdAt : new Date()
     }
+    @Type(Types.String)
     get updatedBy(): string {
         return this.props?.updatedBy ? this.props.updatedBy : ""
     }
+    @Type(Types.Date)
     get updatedAt(): Date {
         return this.props?.updatedAt ? this.props.updatedAt : new Date()
     }

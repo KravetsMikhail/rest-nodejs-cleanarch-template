@@ -1,4 +1,4 @@
-import { Op } from "../domain/types/types"
+import { IFindOptions, Op } from "../domain/types/types"
 
 export class Helpers {
     public static toStrToLowAndRemSpaces(value: any): string {
@@ -16,5 +16,9 @@ export class Helpers {
                 value
             })),
         }
+    }
+
+    public static getWhereForPostgreSql(model: any, options: IFindOptions<any, any>){
+        
     }
 }

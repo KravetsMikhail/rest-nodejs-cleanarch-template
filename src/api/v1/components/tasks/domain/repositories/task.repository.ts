@@ -5,6 +5,7 @@ import { type ITaskRepository } from './i.task.repository'
 
 export class TaskRepository implements ITaskRepository {
     constructor(private readonly datasource: ITaskDatasource) { }
+
     async create(value: Partial<TaskEntity>): Promise<TaskEntity> {
         return await this.datasource.create(value)
     }
@@ -17,8 +18,11 @@ export class TaskRepository implements ITaskRepository {
     async delete(id: ID): Promise<any> {
         return await this.datasource.delete(id)
     }
-    find(value: Partial<TaskEntity>, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
-        throw new Error('Method not implemented.')
+    // find(value: Partial<TaskEntity>, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
+    //     throw new Error('Method not implemented.')
+    // }
+    async find(options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
+        return await  this.datasource.find(options)
     }
     findOne(id: ID | Partial<TaskEntity>, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity> {
         throw new Error('Method not implemented.')
@@ -26,9 +30,9 @@ export class TaskRepository implements ITaskRepository {
     exist(id: ID | Partial<TaskEntity>): Promise<boolean> {
         throw new Error('Method not implemented.')
     }
-    async getTasks(email: string, status: string): Promise<TaskEntity[]> {
-        return await this.datasource.getTasks(email, status)
-    }
+    // async getTasks(email: string, status: string): Promise<TaskEntity[]> {
+    //     return await this.datasource.getTasks(email, status)
+    // }
     // async createTask(name: string, search: string, userId: number): Promise<TaskEntity> {
     //     return await this.datasource.createTask(name, search, userId)
     // }

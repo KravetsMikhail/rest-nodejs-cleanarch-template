@@ -7,9 +7,6 @@ import sql from '../../../../../core/utils/sqltemplatetags'
 import { ID, IFindOptions } from '../../../../../core/domain/types/types'
 
 export class OracleTaskDatasource implements ITaskDatasource {
-    findAll(options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
-        throw new Error('Method not implemented.')
-    }
     async create(value: Partial<TaskEntity>): Promise<TaskEntity> {
         const _currentDate = new Date().toISOString().replace('T', ' ')
         let _name = value.name?.value ? value.name.value : "<Нет наименования>"
@@ -39,8 +36,14 @@ END;`, values)
                                         WHERE n."id"=$1 RETURNING *;`, values)
         return response.rows[0]
     }
-    find(value: Partial<TaskEntity>, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
-        throw new Error('Method not implemented.')
+    // find(value: Partial<TaskEntity>, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
+    //     throw new Error('Method not implemented.')
+    // }
+    async find(options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
+        let _options = { maxRows: 100 }
+        const _query = sql`SELECT * FROM TASKS`
+        const response: QueryResult = await OracleDbService.query(_query, _options)
+        return response.rows
     }
     findOne(id: Partial<TaskEntity> | ID, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity> {
         throw new Error('Method not implemented.')
@@ -48,12 +51,12 @@ END;`, values)
     exist(id: Partial<TaskEntity> | ID): Promise<boolean> {
         throw new Error('Method not implemented.')
     }
-    public async getTasks(email: string, status: string): Promise<TaskEntity[]> {
-        let _options = { maxRows: 100 }
-        const _query = sql`SELECT * FROM TASKS`
-        const response: QueryResult = await OracleDbService.query(_query, _options)
-        return response.rows
-    }
+    // public async getTasks(email: string, status: string): Promise<TaskEntity[]> {
+    //     let _options = { maxRows: 100 }
+    //     const _query = sql`SELECT * FROM TASKS`
+    //     const response: QueryResult = await OracleDbService.query(_query, _options)
+    //     return response.rows
+    // }
 //     public async createTask(name: string, search: string, userId: number): Promise<TaskEntity> {
 //         const _currentDate = new Date().toISOString().replace('T', ' ')
 //         const values = [name, search, userId.toString(), userId.toString(), _currentDate, _currentDate]

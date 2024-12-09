@@ -24,7 +24,7 @@ export class GetTasksUseCase implements IUseCase<Promise<TasksResponse>> {
     async execute(findOptions: IFindOptions<TaskEntity, any>): Promise<TasksResponse> {
         let result = []
         try{
-             result = await this.repository.findAll(findOptions)
+             result = await this.repository.find(findOptions)
         }catch(err){
             return left(new GenericAppError.UnexpectedError(err)) as TasksResponse
         }
