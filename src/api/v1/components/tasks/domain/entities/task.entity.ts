@@ -8,8 +8,6 @@ import { Guard } from '../../../../../../core/domain/types/guard'
 import { TaskCreatedEvent } from '../events/task.created.events'
 import { TaskDeletedEvent } from '../events/task.deleted.events'
 import { DbTypes, DbType, ID } from '../../../../../../core/domain/types/reflections'
-import { th } from '@faker-js/faker/.'
-import { DATE } from 'oracledb'
 
 export interface ITaskProps {
     name: TaskName,
@@ -19,21 +17,6 @@ export interface ITaskProps {
     updatedBy?: string,
     updatedAt?: Date
 }
-
-// export abstract class ITaskProps {
-//     @DbType(DbTypes.String)
-//     name: TaskName = {} as TaskName
-//     @DbType(DbTypes.String)
-//     search: string = ""
-//     @DbType(DbTypes.String)
-//     createdBy: string = ""
-//     @DbType(DbTypes.Date)
-//     createdAt?: Date = new Date()
-//     @DbType(DbTypes.String)
-//     updatedBy?: string = ""
-//     @DbType(DbTypes.Date)
-//     updatedAt?: Date = new Date()
-// }
 
 export interface IDeletedTaskProps {
     deletedBy: string,

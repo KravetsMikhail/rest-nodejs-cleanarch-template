@@ -4,7 +4,7 @@ import { PostgreDbService } from '../../../infrastructure/postgresql/postgresql'
 import { envs } from '../../../../../config/env'
 import { QueryResult } from 'pg'
 import { ID, IFindOptions } from '../../../../../core/domain/types/types'
-import { GetReflectionTypes } from '../../../../../core/domain/types/reflections'
+import { Helpers } from '../../../../../core/utils/helpers'
 
 export class PostgreTaskDatasource implements ITaskDatasource {
     async create(value: Partial<TaskEntity>): Promise<TaskEntity> {
@@ -35,15 +35,13 @@ export class PostgreTaskDatasource implements ITaskDatasource {
     //     throw new Error('Method not implemented.')
     // }
     async find(options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
-        console.log(options)
-        //let t: ITaskProps
-        //t = {name: TaskName.create("Reflect").getValue() as TaskName, search: "", createdBy: ""}
-        //GetReflectionTypes(TaskEntity.GetEmptyObject())
-        //const metadataValue = Reflect.getMetadata('dataType', ITaskProps.prototype, 'name')
-        //console.log(metadataValue)
-        GetReflectionTypes(TaskEntity.prototype)
-        
-        const response: QueryResult = await PostgreDbService.query(`SELECT * FROM ${envs.dbSchema}."Task"`)    
+        let _where = ""
+        let _orderBy = ""
+        //let reflect = GetReflectionTypes(TaskEntity)
+        if(options){
+            _where = Helpers.getWhereForPostgreSql(TaskEntity, options)
+        }
+        const response: QueryResult = await PostgreDbService.query(`SELECT * FROM ${envs.dbSchema}."Task" ${_where} ${_orderBy}`)
         return response.rows
     }
     findOne(id: Partial<TaskEntity> | ID, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity> {
@@ -52,15 +50,4 @@ export class PostgreTaskDatasource implements ITaskDatasource {
     exist(id: Partial<TaskEntity> | ID): Promise<boolean> {
         throw new Error('Method not implemented.')
     }
-    public async getTasks(email: string, status: string): Promise<TaskEntity[]> {
-        const response: QueryResult = await PostgreDbService.query(`SELECT * FROM ${envs.dbSchema}."Task"`)    
-        return response.rows
-    }
-    // public async deleteTask(id: number): Promise<TaskEntity> {
-    //     const values = [id ? id.toString() : '0']
-    //     const response: QueryResult = await PostgreDbService.query(`DELETE FROM ${envs.dbSchema}."Task" n 
-    //                                     WHERE n."id"=$1 RETURNING *;`, values)
-    //     return response.rows[0]
-    // }
-
 }

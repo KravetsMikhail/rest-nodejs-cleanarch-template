@@ -17,7 +17,7 @@ export class TaskRoutesV1 {
         //query параметры
         router.get('', controller.getTasks)
         //path параметры
-        router.get('/:email/:status', controller.getTasks)
+        //router.get('/:email/:status', controller.getTasks)
         //body параметры
         router.post('/', controller.createTask)
         //query параметры
