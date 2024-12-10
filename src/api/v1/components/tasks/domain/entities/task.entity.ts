@@ -7,7 +7,9 @@ import { Result } from '../../../../../../core/domain/types/result'
 import { Guard } from '../../../../../../core/domain/types/guard'
 import { TaskCreatedEvent } from '../events/task.created.events'
 import { TaskDeletedEvent } from '../events/task.deleted.events'
-import { Types, Type, ID } from '../../../../../../core/domain/types/reflections'
+import { DbTypes, DbType, ID } from '../../../../../../core/domain/types/reflections'
+import { th } from '@faker-js/faker/.'
+import { DATE } from 'oracledb'
 
 export interface ITaskProps {
     name: TaskName,
@@ -17,6 +19,21 @@ export interface ITaskProps {
     updatedBy?: string,
     updatedAt?: Date
 }
+
+// export abstract class ITaskProps {
+//     @DbType(DbTypes.String)
+//     name: TaskName = {} as TaskName
+//     @DbType(DbTypes.String)
+//     search: string = ""
+//     @DbType(DbTypes.String)
+//     createdBy: string = ""
+//     @DbType(DbTypes.Date)
+//     createdAt?: Date = new Date()
+//     @DbType(DbTypes.String)
+//     updatedBy?: string = ""
+//     @DbType(DbTypes.Date)
+//     updatedAt?: Date = new Date()
+// }
 
 export interface IDeletedTaskProps {
     deletedBy: string,
@@ -28,27 +45,27 @@ export class TaskEntity extends AggregateRoot<ITaskProps> {
     get id(): UniqueEntityId {
         return this._id
     }
-    @Type(Types.String)
+    @DbType(DbTypes.String)
     get name(): TaskName {
         return this.props.name
     }
-    @Type(Types.String)
+    @DbType(DbTypes.String)
     get search(): TaskSearch {
         return TaskSearch.create(this.props.name.value, this.props?.createdBy, this.props?.createdBy)
     }
-    @Type(Types.String)
+    @DbType(DbTypes.String)
     get createdBy(): string {
         return this.props.createdBy
     }
-    @Type(Types.Date)
+    @DbType(DbTypes.Date)
     get createdAt(): Date {
         return this.props?.createdAt ? this.props.createdAt : new Date()
     }
-    @Type(Types.String)
+    @DbType(DbTypes.String)
     get updatedBy(): string {
         return this.props?.updatedBy ? this.props.updatedBy : ""
     }
-    @Type(Types.Date)
+    @DbType(DbTypes.Date)
     get updatedAt(): Date {
         return this.props?.updatedAt ? this.props.updatedAt : new Date()
     }

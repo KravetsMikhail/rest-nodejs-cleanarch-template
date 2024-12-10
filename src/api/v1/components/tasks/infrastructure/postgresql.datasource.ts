@@ -1,5 +1,5 @@
 import { type ITaskDatasource } from '../domain/datasources/i.task.datasource'
-import { TaskEntity } from '../domain/entities/task.entity'
+import { TaskEntity, ITaskProps } from '../domain/entities/task.entity'
 import { PostgreDbService } from '../../../infrastructure/postgresql/postgresql'
 import { envs } from '../../../../../config/env'
 import { QueryResult } from 'pg'
@@ -36,8 +36,12 @@ export class PostgreTaskDatasource implements ITaskDatasource {
     // }
     async find(options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
         console.log(options)
-
-        GetReflectionTypes(TaskEntity)
+        //let t: ITaskProps
+        //t = {name: TaskName.create("Reflect").getValue() as TaskName, search: "", createdBy: ""}
+        //GetReflectionTypes(TaskEntity.GetEmptyObject())
+        //const metadataValue = Reflect.getMetadata('dataType', ITaskProps.prototype, 'name')
+        //console.log(metadataValue)
+        GetReflectionTypes(TaskEntity.prototype)
         
         const response: QueryResult = await PostgreDbService.query(`SELECT * FROM ${envs.dbSchema}."Task"`)    
         return response.rows

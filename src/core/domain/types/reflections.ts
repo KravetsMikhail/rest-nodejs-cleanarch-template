@@ -1,4 +1,3 @@
-import { T } from "@faker-js/faker/dist/airline-C5Qwd7_q"
 import "reflect-metadata"
 
 // function MaxLength(length: number) {
@@ -7,10 +6,11 @@ import "reflect-metadata"
 //     }
 // }
 
-export enum Types {
+export enum DbTypes {
     ID = "ID",
     String = "String",
     Number = "Number",
+    Boolean = "Boolean",
     Date = "Date",
     JSON = "JSON"
 }
@@ -19,9 +19,10 @@ export function ID(target: any, propertyKey: string){
     Reflect.defineMetadata("ID", "Identity", target, propertyKey)
 }
 
-export function Type(type: Types){
+export function DbType(type: DbTypes){
     return function(target: any, propertyKey: string){
-        Reflect.defineMetadata("type", type, target, propertyKey)
+        console.log("target => ", target, " propertyKey => ", propertyKey)
+        Reflect.defineMetadata("dataType", type, target, propertyKey)
     }
 }
 
@@ -32,20 +33,40 @@ export interface OptionDefinition {
 
 export const Option = (def: OptionDefinition) => Reflect.metadata(Option, def)
 
-const getOptionMetadata = (ctor: new () => any, prop: string) =>
-  Reflect.getMetadata(Option, ctor.prototype, prop) as
+const getOptionMetadata = (target: any, prop: string) =>
+  Reflect.getMetadata(Option, target, prop) as
     | OptionDefinition
     | undefined
 
-export function GetReflectionTypes(T: new () => any ){
-    for (const k of Object.keys(T)) {
-        const def = getOptionMetadata(T, k)
-        if (!def) continue;
-    
-        // получаем информацию из типов TypeScript
-        const defType =
-          def.type ?? Reflect.getMetadata("design:type", T.prototype, k)
-
-        console.log("defType = ", defType)
+//export function GetReflectionTypes(target: new () => any ){
+export function GetReflectionTypes(target: any ){
+    console.log( 
+        target.constructor.name,
+        Reflect.ownKeys(target),
+        //Object.getPrototypeOf(target),
+        //Object.getOwnPropertyNames(target),
+        //Reflect.getPrototypeOf(target)
+    )
+    for (const k of Object.getOwnPropertyNames(target)){
+        console.log("k => ", k, " : type => ",Reflect.getMetadata('dataType', target, k))
+        //console.log("type => ",Reflect.getMetadata('dataType', target, 'createdAt'))
     }
+    // for (const k of Reflect.ownKeys(target)){
+    //     console.log(k, " => ", Reflect.getMetadata("type", target, k))
+    //     const def = getOptionMetadata(target, k as string)
+    //     console.log(def)
+    //     if (!def) continue
+
+    // }
+    // for (const k of Object.keys(target)) {
+    //     const def = getOptionMetadata(target, k)
+    //     console.log(def)
+    //     if (!def) continue
+    
+    //     // получаем информацию из типов TypeScript
+    //     const defType =
+    //       def.type ?? Reflect.getMetadata("design:type", target, k)
+
+    //     console.log("defType = ", defType)
+    // }
 }
