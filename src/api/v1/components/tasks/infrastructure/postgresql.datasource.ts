@@ -5,6 +5,7 @@ import { envs } from '../../../../../config/env'
 import { QueryResult } from 'pg'
 import { ID, IFindOptions } from '../../../../../core/domain/types/types'
 import { Helpers } from '../../../../../core/utils/helpers'
+import { env } from 'process'
 
 export class PostgreTaskDatasource implements ITaskDatasource {
     async create(value: Partial<TaskEntity>): Promise<TaskEntity> {
@@ -37,9 +38,8 @@ export class PostgreTaskDatasource implements ITaskDatasource {
     async find(options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
         let _where = ""
         let _orderBy = ""
-        //let reflect = GetReflectionTypes(TaskEntity)
         if(options){
-            _where = Helpers.getWhereForPostgreSql(TaskEntity, options)
+            _where = Helpers.getWhereForPostgreSql(TaskEntity, options, envs.dbSchema, "Task")
         }
         const response: QueryResult = await PostgreDbService.query(`SELECT * FROM ${envs.dbSchema}."Task" ${_where} ${_orderBy}`)
         return response.rows

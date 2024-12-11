@@ -40,3 +40,25 @@ export class Op {
     public static and = 'AND'
     public static or = 'OR'
 }
+
+export class WhereFilterParams {
+    param: string = ""
+    value: string = ""
+    dbtype: string = ""
+
+    constructor(param: string, value: string, dbtype: string) {
+        this.param = param
+        this.value = value
+        this.dbtype = dbtype
+    }
+}
+
+export class WhereFilters {
+    AND: WhereFilterParams[]
+    OR: WhereFilterParams[]
+
+    constructor(and: WhereFilterParams[], or: WhereFilterParams[]) {
+        this.AND = and
+        this.OR = or
+    }
+}
