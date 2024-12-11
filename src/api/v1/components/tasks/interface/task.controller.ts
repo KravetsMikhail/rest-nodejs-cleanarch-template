@@ -39,7 +39,6 @@ export class TaskController {
         let findOptions = Helpers.getFilters(_req.query)
 
         new GetTasksUseCase(this.repository)
-            //.execute(_req.route.email, _req.route.status)
             .execute(findOptions)
             .then((result) => {
                 if (result.isLeft()) {                    

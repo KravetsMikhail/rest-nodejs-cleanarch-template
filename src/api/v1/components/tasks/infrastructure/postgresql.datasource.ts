@@ -5,7 +5,6 @@ import { envs } from '../../../../../config/env'
 import { QueryResult } from 'pg'
 import { ID, IFindOptions } from '../../../../../core/domain/types/types'
 import { Helpers } from '../../../../../core/utils/helpers'
-import { env } from 'process'
 
 export class PostgreTaskDatasource implements ITaskDatasource {
     async create(value: Partial<TaskEntity>): Promise<TaskEntity> {
@@ -38,10 +37,13 @@ export class PostgreTaskDatasource implements ITaskDatasource {
     async find(options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
         let _where = ""
         let _orderBy = ""
+        let _paging = ""
         if(options){
             _where = Helpers.getWhereForPostgreSql(TaskEntity, options, envs.dbSchema, "Task")
+            _orderBy = Helpers.getOrderByForPostgreSql(TaskEntity, options, envs.dbSchema, "Task")
+            console.log(_orderBy)
         }
-        const response: QueryResult = await PostgreDbService.query(`SELECT * FROM ${envs.dbSchema}."Task" ${_where} ${_orderBy}`)
+        const response: QueryResult = await PostgreDbService.query(`SELECT * FROM ${envs.dbSchema}."Task" ${_where} ${_orderBy} ${_paging}`)
         return response.rows
     }
     findOne(id: Partial<TaskEntity> | ID, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity> {

@@ -1,5 +1,3 @@
-import internal from "stream"
-
 export type AnyObject = Record<string, any>
 
 export type ColumnData = string | {
@@ -18,16 +16,16 @@ export interface IFindOptions<T, C> {
 }
 
 export class OrderBy<T, OrderByType>{
-    private _field: keyof T
+    private _fields: Array<keyof T>
     private _type: OrderByType
 
-    constructor(filed: keyof T, type: OrderByType){
-        this._field = filed
+    constructor(fileds: Array<keyof T>, type: OrderByType){
+        this._fields = fileds
         this._type = type
     }
 
     public value(){
-        return {field: this._field, type: this._type}
+        return {fields: this._fields, type: this._type}
     }
 }
 
