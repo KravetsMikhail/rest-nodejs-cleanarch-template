@@ -41,7 +41,7 @@ export class PostgreTaskDatasource implements ITaskDatasource {
         if(options){
             _where = Helpers.getWhereForPostgreSql(TaskEntity, options, envs.dbSchema, "Task")
             _orderBy = Helpers.getOrderByForPostgreSql(TaskEntity, options, envs.dbSchema, "Task")
-            console.log(_orderBy)
+            _paging = Helpers.getPagingForPostgresSql(options)
         }
         const response: QueryResult = await PostgreDbService.query(`SELECT * FROM ${envs.dbSchema}."Task" ${_where} ${_orderBy} ${_paging}`)
         return response.rows

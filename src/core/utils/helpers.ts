@@ -24,9 +24,9 @@ export class Helpers {
         delete filters.order
         delete filters.sort
         let _orderBy = null
-        if(_sort){
+        if (_sort) {
             let _ord = OrderByType.asc
-            switch(_order) {
+            switch (_order) {
                 case "desc":
                     _ord = OrderByType.desc
                     break
@@ -40,7 +40,7 @@ export class Helpers {
         delete filters.offset
         let _limit = filters.limit
         delete filters.limit
-       
+
         let result = {
             where: {},
             orderBy: {},
@@ -48,10 +48,10 @@ export class Helpers {
             limit: 10000,
             tx: {},
         }
-        if(_where) result.where = _where
-        if(_orderBy) result.orderBy = _orderBy
-        if(_offset) result.offset = _offset
-        if(_limit) result.limit = _limit       
+        if (_where) result.where = _where
+        if (_orderBy) result.orderBy = _orderBy
+        if (_offset) result.offset = _offset
+        if (_limit) result.limit = _limit
 
         return result
     }
@@ -112,13 +112,36 @@ export class Helpers {
     public static getOrderByForPostgreSql(model: any, options: IFindOptions<any, any>, dbScheme: string | undefined, table: string): string {
         let _reflect = GetReflectionTypes(model)
         let result = ""
+        if(!options || options.orderBy) return result
         for (const p of Object.getOwnPropertyNames(options)) {
             if (p === 'orderBy') {
-                const _opt = (options as unknown as typeof model).orderBy as OrderBy<any, any> 
-                result = `${_opt.value().fields.map(f => `ORDER BY ${dbScheme ? dbScheme + "." : ""}"${table}"."${f.toString()}"`).toString()} ${_opt.value().type}`
+                const _opt = options.orderBy as unknown as OrderBy<any, any>
+                if(Object.keys(_opt).length === 0 && _opt.constructor === Object){
+                    break
+                }
+                let _finderfileds = ""
+                _opt.value().fields.map(o => {
+                    let _f = _reflect?.find(r => r.field == o)
+                    if (_f) {
+                        _finderfileds += `${dbScheme ? dbScheme + "." : ""}"${table}"."${_f.field}", `
+                    }
+                })
+                if(_finderfileds){
+                    _finderfileds = _finderfileds.substring(0, _finderfileds.length - 2)
+                    result = `ORDER BY ${_finderfileds} ${_opt.value().type}`
+                } 
+                break               
             }
         }
 
+        return result
+    }
+
+    public static getPagingForPostgresSql(options: IFindOptions<any, any>): string {
+        let result = ""
+        let _limit = options && options.limit ? options.limit as number : 10000
+        let _offset = options && options.offset
+        result = `LIMIT ${_limit} ${_offset ? "OFFSET " + _offset : ""}`
         return result
     }
 }
