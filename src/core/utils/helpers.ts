@@ -11,7 +11,6 @@ export class Helpers {
     }
 
     public static getFilters(filters: { [key: string]: any }): any {
-        console.log(filters)
         if (!filters) return
         let _where = {
             [Op.and]: Object.entries(filters).map(([param, value]) => ({
@@ -50,8 +49,8 @@ export class Helpers {
         }
         if (_where) result.where = _where
         if (_orderBy) result.orderBy = _orderBy
-        if (_offset) result.offset = _offset
-        if (_limit) result.limit = _limit
+        if (_offset) result.offset = Array.isArray(_offset) ? _offset[0] : _offset
+        if (_limit) result.limit = Array.isArray(_offset) ? _limit[0] : _limit
 
         return result
     }
@@ -112,7 +111,7 @@ export class Helpers {
     public static getOrderByForPostgreSql(model: any, options: IFindOptions<any, any>, dbScheme: string | undefined, table: string): string {
         let _reflect = GetReflectionTypes(model)
         let result = ""
-        if(!options || options.orderBy) return result
+        if(!options || !options.orderBy) return result
         for (const p of Object.getOwnPropertyNames(options)) {
             if (p === 'orderBy') {
                 const _opt = options.orderBy as unknown as OrderBy<any, any>
@@ -123,12 +122,13 @@ export class Helpers {
                 _opt.value().fields.map(o => {
                     let _f = _reflect?.find(r => r.field == o)
                     if (_f) {
-                        _finderfileds += `${dbScheme ? dbScheme + "." : ""}"${table}"."${_f.field}", `
+                        _finderfileds += `${dbScheme ? dbScheme + "." : ""}"${table}"."${_f.field}" ${_opt.value().type}, `
                     }
                 })
+                
                 if(_finderfileds){
                     _finderfileds = _finderfileds.substring(0, _finderfileds.length - 2)
-                    result = `ORDER BY ${_finderfileds} ${_opt.value().type}`
+                    result = `ORDER BY ${_finderfileds}`
                 } 
                 break               
             }

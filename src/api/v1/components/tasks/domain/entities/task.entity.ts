@@ -25,6 +25,7 @@ export interface IDeletedTaskProps {
 
 export class TaskEntity extends AggregateRoot<ITaskProps> {
     @ID
+    @DbType(DbTypes.Number)
     get id(): UniqueEntityId {
         return this._id
     }

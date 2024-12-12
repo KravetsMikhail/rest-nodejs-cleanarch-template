@@ -22,10 +22,10 @@ export class TaskRepository implements ITaskRepository {
     //     throw new Error('Method not implemented.')
     // }
     async find(options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
-        return await  this.datasource.find(options)
+        return await this.datasource.find(options)
     }
-    findOne(id: ID | Partial<TaskEntity>, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity> {
-        throw new Error('Method not implemented.')
+    async findOne(id: ID | Partial<TaskEntity>, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity> {
+        return await this.datasource.findOne(id)
     }
     exist(id: ID | Partial<TaskEntity>): Promise<boolean> {
         throw new Error('Method not implemented.')

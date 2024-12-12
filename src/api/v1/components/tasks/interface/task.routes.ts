@@ -16,10 +16,12 @@ export class TaskRoutesV1 {
 
         //query параметры
         router.get('', controller.getTasks)
+        router.get('/:id', controller.getOneTask)
         //path параметры
         //router.get('/:email/:status', controller.getTasks)
         //body параметры
         router.post('/', controller.createTask)
+        router.put('/:id', controller.replaceTask)
         //query параметры
         router.delete('', controller.deleteTask)
         //path параметры

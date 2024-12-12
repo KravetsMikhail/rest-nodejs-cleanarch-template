@@ -46,8 +46,9 @@ export class PostgreTaskDatasource implements ITaskDatasource {
         const response: QueryResult = await PostgreDbService.query(`SELECT * FROM ${envs.dbSchema}."Task" ${_where} ${_orderBy} ${_paging}`)
         return response.rows
     }
-    findOne(id: Partial<TaskEntity> | ID, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity> {
-        throw new Error('Method not implemented.')
+    async findOne(id: Partial<TaskEntity> | ID, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity> {
+        const response: QueryResult = await PostgreDbService.query(`SELECT * FROM ${envs.dbSchema}."Task" WHERE id = ${id}`)
+        return response.rows && response.rows.length > 0 ? response.rows[0] : {} as TaskEntity
     }
     exist(id: Partial<TaskEntity> | ID): Promise<boolean> {
         throw new Error('Method not implemented.')

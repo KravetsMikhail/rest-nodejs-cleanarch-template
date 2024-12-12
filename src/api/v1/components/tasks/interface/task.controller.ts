@@ -1,9 +1,10 @@
 import { type NextFunction, type Request, type Response } from 'express'
 import { type ITaskRepository } from '../domain/repositories/i.task.repository'
 import { type TaskEntity } from '../domain/entities/task.entity'
-import { GetTasksUseCase } from '../usecases/get-tasks.usecase'
+import { GetTasksUseCase, GetOneTaskUseCase } from '../usecases/get-tasks.usecase'
 import { CreateTasksUseCase } from '../usecases/create-task.usecase'
 import { DeleteTasksUseCase } from '../usecases/delete-task.usecase'
+import { ReplaceTasksUseCase } from '../usecases/update-task.usecase'
 import { CustomRequest } from '../../../../../core/domain/types/custom.request'
 import { Helpers } from '../../../../../core/utils/helpers'
 
@@ -52,6 +53,33 @@ export class TaskController {
             })
     }
 
+    public getOneTask = (
+        _req: Request<any, unknown, unknown, QueryParams>,
+        res: Response<TaskEntity>,
+        next: NextFunction
+    ): void => {
+        let _id = 0
+        if (_req && _req.query && _req.params && Object.keys(_req.query).length === 0 && _req.query.constructor === Object) {
+            _id = _req.params.id
+        } 
+        else {
+            return
+        }
+
+        new GetOneTaskUseCase(this.repository)
+            .execute(_id.toString())
+            .then((result) => {
+                if (result.isLeft()) {                    
+                    const error = result.value
+                    next(error.errorValue())
+                } 
+                return res.json((result as any).value.getValue())            
+            })
+            .catch((error) => {
+                next(error)
+            })
+    }
+
     public createTask = (
         _req: Request<unknown, unknown, QueryBody, QueryParams>,
         res: Response<TaskEntity>,
@@ -88,7 +116,27 @@ export class TaskController {
         }
         const userId = ((_req as unknown) as CustomRequest).payload.userId
         new DeleteTasksUseCase(this.repository)
-            .execute(_req.params.id, userId)
+            .execute(_id.toString(), userId)
+            .then((result) => {
+                if (result.isLeft()) {                    
+                    const error = result.value
+                    next(error.errorValue())
+                } 
+                return res.json((result as any).value.getValue())                               
+            })
+            .catch((error) => {
+                next(error)
+            })
+    }
+
+    public replaceTask = (
+        _req: Request<unknown, unknown, QueryBody, QueryParams>,
+        res: Response<TaskEntity>,
+        next: NextFunction
+    ): void => {
+        const userId = ((_req as unknown) as CustomRequest).payload.userId
+        new ReplaceTasksUseCase(this.repository)
+            .execute(_req.body, userId)
             .then((result) => {
                 if (result.isLeft()) {                    
                     const error = result.value
