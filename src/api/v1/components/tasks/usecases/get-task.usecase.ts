@@ -19,7 +19,6 @@ export class GetTasksUseCase implements IUseCase<Promise<TasksResponse>> {
 
         return right(Result.ok<TaskEntity[]>(result as TaskEntity[])) as TasksResponse
     }
-
 }
 
 export class GetOneTaskUseCase implements IUseCase<Promise<TaskResponse>> {

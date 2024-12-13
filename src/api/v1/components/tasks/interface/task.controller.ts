@@ -1,7 +1,7 @@
 import { type NextFunction, type Request, type Response } from 'express'
 import { type ITaskRepository } from '../domain/repositories/i.task.repository'
 import { type TaskEntity } from '../domain/entities/task.entity'
-import { GetTasksUseCase, GetOneTaskUseCase } from '../usecases/get-tasks.usecase'
+import { GetTasksUseCase, GetOneTaskUseCase } from '../usecases/get-task.usecase'
 import { CreateTasksUseCase } from '../usecases/create-task.usecase'
 import { DeleteTasksUseCase } from '../usecases/delete-task.usecase'
 import { ReplaceTasksUseCase } from '../usecases/update-task.usecase'
@@ -20,7 +20,6 @@ type QueryBody = {
 }
 
 export class TaskController {
-    //* Dependency injection
     constructor(private readonly repository: ITaskRepository) { }
 
     public getTasks = (

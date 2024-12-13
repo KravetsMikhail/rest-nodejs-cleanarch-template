@@ -12,7 +12,7 @@ export class TaskRepository implements ITaskRepository {
     createMany(values: Partial<TaskEntity>[]): Promise<TaskEntity[]> {
         throw new Error('Method not implemented.')
     }
-    update(id: ID, newValue: Partial<TaskEntity>): Promise<TaskEntity> {
+    async update(id: ID, newValue: Partial<TaskEntity>): Promise<TaskEntity> {
         throw new Error('Method not implemented.')
     }
     async delete(id: ID): Promise<any> {

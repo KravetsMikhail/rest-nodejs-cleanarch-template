@@ -18,4 +18,10 @@ export class TaskSearch extends ValueObject<ITaskSearchProps> {
         let _value = `${Helpers.toStrToLowAndRemSpaces(name)}${Helpers.toStrToLowAndRemSpaces(createdBy)}${Helpers.toStrToLowAndRemSpaces(updatedBy)}`
         return new TaskSearch(new TaskSearch({ value: _value }))
     }
+
+    public static createSearch(search: string): TaskSearch {
+        let _value = `${Helpers.toStrToLowAndRemSpaces(search)}`
+        return new TaskSearch(new TaskSearch({ value: _value }))
+    }
+
 }
