@@ -34,6 +34,7 @@ export class PostgreTaskDatasource implements ITaskDatasource {
         const response: QueryResult = await PostgreDbService.query(`UPDATE ${envs.dbSchema}."Task" SET 
 ("name", "search", "createdBy", "updatedBy", "createdAt", "updatedAt") = ($1, $2, $3, $4, $5, $6)
  WHERE id=${id} RETURNING *`, values)
+ 
         return response.rows[0]
 
     }
