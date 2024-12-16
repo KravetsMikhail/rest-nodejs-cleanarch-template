@@ -38,43 +38,21 @@ export class ReplaceTasksUseCase implements IUseCase<Promise<TaskResponse>> {
             search: newtask.search as string,
             updatedBy: _updatedBy,
         }, newtask.id)
-        //const _createdBy = userId.toString()
-        //const _updatedBy = userId.toString()
-        //const _name = TaskName.create(name)
-        // if(_name.isFailure) {
-        //     return left(Result.fail<void, void>(_name.error)) as TaskResponse
-        // }
-        // const _nameString = _name.getValue()?.value as string
-        // const _search = TaskSearch.create(_nameString, _createdBy, _updatedBy)
 
-        // const combinedPropsResult = Result.combine([_name])
+        if (_task.isFailure) {
+            return left(Result.fail<void, void>("Ошибка! Не удалось создать Task для обновления")) as TaskResponse
+        }
 
-        // if (combinedPropsResult.isFailure) {
-        //     return left(Result.fail<void, void>(combinedPropsResult.error)) as TaskResponse
-        // }
-        // const _id = new UniqueEntityId()
-        // const _task = TaskEntity.create({
-        //     name: _name?.getValue() as TaskName,
-        //     search: _search.value,
-        //     createdBy: _createdBy,
-        //     updatedBy: _updatedBy,
-        // }, _id)
+        const task: TaskEntity = _task.getValue() as TaskEntity
+        let replaceTask = {} 
 
-        // if (_task.isFailure) {
-        //     return left(Result.fail<void, void>(combinedPropsResult.error)) as TaskResponse
-        // }
+        try {
+            replaceTask = await this.repository.update(newtask.id, task)
+            DomainEvents.dispatchEventsForAggregate(newtask.id)
+        }catch(err){
+            return left(new GenericAppError.UnexpectedError(err)) as TaskResponse
+        }
 
-        // const task: TaskEntity = _task.getValue() as TaskEntity
-        // let newTask = {} 
-
-        // try {
-        //     newTask = await this.repository.create(task)
-        //     DomainEvents.dispatchEventsForAggregate(_id)
-        // }catch(err){
-        //     return left(new GenericAppError.UnexpectedError(err)) as TaskResponse
-        // }
-
-        // return right(Result.ok<TaskEntity>(newTask as TaskEntity)) as TaskResponse
-        return {} as TaskResponse
+        return right(Result.ok<TaskEntity>(replaceTask as TaskEntity)) as TaskResponse
     }
 }

@@ -14,7 +14,7 @@ export class TaskSearch extends ValueObject<ITaskSearchProps> {
         super(props)
     }
 
-    public static create(name: string, createdBy: string, updatedBy: string): TaskSearch {
+    public static create(name: string, createdBy?: string, updatedBy?: string): TaskSearch {
         let _value = `${Helpers.toStrToLowAndRemSpaces(name)}${Helpers.toStrToLowAndRemSpaces(createdBy)}${Helpers.toStrToLowAndRemSpaces(updatedBy)}`
         return new TaskSearch(new TaskSearch({ value: _value }))
     }

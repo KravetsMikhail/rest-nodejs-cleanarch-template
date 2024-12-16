@@ -35,11 +35,11 @@ export class TaskEntity extends AggregateRoot<ITaskProps> {
     }
     @DbType(DbTypes.String)
     get search(): TaskSearch {
-        return TaskSearch.create(this.props.name.value, this.props?.createdBy, this.props?.createdBy)
+        return TaskSearch.create(this.props.name.value, this.props?.createdBy, this.props?.updatedBy)
     }
     @DbType(DbTypes.String)
     get createdBy(): string {
-        return this.props.createdBy
+        return this.props?.createdBy ? this.props.createdBy : ""
     }
     @DbType(DbTypes.Date)
     get createdAt(): Date {
