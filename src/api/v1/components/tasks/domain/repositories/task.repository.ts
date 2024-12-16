@@ -13,7 +13,7 @@ export class TaskRepository implements ITaskRepository {
         throw new Error('Method not implemented.')
     }
     async update(id: ID, newValue: Partial<TaskEntity>): Promise<TaskEntity> {
-        throw new Error('Method not implemented.')
+        return await this.datasource.update(id, newValue)
     }
     async delete(id: ID): Promise<any> {
         return await this.datasource.delete(id)

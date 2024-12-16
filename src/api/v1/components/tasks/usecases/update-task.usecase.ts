@@ -13,13 +13,13 @@ import { GetReflectionTypes, ReflectionData } from '../../../../../core/domain/t
 export class ReplaceTasksUseCase implements IUseCase<Promise<TaskResponse>> {
     constructor(private readonly repository: ITaskRepository) { }
 
-    async execute(newtask: any, userId: number): Promise<TaskResponse> {
-        if (!newtask) {
+    async execute(id: number, updtask: any, userId: number): Promise<TaskResponse> {
+        if (!updtask) {
             return left(Result.fail<void, void>("Ошибка! Нет данных")) as TaskResponse
         }
         let _reflect = GetReflectionTypes(TaskEntity)
         let _isOk: boolean = true;
-        for (const k of Object.getOwnPropertyNames(newtask)) {
+        for (const k of Object.getOwnPropertyNames(updtask)) {
             if (!(_reflect as ReflectionData[]).find(r => r.field === k)) {
                 _isOk = false
                 break
@@ -30,14 +30,15 @@ export class ReplaceTasksUseCase implements IUseCase<Promise<TaskResponse>> {
         }
 
         const _updatedBy = userId.toString()
-        const _name = TaskName.create(newtask.name)
-        const _nameString = _name.getValue()?.value as string
+        const _name = TaskName.create(updtask.name)
 
-        const _task = TaskEntity.create({
+        const _task = TaskEntity.update({
             name: _name?.getValue() as TaskName,
-            search: newtask.search as string,
+            search: updtask.search as string,
             updatedBy: _updatedBy,
-        }, newtask.id)
+            createdAt: updtask.createdAt,
+            createdBy: updtask.createdBy
+        }, new UniqueEntityId(id))
 
         if (_task.isFailure) {
             return left(Result.fail<void, void>("Ошибка! Не удалось создать Task для обновления")) as TaskResponse
@@ -47,8 +48,8 @@ export class ReplaceTasksUseCase implements IUseCase<Promise<TaskResponse>> {
         let replaceTask = {} 
 
         try {
-            replaceTask = await this.repository.update(newtask.id, task)
-            DomainEvents.dispatchEventsForAggregate(newtask.id)
+            replaceTask = await this.repository.update(id, task)
+            DomainEvents.dispatchEventsForAggregate(id)
         }catch(err){
             return left(new GenericAppError.UnexpectedError(err)) as TaskResponse
         }

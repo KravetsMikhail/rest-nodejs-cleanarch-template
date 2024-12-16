@@ -7,6 +7,7 @@ import { Result } from '../../../../../../core/domain/types/result'
 import { Guard } from '../../../../../../core/domain/types/guard'
 import { TaskCreatedEvent } from '../events/task.created.events'
 import { TaskDeletedEvent } from '../events/task.deleted.events'
+import { TaskUpdatedEvent } from '../events/task.updated.events'
 import { DbTypes, DbType, ID } from '../../../../../../core/domain/types/reflections'
 
 export interface ITaskProps {
@@ -76,6 +77,29 @@ export class TaskEntity extends AggregateRoot<ITaskProps> {
             }, id)
 
             task.addDomainEvent(new TaskCreatedEvent(task))
+
+            return Result.ok<TaskEntity>(task)
+        }
+    }
+
+    public static update(props: ITaskProps, id?: UniqueEntityId): Result<TaskEntity> {
+        const guardedProps = [
+            { argument: props.name, argumentName: 'name' },
+        ]
+
+        const guardResult = Guard.againstNullOrUndefinedBulk(guardedProps)
+        
+        if (!guardResult.succeeded) {
+            return Result.fail<TaskEntity, ValidationError>(
+                new ValidationError([{fields: ["name"], constraint: guardResult.message as string}])
+            )
+        }
+        else {
+            const task = new TaskEntity({
+                ...props,
+            }, id)
+
+            task.addDomainEvent(new TaskUpdatedEvent(task))
 
             return Result.ok<TaskEntity>(task)
         }

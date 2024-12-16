@@ -129,13 +129,22 @@ export class TaskController {
     }
 
     public replaceTask = (
-        _req: Request<unknown, unknown, QueryBody, QueryParams>,
+        _req: Request<any, unknown, QueryBody, QueryParams>,
         res: Response<TaskEntity>,
         next: NextFunction
     ): void => {
+        let _id = 0
+        if (_req && _req.query && _req.params && Object.keys(_req.query).length === 0 && _req.query.constructor === Object) {
+            _id = _req.params.id
+        } else if (_req && _req.query) {
+            _id = (_req.query as QueryParams).id
+        }
+        else {
+            return
+        }
         const userId = ((_req as unknown) as CustomRequest).payload.userId
         new ReplaceTasksUseCase(this.repository)
-            .execute(_req.body, userId)
+            .execute(_id, _req.body, userId)
             .then((result) => {
                 if (result.isLeft()) {                    
                     const error = result.value
