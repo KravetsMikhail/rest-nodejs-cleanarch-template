@@ -49,7 +49,7 @@ export class ReplaceTasksUseCase implements IUseCase<Promise<TaskResponse>> {
 
         try {
             replaceTask = await this.repository.update(id, task)
-            DomainEvents.dispatchEventsForAggregate(id)
+            DomainEvents.dispatchEventsForAggregate(new UniqueEntityId(id))
         }catch(err){
             return left(new GenericAppError.UnexpectedError(err)) as TaskResponse
         }
