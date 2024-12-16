@@ -37,7 +37,6 @@ export class ReplaceTasksUseCase implements IUseCase<Promise<TaskResponse>> {
             name: _name?.getValue() as TaskName,
             search: newtask.search as string,
             updatedBy: _updatedBy,
-            createdBy: 
         }, newtask.id)
         //const _createdBy = userId.toString()
         //const _updatedBy = userId.toString()

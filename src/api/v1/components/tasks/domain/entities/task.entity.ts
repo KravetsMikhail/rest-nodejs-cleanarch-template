@@ -12,7 +12,7 @@ import { DbTypes, DbType, ID } from '../../../../../../core/domain/types/reflect
 export interface ITaskProps {
     name: TaskName,
     search: string,
-    createdBy: string,
+    createdBy?: string,
     createdAt?: Date,
     updatedBy?: string,
     updatedAt?: Date
