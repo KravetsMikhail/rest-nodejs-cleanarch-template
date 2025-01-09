@@ -14,7 +14,7 @@ export function generateTaskData(overide = {}) {
 
     let _id = new UniqueEntityId(faker.number.int())
 
-    const t = TaskEntity.create((_task as unknown) as ITaskProps, _id)
+    const t = TaskEntity.create((_task as unknown) as ITaskProps, false, _id)
     return t.getValue()
 }
 

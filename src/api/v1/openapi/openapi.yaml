@@ -15,17 +15,42 @@ paths:
           - read
       parameters:
         - in: query
-          name: email
+          name: name
           schema:
             type: string
-          required: true
-          description: E-mail адрес пользователя
-          example: 123@123.ru
+          required: false
+          description: Фильтр по наименованию
+          example: задача1
         - in: query
-          name: status
+          name: offset
           schema: 
+            type: number
+          required: false
+          description: Смещение относительно начала списка задач
+          example: 0
+        - in: query
+          name: limit
+          schema:
+            type: number
+          required: false
+          description: Количество строк в результирующей выборке
+          example: 10
+        - in: query
+          name: sort
+          schema:
             type: string
-          required: true
+          required: false
+          description: Поле сортировки результата
+          example: name
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum:
+              - desc
+              - asc
+          description: Тип сортировки (по возрастанию или убыванию)
+          example: desc
       responses:
         '200':
           description: Выполнено

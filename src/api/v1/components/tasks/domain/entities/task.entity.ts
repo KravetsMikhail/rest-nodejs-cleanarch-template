@@ -9,6 +9,7 @@ import { TaskCreatedEvent } from '../events/task.created.events'
 import { TaskDeletedEvent } from '../events/task.deleted.events'
 import { TaskUpdatedEvent } from '../events/task.updated.events'
 import { DbTypes, DbType, ID } from '../../../../../../core/domain/types/reflections'
+import { B } from '@faker-js/faker/dist/airline-C5Qwd7_q'
 
 export interface ITaskProps {
     name: TaskName,
@@ -59,7 +60,7 @@ export class TaskEntity extends AggregateRoot<ITaskProps> {
         super(props, id)
     }
 
-    public static create(props: ITaskProps, id?: UniqueEntityId): Result<TaskEntity> {
+    public static create(props: ITaskProps, isCreateEvent: boolean = true, id?: UniqueEntityId): Result<TaskEntity> {
         const guardedProps = [
             { argument: props.name, argumentName: 'name' },
         ]
@@ -76,7 +77,9 @@ export class TaskEntity extends AggregateRoot<ITaskProps> {
                 ...props,
             }, id)
 
-            task.addDomainEvent(new TaskCreatedEvent(task))
+            if(isCreateEvent){
+                task.addDomainEvent(new TaskCreatedEvent(task))
+            }
 
             return Result.ok<TaskEntity>(task)
         }
