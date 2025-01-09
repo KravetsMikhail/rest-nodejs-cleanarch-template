@@ -22,6 +22,8 @@ services:
 
       # Required for a single node cluster
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - network
 
   kafka-ui:
     image: ghcr.io/kafbat/kafka-ui:latest
@@ -33,3 +35,8 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9093
     depends_on:
       - kafka
+
+networks:
+  network:
+    driver: bridge
+    name: kafka_network
