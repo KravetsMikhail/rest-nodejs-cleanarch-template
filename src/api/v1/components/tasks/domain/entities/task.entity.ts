@@ -60,7 +60,7 @@ export class TaskEntity extends AggregateRoot<ITaskProps> {
         super(props, id)
     }
 
-    public static create(props: ITaskProps, isCreateEvent: boolean = true, id?: UniqueEntityId): Result<TaskEntity> {
+    public static create(props: ITaskProps, id?: UniqueEntityId, isCreateEvent: boolean = true): Result<TaskEntity> {
         const guardedProps = [
             { argument: props.name, argumentName: 'name' },
         ]
