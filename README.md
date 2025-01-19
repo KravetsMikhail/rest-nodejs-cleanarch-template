@@ -1,6 +1,8 @@
 # rest-nodejs-cleanarch-template
 Шаблон REST API сервера на чистой архитектуре (гескагональная архитектура)
 
+![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white) ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+
 [TypeScript] [Docker] [Kafka] [Clean architecture]
 
 ## МИГРАЦИИ
@@ -54,15 +56,14 @@
 
     sudo bash service_down.sh
 
-### Стандалоне - запуск debug 
-#### Windows
-    SET DEBUG=rest-nodejs-cleanarch-template:* & npm run dev
-#### Linux
-    DEBUG=:rest-nodejs-cleanarch-template* npm run dev
+### Сборка проекта
 
-### Сиандалоне - запуск production
-#### Windows
-    SET NODE_ENV=production & npm run serve
-#### Linux
-    NODE_ENV=production npm run serve
+    npm run build
 
+### Запуск debug 
+
+    npm run dev
+
+### Запуск production
+
+    npm run serve
