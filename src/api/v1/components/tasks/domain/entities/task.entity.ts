@@ -9,7 +9,6 @@ import { TaskCreatedEvent } from '../events/task.created.events'
 import { TaskDeletedEvent } from '../events/task.deleted.events'
 import { TaskUpdatedEvent } from '../events/task.updated.events'
 import { DbTypes, DbType, ID } from '../../../../../../core/domain/types/reflections'
-import { B } from '@faker-js/faker/dist/airline-C5Qwd7_q'
 
 export interface ITaskProps {
     name: TaskName,
