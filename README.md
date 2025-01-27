@@ -17,7 +17,8 @@
 
 ## Диаграмма проекта
 
-```plantuml
+<!--
+@startuml projectdiagram
 left to right direction
 artifact Проект { 
 ''component "CORE API" {
@@ -39,7 +40,10 @@ artifact Проект {
     }
 ''}
 }
-```
+@enduml
+-->
+
+![](projectdiagram.svg)
 
 ## Структура проекта
 
