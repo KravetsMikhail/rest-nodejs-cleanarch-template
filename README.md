@@ -20,25 +20,36 @@
 <!--
 @startuml projectdiagram
 left to right direction
-artifact Проект { 
-''component "CORE API" {
-    artifact core { 
-        hexagon "API V1" {
+artifact "Проект" {
+    folder "API" { 
+        folder "V1" {
             component "interface"
+            folder "components" {
+                hexagon "task" {
+                    component "interface" as intr1
+                    component "domain" as domain1
+                    component "usecase" as usecase1
+                    component "infrastructure" as infr1
+                }
+                hexagon "notification" {
+                    component "interface" as intr2
+                    component "domain" as domain2
+                    component "usecase" as usecase2
+                    component "infrastructure" as infr2
+                }
+            }
             component "infrastructure"
+            component "openapi"
         }
     }
-    component components {
-        hexagon "task" {
-            component "interface" as intr1
-            component "infrastructure" as infr1
-        }
-        hexagon notification {
-            component "interface" as intr2
-            component "infrastructure" as infr2
-        }
+    folder "CORE" {
+        component "midlware"
+        component "domen"
+        component "utils"
+        component "errors"
+        component "constants"
+        component "logger"
     }
-''}
 }
 @enduml
 -->
