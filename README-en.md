@@ -1,21 +1,21 @@
 # rest-nodejs-cleanarch-template
 
-Шаблон REST API сервера на компонентной чистой архитектуре
+REST API server template on component-based pure architecture
 
 ![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white) ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E) ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![Jest](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white) ![openapi initiative](https://img.shields.io/badge/openapiinitiative-%23000000.svg?style=for-the-badge&logo=openapiinitiative&logoColor=white) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white) ![Apache Kafka](https://img.shields.io/badge/Apache%20Kafka-000?style=for-the-badge&logo=apachekafka) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) ![Oracle](https://img.shields.io/badge/Oracle-F80000?style=for-the-badge&logo=oracle&logoColor=white)
 
-## Описание проекта
+## Project Description
 
-Проект представляет собой шаблон REST API сервиса, построенный на компонентной чистой архитектуре.
+The project is a REST API service template built on component-based pure architecture.
 
-В проекте применяются: миграции БД, версионность API, Docker, Kafka, OpenAPI.
+The project uses: database migrations, API versioning, Docker, Kafka, OpenAPI.
 
-В основе проекта лежат принципы чистой (луковой) архитектуры, с такими элементами как: домен, usecase, интерфейс, инфраструктура и доменные события.
-Спецификой проекта является добавление компонентной части, которая представляет собой набор необходимых бизнес-объектов. 
-Компоненты, в свою очередь, реализованы на чистой архитектуре.
-Взаимодействие между компнентами реализовано средствами доменных событий родительского домена.
+The project is based on the principles of pure (onion) architecture, with such elements as: domain, usecase, interface, infrastructure and domain events.
+The specificity of the project is the addition of a component part, which is a set of necessary business objects.
+The components, in turn, are implemented on a pure architecture.
+Interaction between the components is realized by means of domain events of the parent domain.
 
-## Схема проекта
+## Project outline
 
 <!--
 @startuml projectdiagram
@@ -56,7 +56,7 @@ artifact "Проект" {
 
 ![](projectdiagram.svg)
 
-## Структура проекта
+## Project structure
 
 ```
 
@@ -99,50 +99,51 @@ artifact "Проект" {
         └───utils
 ```
 
-### Описание каталогов проекта
+### Description of the project's catalogs
 
 #### core
 
-Каталог **core** содержит общие для всего проекта компоненты. Такие как: аутентификация, доменнные события, константы, интерфейсы, типы, ошибки, хелперы и т.д.
+The **core** directory contains components common to the entire project. Such as: authentication, domain events, constants, interfaces, types, errors, helpers, etc.
 
 #### api
 
-Каталог **api** разбит по версиям, где каждая версия содержит интерфейсы (роуты), инфраструктуру (в частном случае работу с БД) и компоненты системы. Компоненты системы, в свою очередь, представляют собой проекты чистой архитектуры. Каждый компонент может содержать каталоги: domain, usecases, infrastructure, interface, subscribers.
+The **api** catalog is divided into versions, where each version contains interfaces (routers), infrastructure (in the particular case of database operation) and system components. The system components, in turn, are pure architecture projects. Each component can contain catalogs: domain, usecases, infrastructure, interface, subscribers.
 
 #### config
 
-Каталог **config** содержит вспомогательные компоненты для работы с конфигурациями.
+The **config** directory contains auxiliary components for working with configurations.
 
-## МИГРАЦИИ БД
+## DB MIGRATIONS
 
 ### 1. PostgreSql
 
 #### db-migrate
 
-ссылки: 
+references:
 
 [https://db-migrate.readthedocs.io/en/latest/](https://db-migrate.readthedocs.io/en/latest/)
+
 [https://coding-overhead.com/post/db-migrate](https://coding-overhead.com/post/db-migrate)
 
-#### Создание миграции (для Windows выполнить в Git bash)
+#### Create a migration (for Windows, execute in Git bash)
 
 ```bash
     node_modules/.bin/db-migrate create v0_0_1 --config ./src/core/config/database.json --sql-file
 ```
 
-#### Создание БД
+#### Database creation
 
 ```bash
     node_modules/.bin/db-migrate db:create test --config ./src/core/config/database.json
 ```
 
-#### Откат БД
+#### DB rollback
 
 ```bash
     node_modules/.bin/db-migrate down --config ./src/core/config/database.json
 ```
 
-#### Новая миграция
+#### New migration
 
 ```bash
     node_modules/.bin/db-migrate up --config ./src/core/config/database.json
@@ -150,75 +151,75 @@ artifact "Проект" {
 
 ### 2. Oracle DB
 
-#### Пакет Marv
+#### Marv package
 
-ссылки:
+references:
 
 [https://github.com/guidesmiths/marv/](https://github.com/guidesmiths/marv/)
 [https://www.npmjs.com/package/marv](https://www.npmjs.com/package/marv)
 [https://www.npmjs.com/package/marv-oracledb-driver](https://www.npmjs.com/package/marv-oracledb-driver)
 
-#### Создание миграции
+#### Creating a migration
 
-1. В папке /migrations создаем файл .sql
-2. Номерацию файла продолжаем или начинаем с 001
+1. In the folder /migrations create a file .sql
+2. File numbering continues or starts with 001
 
-#### Запуск миграции
+#### Starting migration
 
-Команда запуска миграции
+Command to start migration
 
 ```bash
     npm run oraclemigration
 ```
 
-## ТЕСТЫ
+## TESTS
 
-Команда запуска тестов
+Test Run Command
 
 ```bash
     npm run test
 ```
 
-## ЗАПУСК
+## STARTING
 
-### В докере
+### In the docker
 
-Забираем последнюю версию
+We're picking up the latest version
 
 ```bash
     sudo git pull
 ```
 
-Запуск докера
+Starting the docker
 
 ```bash
     sudo bash service_up.sh
 ```
 
-Остановка докера
+Stopping the dock
 
 ```bash
     sudo bash service_down.sh
 ```
 
-### Сборка проекта
+### Project assembly
 
 ```bash
     npm run build
 ```
 
-### Запуск debug 
+### Starting debug
 
 ```bash
     npm run dev
 ```
 
-### Запуск production
+### Start of production
 
 ```bash
     npm run serve
 ```
 
-### Ссылки
+### References
 
-В разработке шаблона использовались наработки: [@tkssharma](https://github.com/tkssharma#hey-im-tarun-tkssharma), [@stemmlerjs](https://github.com/stemmlerjs/white-label)
+In the development of the template, the developments were used: [@tkssharma](https://github.com/tkssharma#hey-im-tarun-tkssharma), [@stemmlerjs](https://github.com/stemmlerjs/white-label)
