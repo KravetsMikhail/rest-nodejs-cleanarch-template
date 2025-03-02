@@ -1,4 +1,4 @@
-# rest-nodejs-cleanarch-template ![[English version]](https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template/blob/main/README-en.md)
+# rest-nodejs-cleanarch-template [[English version]](https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template/blob/main/README-en.md)
 
 Шаблон REST API сервера на компонентной чистой архитектуре 
 
