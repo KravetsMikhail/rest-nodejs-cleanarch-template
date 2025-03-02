@@ -5,7 +5,7 @@ import { TaskName } from '../valueobjects/task.name'
 import { TaskSearch } from '../valueobjects/task.search'
 import { Result } from '../../../../../../core/domain/types/result'
 import { Guard } from '../../../../../../core/domain/types/guard'
-import { TaskCreatedEvent } from '../events/task.created.events'
+import { ITaskCreatedEventProps, TaskCreatedEvent } from '../events/task.created.events'
 import { TaskDeletedEvent } from '../events/task.deleted.events'
 import { TaskUpdatedEvent } from '../events/task.updated.events'
 import { DbTypes, DbType, ID } from '../../../../../../core/domain/types/reflections'
@@ -65,22 +65,24 @@ export class TaskEntity extends AggregateRoot<ITaskProps> {
         ]
 
         const guardResult = Guard.againstNullOrUndefinedBulk(guardedProps)
-        
+
         if (!guardResult.succeeded) {
             return Result.fail<TaskEntity, ValidationError>(
-                new ValidationError([{fields: ["name"], constraint: guardResult.message as string}])
+                new ValidationError([{ fields: ["name"], constraint: guardResult.message as string }])
             )
         }
         else {
-            const task = new TaskEntity({
-                ...props,
-            }, id)
+            const itask = {
+                task: new TaskEntity({
+                    ...props,
+                }, id)
+            } as ITaskCreatedEventProps
 
-            if(isCreateEvent){
-                task.addDomainEvent(new TaskCreatedEvent(task))
+            if (isCreateEvent) {
+                itask.task.addDomainEvent(new TaskCreatedEvent(itask))
             }
 
-            return Result.ok<TaskEntity>(task)
+            return Result.ok<TaskEntity>(itask.task)
         }
     }
 
@@ -90,10 +92,10 @@ export class TaskEntity extends AggregateRoot<ITaskProps> {
         ]
 
         const guardResult = Guard.againstNullOrUndefinedBulk(guardedProps)
-        
+
         if (!guardResult.succeeded) {
             return Result.fail<TaskEntity, ValidationError>(
-                new ValidationError([{fields: ["name"], constraint: guardResult.message as string}])
+                new ValidationError([{ fields: ["name"], constraint: guardResult.message as string }])
             )
         }
         else {
@@ -124,11 +126,11 @@ export class DeletedTaskEntity extends AggregateRoot<IDeletedTaskProps> {
     }
 
     public static delete(id: UniqueEntityId, userId: string): Result<DeletedTaskEntity> {
-        const guardResult =  Guard.againstNullOrUndefinedOrEmpty(id, "id")
+        const guardResult = Guard.againstNullOrUndefinedOrEmpty(id, "id")
 
         if (!guardResult.succeeded) {
             return Result.fail<DeletedTaskEntity, ValidationError>(
-                new ValidationError([{fields: ["id"], constraint: guardResult.message as string}])
+                new ValidationError([{ fields: ["id"], constraint: guardResult.message as string }])
             )
         }
         else {

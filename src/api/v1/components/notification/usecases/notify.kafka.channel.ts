@@ -1,7 +1,6 @@
 
 import { IUseCase } from "../../../../../core/domain/types/i.usecase"
-import { KafkaTopic } from "../domain/kafka.topic"
-import { IKafkaService } from "../services/kafka.service"
+import { IKafkaService, KafkaTopic } from "../../../infrastructure/kafka/kafka.service"
 
 export class NotifyKafkaChannel implements IUseCase<Promise<void>> {
     private kafkaService: IKafkaService

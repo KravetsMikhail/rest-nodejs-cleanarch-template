@@ -1,8 +1,9 @@
 
 import { Kafka, Message } from 'kafkajs'
-import { KafkaTopic } from '../domain/kafka.topic'
-import { envs } from '../../../../../config/env'
-import { Logger } from '../../../../../core/logger/logger' 
+import { envs } from '../../../../config/env'
+import { Logger } from '../../../../core/logger/logger' 
+
+export type KafkaTopic = 'createtask' | 'deletetask' | 'updatetask'
 
 export interface IKafkaService {
     sendMessage(text: string, topic: KafkaTopic): Promise<any>

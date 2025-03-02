@@ -1,1 +1,0 @@
-export type KafkaTopic = 'createtask' | 'deletetask' | 'updatetask'

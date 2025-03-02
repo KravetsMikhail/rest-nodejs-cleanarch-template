@@ -54,12 +54,11 @@ artifact "Проект" {
 @enduml
 -->
 
-![](projectdiagram.svg)
+![Project outline](projectdiagram.svg)
 
 ## Project structure
 
-```
-
+```txt
 ├───api
 │   └───v1
 │       ├───components
@@ -112,6 +111,54 @@ The **api** catalog is divided into versions, where each version contains interf
 #### config
 
 The **config** directory contains auxiliary components for working with configurations.
+
+#### .env
+
+The **.env** file contains the environment variables that are used in the project. All environment variables are described in the **.env.example** file.
+
+## Project Usage
+
+### OpenAPI
+
+By default, the project runs on port 1234.
+
+OpenAPI documentation is available at <http://localhost:1234/api-docs/v1/>
+
+### Authentication
+
+The project implements authentication using JWT. For authentication it is necessary to add a header with a request body in JWT Bearer format to all requests.
+
+> [!NOTE]
+> When using Postman, you must add a header with a request body in JWT Bearer format.
+>
+>- In the Authorization tab, select Auth type - JWT Bearer.
+>- In the Algorithm field, select HS256.
+>- In the Secret field, select 112233445566
+>- In the Payload field enter
+>
+>```json
+>{    
+>    "userId": 123,
+>    "userName": "Ivanov",
+>    "exp": 1762962547
+>}
+>```
+
+### API requests
+
+API requests can be made with Postman or with curl.
+
+Server address: <http://localhost:1234/api/v1/>
+
+### Events
+
+The project implements support of domain events. To work with events you should use **domain** and **usecases** components.
+
+In the **domain** component interfaces for working with events are implemented. Services for working with events are implemented in **usecases** component.
+
+To subscribe to events you should use the **subscribers** component. The **subscribers** component implements event subscribers.
+
+To send events to external services you need to use the **infrastructure** component. The **infrastructure** component implements services for sending events. Kafka queue is used in the project.
 
 ## DB MIGRATIONS
 
