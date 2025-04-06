@@ -161,3 +161,6 @@ Session.vim
 
 # yarn lock
 *.lock
+
+# poatgres
+pgdata

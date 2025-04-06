@@ -174,25 +174,25 @@ OpenAPI документация доступна по адресу <http://loca
 #### Создание миграции (для Windows выполнить в Git bash)
 
 ```bash
-    node_modules/.bin/db-migrate create v0_0_1 --config ./src/core/config/database.json --sql-file
+    node_modules/.bin/db-migrate create v0_0_1 --config ./src/config/database.json --sql-file
 ```
 
 #### Создание БД
 
 ```bash
-    node_modules/.bin/db-migrate db:create test --config ./src/core/config/database.json
+    node_modules/.bin/db-migrate db:create test --config ./src/config/database.json
 ```
 
 #### Откат БД
 
 ```bash
-    node_modules/.bin/db-migrate down --config ./src/core/config/database.json
+    node_modules/.bin/db-migrate down --config ./src/config/database.json
 ```
 
 #### Новая миграция
 
 ```bash
-    node_modules/.bin/db-migrate up --config ./src/core/config/database.json
+    node_modules/.bin/db-migrate up --config ./src/config/database.json
 ```
 
 ### 2. Oracle DB
@@ -236,16 +236,32 @@ OpenAPI документация доступна по адресу <http://loca
     sudo git pull
 ```
 
-Запуск докера
+#### Запуск докера
+
+Linux
 
 ```bash
     sudo bash service_up.sh
 ```
 
-Остановка докера
+Windows (в Git bash)
+
+```bash
+    bash service_up.sh
+```
+
+#### Остановка докера
+
+Linux
 
 ```bash
     sudo bash service_down.sh
+```
+
+Windows (в Git bash)
+
+```bash
+    bash service_down.sh
 ```
 
 ### Сборка проекта

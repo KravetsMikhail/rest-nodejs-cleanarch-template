@@ -175,25 +175,25 @@ references:
 #### Create a migration (for Windows, execute in Git bash)
 
 ```bash
-    node_modules/.bin/db-migrate create v0_0_1 --config ./src/core/config/database.json --sql-file
+    node_modules/.bin/db-migrate create v0_0_1 --config ./src/config/database.json --sql-file
 ```
 
 #### Database creation
 
 ```bash
-    node_modules/.bin/db-migrate db:create test --config ./src/core/config/database.json
+    node_modules/.bin/db-migrate db:create test --config ./src/config/database.json
 ```
 
 #### DB rollback
 
 ```bash
-    node_modules/.bin/db-migrate down --config ./src/core/config/database.json
+    node_modules/.bin/db-migrate down --config ./src/config/database.json
 ```
 
 #### New migration
 
 ```bash
-    node_modules/.bin/db-migrate up --config ./src/core/config/database.json
+    node_modules/.bin/db-migrate up --config ./src/config/database.json
 ```
 
 ### 2. Oracle DB
@@ -237,16 +237,32 @@ We're picking up the latest version
     sudo git pull
 ```
 
-Starting the docker
+#### Starting the docker
+
+Linux version
 
 ```bash
     sudo bash service_up.sh
 ```
 
-Stopping the dock
+Windows version
+
+```bash
+    bash service_up.sh
+```
+
+#### Stopping the dock
+
+Linux version
 
 ```bash
     sudo bash service_down.sh
+```
+
+Windows version
+
+```bash
+    bash service_down.sh
 ```
 
 ### Project assembly
