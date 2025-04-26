@@ -1,90 +1,106 @@
 import oracledb from 'oracledb'
-import { envs } from '../../../../config/env'
+import { EnvConfig } from '../../../../config/env'
 import { Logger } from '../../../../core/logger/logger'
 
-class OraclePoolConfig implements oracledb.PoolAttributes {
-    public readonly user: string
-    public readonly password: string
-    public readonly connectString: string
-    public readonly poolIncrement: number
-    public readonly poolMax: number
-    public readonly poolMin: number
-    public readonly poolPingInterval: number
-    public readonly poolTimeout: number
-
-    constructor() {
-        const { oracleDbuser,
-            oracleDbPass,
-            oracleDbHost,
-            oracleDbName,
-            oracleDbPoolincrement,
-            oracleDbPoolmax,
-            oracleDbPoolmin,
-            oracleDbPoolpinginterval,
-            oracleDbPooltimeout,
-            oracleDbPort } = envs
-
-        this.user = oracleDbuser
-        this.password = oracleDbPass
-        this.poolIncrement = oracleDbPoolincrement
-        this.poolMax = oracleDbPoolmax
-        this.poolMin = oracleDbPoolmin
-        this.poolPingInterval = oracleDbPoolpinginterval
-        this.poolTimeout = oracleDbPooltimeout
-        this.connectString = `${oracleDbHost}:${oracleDbPort}/${oracleDbName}`
-    }
+interface OracleResult {
+    rows: any[]
+    metaData?: any[]
+    errors?: { message: string }[]
 }
 
-class OracleDbService {
-    public static logger: any = new Logger()
-    private static pool: any
+export class OracleService {
+    private static instance: OracleService
+    private pool: oracledb.Pool | null = null
+    private readonly logger: Logger
 
-    public static async _initialize() {
-        let _config = new OraclePoolConfig()
-
-        try {
-            OracleDbService.logger.debug("=> Запуск пул Oracle <=")
-            this.pool = await oracledb.createPool(_config)
-            OracleDbService.logger.debug("=> Создан пул Oracle <=")
-        } catch(err) {            
-            OracleDbService.logger.debug("Error in OracleDbService in _initialize")
-            OracleDbService.logger.debug("Не удалось создать пул Oracle")
-            OracleDbService.logger.error(err)
-        } 
+    private constructor() {
+        this.logger = new Logger()
     }
 
-    public static async query(sql: any, params?: any): Promise<any> {
-        const connection = await this.pool.getConnection()
-        try {
-            OracleDbService.logger.debug(`=> Запрос в Oracle: ${sql}`)
-            const result = await connection.execute(sql, params)
-            OracleDbService.logger.debug(`<= Ответ из Oracle: ${result}`)
-            return result
-        } catch(err){            
-            OracleDbService.logger.debug("Не удалось выполнить запрос в Oracle")
-            OracleDbService.logger.error(err)
+    public static getInstance(): OracleService {
+        if (!OracleService.instance) {
+            OracleService.instance = new OracleService()
         }
-        finally {
+        return OracleService.instance
+    }
+
+    public async initialize(): Promise<void> {
+        try {
+            this.logger.debug('Initializing Oracle pool')
+            const config: oracledb.PoolAttributes = {
+                user: EnvConfig.oracle.user,
+                password: EnvConfig.oracle.pass,
+                connectString: `${EnvConfig.oracle.host}:${EnvConfig.oracle.port}/${EnvConfig.oracle.name}`,
+                poolIncrement: EnvConfig.oracle.poolIncrement,
+                poolMax: EnvConfig.oracle.poolMax,
+                poolMin: EnvConfig.oracle.poolMin,
+                poolPingInterval: EnvConfig.oracle.poolPingInterval,
+                poolTimeout: EnvConfig.oracle.poolTimeout
+            }
+
+            this.pool = await oracledb.createPool(config)
+            this.logger.debug('Oracle pool initialized successfully')
+        } catch (err) {
+            const error = err as Error
+            this.logger.error('Failed to initialize Oracle pool', { message: error.message, stack: error.stack })
+            throw err
+        }
+    }
+
+    public async query(sql: string, params?: any[]): Promise<OracleResult> {
+        if (!this.pool) {
+            throw new Error('Oracle pool not initialized')
+        }
+
+        const start = Date.now()
+        const connection = await this.pool.getConnection()
+        
+        try {
+            this.logger.debug(`Executing Oracle query: ${sql}`)
+            const result = await connection.execute(sql, params || [], { outFormat: oracledb.OUT_FORMAT_OBJECT })
+            const duration = Date.now() - start
+            this.logger.debug(`Executed query in ${duration}ms: ${sql}`)
+            
+            return {
+                rows: result.rows || [],
+                metaData: result.metaData
+            }
+        } catch (err) {
+            this.logger.error('Error executing Oracle query', {
+                query: sql,
+                params,
+                error: err
+            })
+            return {
+                rows: [],
+                errors: [{ message: (err as Error).message }]
+            }
+        } finally {
             await connection.release()
         }
     }
 
-    public static async closePool() {
-        try {
-            OracleDbService.logger.debug("=> Закрытие пула Oracle в finally <=")
-            await this.pool.terminate()
-            OracleDbService.logger.debug("=> Закрыт пул Oracle <=")
-        } catch (err) {
-            OracleDbService.logger.error(err)
-            OracleDbService.logger.debug("Error in OracleDbService in closePool")            
+    public async close(): Promise<void> {
+        if (this.pool) {
+            try {
+                this.logger.debug('Closing Oracle pool')
+                await this.pool.terminate()
+                this.pool = null
+                this.logger.debug('Oracle pool closed successfully')
+            } catch (err) {
+                const error = err as Error
+                this.logger.error('Error closing Oracle pool', { message: error.message, stack: error.stack })
+                throw err
+            }
         }
     }
 }
 
-process
-    .once('SIGTERM', OracleDbService.closePool)
-    .once('SIGINT', OracleDbService.closePool)
+// Initialize pool on process termination
+process.once('SIGTERM', async () => {
+    await OracleService.getInstance().close()
+})
 
-OracleDbService._initialize()
-
-export { OracleDbService }
+process.once('SIGINT', async () => {
+    await OracleService.getInstance().close()
+})

@@ -1,8 +1,8 @@
-export class HttpCode {
-    public static OK = 200
-    public static BAD_REQUEST = 400
-    public static UNAUTHORIZED = 401
-    public static FORBIDDEN = 403
-    public static NOT_FOUND = 404    
-    public static INTERNAL_SERVER_ERROR = 500
+export enum HttpCode {
+    OK = 200,
+    BAD_REQUEST = 400,
+    UNAUTHORIZED = 401,
+    FORBIDDEN = 403,
+    NOT_FOUND = 404,
+    INTERNAL_SERVER_ERROR = 500
 }

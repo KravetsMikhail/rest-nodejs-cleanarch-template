@@ -10,11 +10,15 @@ import { ErrorMiddleware } from './core/middlewares/errors/error.middleware'
 import { auth } from './core/middlewares/auth/auth.middleware'
 import { AppError } from './core/errors/custom.error'
 import { Logger } from './core/logger/logger'
+import { PostgresService } from './api/v1/infrastructure/postgresql/postgresql'
+import { OracleService } from './api/v1/infrastructure/oracle/oracledb'
+import { EnvConfig } from './config/env'
 import serveFavicon = require('serve-favicon')
 import path = require('path')
 import YAML from 'yaml'
 import fs from 'fs'
 import "./core/subscribers"
+import { CircuitBreaker } from './core/utils/circuit-breaker'
 
 interface ServerOptions {
     host: String
@@ -30,6 +34,11 @@ export class Server {
     private readonly routes: Router
     private readonly apiPrefix: string
     private readonly host: String
+    private readonly postgresService: PostgresService
+    private readonly oracleService: OracleService
+    private server: any = null
+    private isRestarting: boolean = false
+    private readonly circuitBreaker: CircuitBreaker
 
     constructor(options: ServerOptions) {
         const { host, port, routes, apiPrefix } = options
@@ -37,16 +46,23 @@ export class Server {
         this.port = port
         this.routes = routes
         this.apiPrefix = apiPrefix
+        this.postgresService = PostgresService.getInstance()
+        this.oracleService = OracleService.getInstance()
+        this.circuitBreaker = new CircuitBreaker(
+            EnvConfig.circuitBreaker.failureThreshold,
+            EnvConfig.circuitBreaker.resetTimeout,
+            EnvConfig.maxRetries
+        )
     }
 
-    async start(): Promise<void> {
-        //* Middlewares  
-        this.app.use(express.json()) // parse json in request body (allow raw)  
-        this.app.use(express.urlencoded({ extended: true })) // allow x-www-form-urlencoded  
+    private setupBasicMiddleware(): void {
+        this.app.use(express.json())
+        this.app.use(express.urlencoded({ extended: true }))
         this.app.use(compression())
         this.app.use(this.logger.getRequestLogger())
-        
-        //  limit repeated requests to public APIs  
+    }
+
+    private setupRateLimiting(): void {
         this.app.use(
             rateLimit({
                 max: ONE_HUNDRED,
@@ -54,53 +70,157 @@ export class Server {
                 message: 'Too many requests from this IP, please try again in one hour'
             })
         )
+    }
 
-        // CORS  
+    private setupCORS(): void {
         this.app.use((req, res, next) => {
-            // Add your origins  
             const allowedOrigins = [`http://localhost:${this.port}`, `http://${this.host}:${this.port}`]
             const origin = req.headers.origin
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion  
-            if (allowedOrigins.includes(origin!)) {
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion  
-                res.setHeader('Access-Control-Allow-Origin', origin!)
+            
+            if (origin && allowedOrigins.includes(origin)) {
+                res.setHeader('Access-Control-Allow-Origin', origin)
             }
             res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
             res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
             next()
         })
+    }
 
+    private setupStaticFiles(): void {
         this.app.use(serveFavicon(path.join(__dirname, '..', '/public/favicon.ico')))
+    }
 
-        //* Routes  
+    private setupRoutes(): void {
         this.app.use(this.apiPrefix, auth, this.routes)
-        this.app.get('/health', (_req: Request, res: Response) => {
-            return res.status(HttpCode.OK).json({ status: true, message: 'Health OK!' }) as any
+        
+        this.app.get('/health', (_req: Request, res: Response): void => {
+            res.status(HttpCode.OK).json({ status: true, message: 'Health OK!' })
         })
 
-        // Test rest api  
-        this.app.get('/', (_req: Request, res: Response)  => {
-            return res.status(HttpCode.OK).send({
-                message: `Welcome to Initial API! n Endpoints available at http://${this.host}:${this.port}/`
-            }) as any
+        this.app.get('/', (_req: Request, res: Response): void => {
+            res.status(HttpCode.OK).send({
+                message: `Welcome to Initial API! Endpoints available at http://${this.host}:${this.port}/`
+            })
         })
+    }
 
-        const file  = fs.readFileSync('./dist/api/v1/openapi/openapi.yaml', 'utf8')
+    private setupSwagger(): void {
+        const file = fs.readFileSync('./dist/api/v1/openapi/openapi.yaml', 'utf8')
         const swaggerDocumentV1 = YAML.parse(file)
         this.app.use('/api-docs/v1', swaggerUi.serve, swaggerUi.setup(swaggerDocumentV1))
+    }
 
-        //* Handle not found routes in /api/v1/* (only if 'Public content folder' is not available)  
+    private setupErrorHandling(): void {
         this.routes.all('*', (req: Request, _: Response, next: NextFunction): void => {
-            next(AppError.notFound(`Cant find ${req.originalUrl} on this server!`))
+            next(AppError.notFound(`Can't find ${req.originalUrl} on this server!`))
         })
 
-        // Handle errors middleware  
         ErrorMiddleware.initialize(this.logger)
-        this.routes.use(ErrorMiddleware.handleError)        
+        this.routes.use(ErrorMiddleware.handleError)
         this.app.use(this.logger.getRequestErrorLogger())
-        
-        this.app.listen(this.port, () => {
-            console.log(`Server running on port ${this.port}...`)
-        })
+    }
+
+    private async checkDatabaseConnections(retryCount: number = 0): Promise<void> {
+        const errors: string[] = []
+
+        try {
+            await this.circuitBreaker.execute(async () => {
+                if (EnvConfig.defaultDataSource === 'postgres') {
+                    await this.postgresService.query('SELECT 1')
+                    this.logger.info('PostgreSQL connection successful')
+                } else {
+                    await this.oracleService.query('SELECT 1 FROM DUAL')
+                    this.logger.info('Oracle connection successful')
+                }
+            })
+        } catch (err) {
+            const error = err as Error
+            const dbType = EnvConfig.defaultDataSource === 'postgres' ? 'PostgreSQL' : 'Oracle'
+            errors.push(`${dbType} connection failed`)
+            this.logger.error(`${dbType} connection failed`, { error: { message: error.message, stack: error.stack } })
+        }
+
+        if (errors.length > 0) {
+            if (retryCount < EnvConfig.maxRetries) {
+                this.logger.info(`Retrying database connection (attempt ${retryCount + 1}/${EnvConfig.maxRetries})...`)
+                await new Promise(resolve => setTimeout(resolve, EnvConfig.retryDelay))
+                return this.checkDatabaseConnections(retryCount + 1)
+            }
+            throw new Error(`Database connection errors: ${errors.join(', ')}`)
+        }
+    }
+
+    private async restartServer(): Promise<void> {
+        if (this.isRestarting) {
+            this.logger.warn('Server restart already in progress')
+            return
+        }
+
+        this.isRestarting = true
+        this.logger.info('Initiating server restart...')
+
+        try {
+            if (this.server) {
+                this.server.close()
+                this.logger.info('Server stopped')
+            }
+
+            await this.checkDatabaseConnections()
+            
+            this.setupBasicMiddleware()
+            this.setupRateLimiting()
+            this.setupCORS()
+            this.setupStaticFiles()
+            this.setupRoutes()
+            this.setupSwagger()
+            this.setupErrorHandling()
+            
+            this.server = this.app.listen(this.port, () => {
+                this.logger.info(`Server restarted successfully on port ${this.port}...`)
+            })
+
+            // Set up database connection monitoring
+            this.monitorDatabaseConnections()
+        } catch (error) {
+            this.logger.error('Failed to restart server', { error })
+            process.exit(1)
+        } finally {
+            this.isRestarting = false
+        }
+    }
+
+    private async monitorDatabaseConnections(): Promise<void> {
+        setInterval(async () => {
+            try {
+                await this.checkDatabaseConnections()
+            } catch (error) {
+                this.logger.error('Database connection lost, attempting to restart server...', { error })
+                await this.restartServer()
+            }
+        }, EnvConfig.databaseMonitoring.interval)
+    }
+
+    async start(): Promise<void> {
+        try {
+            await this.checkDatabaseConnections()
+            
+            this.setupBasicMiddleware()
+            this.setupRateLimiting()
+            this.setupCORS()
+            this.setupStaticFiles()
+            this.setupRoutes()
+            this.setupSwagger()
+            this.setupErrorHandling()
+            
+            this.server = this.app.listen(this.port, () => {
+                this.logger.info(`Server running on port ${this.port}...`)
+            })
+
+            // Start monitoring database connections
+            this.monitorDatabaseConnections()
+        } catch (error) {
+            this.logger.error('Failed to start server', { error })
+            process.exit(1)
+        }
     }
 }

@@ -4,39 +4,69 @@ import { ValidationError } from '../../errors/validation.error'
 import { HttpCode } from '../../constants/httpcodes'
 import { AppError } from '../../errors/custom.error'
 import { Logger } from '../../logger/logger'
+import { ErrorFactory } from '../../errors/error.types'
+import { PostgresService } from '../../../api/v1/infrastructure/postgresql/postgresql'
+import { OracleService } from '../../../api/v1/infrastructure/oracle/oracledb'
 
 export class ErrorMiddleware {
     //* Dependency injection  
     //constructor() {}  
 
-    public static logger: Logger
+    private static logger: Logger
+    private static postgresService: PostgresService
+    private static oracleService: OracleService
 
-    static initialize(logg: Logger) {
-        ErrorMiddleware.logger = logg
+    public static initialize(logger: Logger): void {
+        ErrorMiddleware.logger = logger
+        ErrorMiddleware.postgresService = PostgresService.getInstance()
+        ErrorMiddleware.oracleService = OracleService.getInstance()
     }
 
-    public static handleError = (error: unknown, _: Request, res: Response, next: NextFunction): void => {
-        if (error instanceof ValidationError) {
-            const { message, name, validationErrors, stack } = error
-            const statusCode = error.statusCode || HttpCode.INTERNAL_SERVER_ERROR
-            res.statusCode = statusCode as number
-            res.json({ name, message, validationErrors, stack })
-        } else if (error instanceof AppError) {
-            const { message, name, stack } = error
-            const statusCode = error.statusCode || HttpCode.INTERNAL_SERVER_ERROR
-            res.statusCode = statusCode as number
-            if(statusCode == HttpCode.UNAUTHORIZED){
-                res.json({ name, message })
-            }else{
-                res.json({ name, message, stack })
-            }
-        } else {            
-            const name = 'InternalServerError'
-            const message = 'An internal server error occurred'
-            const statusCode = HttpCode.INTERNAL_SERVER_ERROR
-            res.statusCode = statusCode
-            res.json({ name, message })            
+    public static handleError = async (error: unknown, _: Request, res: Response, next: NextFunction): Promise<void> => {
+        let statusCode: number = HttpCode.INTERNAL_SERVER_ERROR
+        let errorResponse: ReturnType<typeof ErrorFactory.createErrorResponse>
+
+        // Check database connectivity
+        const dbErrors: string[] = []
+        try {
+            await ErrorMiddleware.postgresService.query('SELECT 1')
+        } catch (err) {
+            dbErrors.push('PostgreSQL connection failed')
         }
-        next(ErrorMiddleware.logger.error(error))
+
+        try {
+            await ErrorMiddleware.oracleService.query('SELECT 1 FROM DUAL')
+        } catch (err) {
+            dbErrors.push('Oracle connection failed')
+        }
+
+        if (error instanceof ValidationError) {
+            statusCode = HttpCode.BAD_REQUEST
+            errorResponse = ErrorFactory.createErrorResponse(error)
+        } else if (error instanceof AppError) {
+            statusCode = error.statusCode
+            errorResponse = ErrorFactory.createErrorResponse(error)
+        } else {
+            errorResponse = ErrorFactory.createErrorResponse(error)
+        }
+
+        // Add database errors to response if any
+        if (dbErrors.length > 0) {
+            errorResponse = {
+                ...errorResponse,
+                databaseErrors: dbErrors
+            }
+        }
+
+        // Log the error
+        ErrorMiddleware.logger.error('Error occurred', {
+            error,
+            statusCode,
+            response: errorResponse,
+            databaseErrors: dbErrors
+        })
+
+        // Send response
+        res.status(statusCode).json(errorResponse)
     }
 }

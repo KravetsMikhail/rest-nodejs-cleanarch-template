@@ -5,10 +5,16 @@ export interface CustomRequest extends Request {
     payload: TokenPayload
 }
 
-export interface TokenPayload {
-    exp: string
+export interface TokenPayload extends Omit<JwtPayload, 'exp'> {
+    exp: number
     roles: string[]
     userName: string
     userId: number
-    token: string | JwtPayload    
+    token: JwtPayload
+}
+
+export interface TokenPayloadInput {
+    roles?: string[]
+    userName: string
+    userId: number
 }

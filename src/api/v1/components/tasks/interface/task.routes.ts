@@ -3,14 +3,13 @@ import { PostgreTaskDatasource } from '../infrastructure/postgresql.datasource'
 import { OracleTaskDatasource } from '../infrastructure/oracldb.datasource'
 import { TaskRepository } from '../domain/repositories/task.repository'
 import { TaskController } from './task.controller'
+import { EnvConfig, DataSourceType } from '../../../../../config/env'
 
 export class TaskRoutesV1 {
     static get routes(): Router {
         const router = Router()
 
-        //* This datasource can be change  
-        const datasource = new PostgreTaskDatasource()
-        //const datasource = new OracleTaskDatasource()
+        const datasource = TaskRoutesV1.getDatasource(EnvConfig.defaultDataSource)
         const repository = new TaskRepository(datasource)
         const controller = new TaskController(repository)
 
@@ -28,5 +27,16 @@ export class TaskRoutesV1 {
         router.delete('/:id', controller.deleteTask)
 
         return router
+    }
+
+    private static getDatasource(type: DataSourceType) {
+        switch (type) {
+            case 'postgres':
+                return new PostgreTaskDatasource()
+            case 'oracle':
+                return new OracleTaskDatasource()
+            default:
+                return new PostgreTaskDatasource() // fallback to postgres
+        }
     }
 }

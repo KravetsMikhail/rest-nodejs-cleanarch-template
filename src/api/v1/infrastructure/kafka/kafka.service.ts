@@ -1,6 +1,5 @@
-
-import { Kafka, Message } from 'kafkajs'
-import { envs } from '../../../../config/env'
+import { Kafka, Message, Partitioners } from 'kafkajs'
+import { EnvConfig } from '../../../../config/env'
 import { Logger } from '../../../../core/logger/logger' 
 
 export type KafkaTopic = 'createtask' | 'deletetask' | 'updatetask'
@@ -12,18 +11,21 @@ export interface IKafkaService {
 export class KafkaService implements IKafkaService {
     public static logger: any = new Logger()
     private static kafka = new Kafka({
-        clientId: envs.kafkaClientId,
-        brokers: envs.kafkaBrokers,
+        clientId: EnvConfig.kafka.clientId,
+        brokers: EnvConfig.kafka.brokers,
     })
 
-    private static producer = this.kafka.producer({allowAutoTopicCreation: true})
+    private static producer = this.kafka.producer({
+        allowAutoTopicCreation: true,
+        createPartitioner: Partitioners.LegacyPartitioner
+    })
 
     constructor() {
     }
 
     async sendMessage(text: string, topic: KafkaTopic): Promise<any> {
         console.log("==>> Отправляю сообщение: " + text)
-        console.log("envs.kafkaBrokers = ", envs.kafkaBrokers)
+        console.log("kafka brokers = ", EnvConfig.kafka.brokers)
         try{
             await KafkaService.producer.connect().catch((err) => {
                 console.log(err)
