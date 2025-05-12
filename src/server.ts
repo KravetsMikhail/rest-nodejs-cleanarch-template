@@ -21,10 +21,12 @@ import "./core/subscribers"
 import { CircuitBreaker } from './core/utils/circuit-breaker'
 
 interface ServerOptions {
-    host: String
+    host: string
     port: number
     routes: Router
     apiPrefix: string
+    uiHost: string
+    uiPort: number
 }
 
 export class Server {
@@ -33,6 +35,8 @@ export class Server {
     private readonly port: number
     private readonly routes: Router
     private readonly apiPrefix: string
+    private readonly uiHost: string
+    private readonly uiPort: number
     private readonly host: String
     private readonly postgresService: PostgresService
     private readonly oracleService: OracleService
@@ -41,11 +45,13 @@ export class Server {
     private readonly circuitBreaker: CircuitBreaker
 
     constructor(options: ServerOptions) {
-        const { host, port, routes, apiPrefix } = options
+        const { host, port, routes, apiPrefix, uiHost, uiPort } = options
         this.host = host
         this.port = port
         this.routes = routes
         this.apiPrefix = apiPrefix
+        this.uiHost = uiHost
+        this.uiPort = uiPort
         this.postgresService = PostgresService.getInstance()
         this.oracleService = OracleService.getInstance()
         this.circuitBreaker = new CircuitBreaker(
@@ -74,9 +80,9 @@ export class Server {
 
     private setupCORS(): void {
         this.app.use((req, res, next) => {
-            const allowedOrigins = [`http://localhost:${this.port}`, `http://${this.host}:${this.port}`]
+            const allowedOrigins = [`http://localhost:${this.port}`, `http://${this.host}:${this.port}`, `http://${this.uiHost}:${this.uiPort}`]
             const origin = req.headers.origin
-            
+
             if (origin && allowedOrigins.includes(origin)) {
                 res.setHeader('Access-Control-Allow-Origin', origin)
             }
@@ -91,8 +97,15 @@ export class Server {
     }
 
     private setupRoutes(): void {
+        this.app.options("/*", function (req, res, next) {
+            res.header('Access-Control-Allow-Origin', '*');
+            res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+            res.send(200);
+        });
+
         this.app.use(this.apiPrefix, auth, this.routes)
-        
+
         this.app.get('/health', (_req: Request, res: Response): void => {
             res.status(HttpCode.OK).json({ status: true, message: 'Health OK!' })
         })
@@ -166,7 +179,7 @@ export class Server {
             }
 
             await this.checkDatabaseConnections()
-            
+
             this.setupBasicMiddleware()
             this.setupRateLimiting()
             this.setupCORS()
@@ -174,7 +187,7 @@ export class Server {
             this.setupRoutes()
             this.setupSwagger()
             this.setupErrorHandling()
-            
+
             this.server = this.app.listen(this.port, () => {
                 this.logger.info(`Server restarted successfully on port ${this.port}...`)
             })
@@ -203,7 +216,7 @@ export class Server {
     async start(): Promise<void> {
         try {
             await this.checkDatabaseConnections()
-            
+
             this.setupBasicMiddleware()
             this.setupRateLimiting()
             this.setupCORS()
@@ -211,7 +224,7 @@ export class Server {
             this.setupRoutes()
             this.setupSwagger()
             this.setupErrorHandling()
-            
+
             this.server = this.app.listen(this.port, () => {
                 this.logger.info(`Server running on port ${this.port}...`)
             })

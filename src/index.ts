@@ -11,7 +11,9 @@ function main(): void {
         host: envs.host,
         routes: AppRoutes.routes,
         apiPrefix: envs.apiPrefix,
-        port: envs.port
+        port: envs.port,
+        uiHost: envs.uiHost,
+        uiPort: envs.uiPort
     })
     void server.start()
 }

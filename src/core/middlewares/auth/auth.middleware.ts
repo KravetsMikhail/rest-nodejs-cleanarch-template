@@ -4,11 +4,48 @@ import { AppError } from '../../../core/errors/custom.error'
 import { ErrorMiddleware } from '../errors/error.middleware'
 import { CustomRequest, TokenPayload } from '../../domain/types/custom.request'
 import { Logger } from '../../logger/logger'
-import { HttpCode } from '../../constants/httpcodes'
+import jwksClient from 'jwks-rsa'
 
 export class AuthMiddleware {
-    private static readonly SECRET_KEY: Secret = process.env.JWT_SECRET || '112233445566'
     private static readonly logger = new Logger()
+    private static readonly keycloakDomain = process.env.KEYCLOAK_DOMAIN || 'http://localhost:8282'
+    private static readonly realmName = process.env.KEYCLOAK_REALM || 'master'
+    private static readonly jwksClient = jwksClient({
+        jwksUri: `${this.keycloakDomain}/realms/${this.realmName}/protocol/openid-connect/certs`,
+    })
+
+    public static getKey = (header: jwt.JwtHeader, callback: jwt.SigningKeyCallback): void => {
+        this.jwksClient.getSigningKey(header.kid, (err, key) => {
+            if (err) {
+                this.logger.error(`Error fetching signing key: ${err.message}`)
+                callback(err, undefined)
+            } else {
+                const signingKey = key?.getPublicKey()
+                callback(null, signingKey)
+            }
+        })
+    }
+
+    public static verify(token: string): Promise<JwtPayload> {
+        return new Promise(
+            (
+                resolve: (decoded: JwtPayload) => void,
+                reject: (error: Error) => void
+            ) => {
+                const verifyCallback: jwt.VerifyCallback = (
+                    error: jwt.VerifyErrors | null,
+                    decoded: any
+                ): void => {
+                    if (error) {
+                        return reject(error);
+                    }
+                    return resolve(decoded);
+                };
+
+                jwt.verify(token, this.getKey, verifyCallback);
+            }
+        );
+    }
 
     public static verifyToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
@@ -16,11 +53,18 @@ export class AuthMiddleware {
             if (!token) {
                 throw AppError.unauthorized('No token provided')
             }
-
-            const decoded = this.verifyAndDecodeToken(token)
-            this.attachPayloadToRequest(req as CustomRequest, decoded)
-
-            next()
+            this.verify(token).then((decoded) => {
+                this.attachPayloadToRequest(req as CustomRequest, this.validateTokenPayload(decoded))
+                next()
+            }).catch((error) => {
+                console.log("error 1 => ", error)
+                ErrorMiddleware.handleError(
+                    AppError.unauthorized('Authentication failed'),
+                    req,
+                    res,
+                    next
+                )
+            })
         } catch (error) {
             if (error instanceof jwt.JsonWebTokenError) {
                 ErrorMiddleware.handleError(
@@ -37,6 +81,7 @@ export class AuthMiddleware {
                     next
                 )
             } else {
+                console.log("error 2 => ", error)
                 ErrorMiddleware.handleError(
                     error instanceof AppError ? error : AppError.unauthorized('Authentication failed'),
                     req,
@@ -57,20 +102,10 @@ export class AuthMiddleware {
         return type === 'Bearer' ? token : null
     }
 
-    private static verifyAndDecodeToken(token: string): TokenPayload {
-        try {
-            const decoded = jwt.verify(token, this.SECRET_KEY) as JwtPayload
-            return this.validateTokenPayload(decoded)
-        } catch (error) {
-            this.logger.error('Token verification failed', { error })
-            throw error
-        }
-    }
-
     private static validateTokenPayload(decoded: JwtPayload): TokenPayload {
-        if (!decoded.exp || !decoded.userId || !decoded.userName) {
-            throw AppError.unauthorized('Invalid token payload')
-        }
+        // if (!decoded.exp || !decoded.userId || !decoded.userName) {
+        //     throw AppError.unauthorized('Invalid token payload')
+        // }
 
         return {
             exp: decoded.exp as number,
@@ -81,17 +116,9 @@ export class AuthMiddleware {
         }
     }
 
+    //private static attachPayloadToRequest(req: CustomRequest, payload: TokenPayload): void {
     private static attachPayloadToRequest(req: CustomRequest, payload: TokenPayload): void {
         req.payload = payload
-    }
-
-    public static generateToken(payload: Omit<TokenPayload, 'exp' | 'token'>): string {
-        const tokenPayload: JwtPayload = {
-            ...payload,
-            exp: Math.floor(Date.now() / 1000) + (60 * 60) // 1 hour expiration
-        }
-
-        return jwt.sign(tokenPayload, this.SECRET_KEY)
     }
 }
 
