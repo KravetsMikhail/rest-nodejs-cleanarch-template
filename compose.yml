@@ -15,8 +15,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    # networks:
-    #   - cleanarch-app
+    networks:
+      - cleanarch-app
+      - keycloak_app_network
   kafka:
     image: apache/kafka-native
     ports:
@@ -40,8 +41,8 @@ services:
 
       # Required for a single node cluster
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    # networks:
-    #   - cleanarch-app
+    networks:
+      - cleanarch-app
   kafka-ui:
     image: ghcr.io/kafbat/kafka-ui:latest
     ports:
@@ -52,8 +53,8 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9093
     depends_on:
       - kafka
-    # networks:
-    #   - cleanarch-app
+    networks:
+      - cleanarch-app
   db:
     image: postgres:latest
     container_name: postgres_container
@@ -90,13 +91,14 @@ services:
     restart: unless-stopped
     tty: true
     stdin_open: true
-    # networks:
-    #   - cleanarch-app
+    networks:
+      - cleanarch-app
 volumes:
   pgdata:
     driver: local
 
-# networks:
-#   cleanarch-app:
-#     name: cleanarch_app_network
-#     external: true
+networks:
+  cleanarch-app:
+  keycloak_app_network:
+    name: rest-nodejs-cleanarch-template-auth_default
+    external: true
