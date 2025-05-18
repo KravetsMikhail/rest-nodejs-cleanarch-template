@@ -30,8 +30,9 @@ export class EnvConfig {
     public static readonly host = process.env.HOST || 'localhost'
     public static readonly port = Number(process.env.PORT) || 1234
     public static readonly apiPrefix = process.env.API_PREFIX || '/api'
-    public static readonly uiHost = process.env.UI_HOST || 'localhost'
-    public static readonly uiPort = Number(process.env.UI_PORT) || 3000
+    //public static readonly uiHost = process.env.UI_HOST || 'localhost'
+    //public static readonly uiPort = Number(process.env.UI_PORT) || 3000
+    public static readonly allowOrig = process.env.ALLOW_ORIG || ["http://localhost:1234","http://localhost:5173"]
     public static readonly defaultDataSource: DataSourceType = (process.env.DEFAULT_DATASOURCE as DataSourceType) || 'postgres'
     public static readonly maxRetries = Number(process.env.MAX_RETRIES) || 5
     public static readonly retryDelay = Number(process.env.RETRY_DELAY) || 5000

@@ -25,8 +25,9 @@ interface ServerOptions {
     port: number
     routes: Router
     apiPrefix: string
-    uiHost: string
-    uiPort: number
+    allowOrig: string | string[]
+    //uiHost: string
+    //uiPort: number
 }
 
 export class Server {
@@ -35,8 +36,9 @@ export class Server {
     private readonly port: number
     private readonly routes: Router
     private readonly apiPrefix: string
-    private readonly uiHost: string
-    private readonly uiPort: number
+    private readonly allowOrig: string[]
+    //private readonly uiHost: string
+    //private readonly uiPort: number
     private readonly host: String
     private readonly postgresService: PostgresService
     private readonly oracleService: OracleService
@@ -45,13 +47,15 @@ export class Server {
     private readonly circuitBreaker: CircuitBreaker
 
     constructor(options: ServerOptions) {
-        const { host, port, routes, apiPrefix, uiHost, uiPort } = options
+        //const { host, port, routes, apiPrefix, uiHost, uiPort } = options
+        const { host, port, routes, apiPrefix, allowOrig } = options
         this.host = host
         this.port = port
         this.routes = routes
         this.apiPrefix = apiPrefix
-        this.uiHost = uiHost
-        this.uiPort = uiPort
+        this.allowOrig = allowOrig as string[]
+        //this.uiHost = uiHost
+        //this.uiPort = uiPort
         this.postgresService = PostgresService.getInstance()
         this.oracleService = OracleService.getInstance()
         this.circuitBreaker = new CircuitBreaker(
@@ -80,7 +84,8 @@ export class Server {
 
     private setupCORS(): void {
         this.app.use((req, res, next) => {
-            const allowedOrigins = [`http://localhost:${this.port}`, `http://${this.host}:${this.port}`, `http://${this.uiHost}:${this.uiPort}`]
+            //const allowedOrigins = [`http://localhost:${this.port}`, `http://${this.host}:${this.port}`, `http://${this.uiHost}:${this.uiPort}`]
+            const allowedOrigins = this.allowOrig
             const origin = req.headers.origin
 
             if (origin && allowedOrigins.includes(origin)) {
