@@ -45,7 +45,8 @@ export class TaskController {
                     const error = result.value
                     next(error.errorValue())
                 } 
-                return res.json((result as any).value.getValue())            
+                //console.log(res.json((result as any)))
+                return res.json(result.value.getValue())       
             })
             .catch((error) => {
                 next(error)
@@ -67,7 +68,7 @@ export class TaskController {
 
         new GetOneTaskUseCase(this.repository)
             .execute(_id.toString())
-            .then((result) => {
+            .then((result) => {                
                 if (result.isLeft()) {                    
                     const error = result.value
                     next(error.errorValue())
@@ -84,7 +85,7 @@ export class TaskController {
         res: Response<TaskEntity>,
         next: NextFunction
     ): void => {
-        const userId = ((_req as unknown) as CustomRequest).payload.userId
+        const userId = ((_req as unknown) as CustomRequest).payload.token.preferred_username
         new CreateTasksUseCase(this.repository)
             .execute(_req.body.name, userId)
             .then((result) => {
