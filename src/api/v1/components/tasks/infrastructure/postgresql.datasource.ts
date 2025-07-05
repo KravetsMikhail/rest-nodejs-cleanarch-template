@@ -57,9 +57,7 @@ export class PostgreTaskDatasource implements ITaskDatasource {
         let _where = ""
         let _orderBy = ""
         let _paging = ""
-
-        console.log(options)
-        
+                
         if(options){
             _where = Helpers.getWhereForPostgreSql(TaskEntity, options, EnvConfig.postgres.schema, "Task")
             _orderBy = Helpers.getOrderByForPostgreSql(TaskEntity, options, EnvConfig.postgres.schema, "Task")

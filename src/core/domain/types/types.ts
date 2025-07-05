@@ -45,8 +45,8 @@ export class WhereFilterParams {
     dbtype: string = ""
 
     constructor(param: string, value: string, dbtype: string) {
-        this.param = param
-        this.value = value
+        this.param = param?.trim()
+        this.value = value?.trim()
         this.dbtype = dbtype
     }
 }

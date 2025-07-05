@@ -12,11 +12,11 @@ export class Helpers {
 
     public static getFilters(filters: { [key: string]: any }): any {
         if (!filters) return       
-        
-        console.log(filters)
-        
+               
         let _where = {
-            [Op.and]: Object.entries(filters).map(([param, value]) => ({
+            [Op.and]: Object.entries(filters)
+            .filter(([param]) => param !== 'limit' && param !== 'offset' && param !== '_order' && param !== '_sort')
+            .map(([param, value]) => ({
                 param,
                 value
             }))
@@ -64,12 +64,15 @@ export class Helpers {
         for (const p of Object.getOwnPropertyNames(options)) {
             if (p === 'where') {
                 const _opt = (options as unknown as typeof model).where as WhereFilters
+                console.log(_opt)
                 if (_opt && _opt.AND) {
                     let _finder: WhereFilterParams[] = []
                     _opt.AND.map(o => {
-                        let _f = _reflect?.find(r => r.field == o["param"])
+                        let _param = o["param"] && !o["param"].includes("_like") ? o["param"] 
+                                        : o["param"] && o["param"].includes("_like") ? o["param"].split("_")[0] : ""
+                        let _f = _reflect?.find(r => r.field == _param)
                         if (_f) {
-                            _finder.push(new WhereFilterParams(o["param"], o["value"], _f.type))
+                            _finder.push(new WhereFilterParams(_param, o["value"], _f.type))
                         }
                     })
                     if (_finder) {
@@ -108,6 +111,7 @@ export class Helpers {
                 break
             }
         }
+        console.log(result)
         return result
     }
 
