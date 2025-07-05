@@ -87,11 +87,11 @@ export class Server {
             //const allowedOrigins = [`http://localhost:${this.port}`, `http://${this.host}:${this.port}`, `http://${this.uiHost}:${this.uiPort}`]
             const allowedOrigins = this.allowOrig
             //const allowedOrigins = "*"
-            const origin = req.headers.origin
-
+            const origin = req.headers.origin            
             if (origin && allowedOrigins.includes(origin)) {
                 res.setHeader('Access-Control-Allow-Origin', origin)
-            }else if(!allowedOrigins || (allowedOrigins.length == 1 && allowedOrigins[0] === "*")){
+            }else if(!allowedOrigins || allowedOrigins.includes("*")){
+               
                 res.setHeader('Access-Control-Allow-Origin', "*")
             }
             res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')

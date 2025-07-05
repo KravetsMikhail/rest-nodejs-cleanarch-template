@@ -85,9 +85,9 @@ export class TaskController {
         res: Response<TaskEntity>,
         next: NextFunction
     ): void => {
-        const userId = ((_req as unknown) as CustomRequest).payload.token.preferred_username
+        const user = ((_req as unknown) as CustomRequest).payload.token.preferred_username
         new CreateTasksUseCase(this.repository)
-            .execute(_req.body.name, userId)
+            .execute(_req.body.name, user)
             .then((result) => {
                 if (result.isLeft()) {                    
                     const error = result.value
@@ -114,9 +114,9 @@ export class TaskController {
         else {
             return
         }
-        const userId = ((_req as unknown) as CustomRequest).payload.userId
+        const user = ((_req as unknown) as CustomRequest).payload.token.preferred_username
         new DeleteTasksUseCase(this.repository)
-            .execute(_id.toString(), userId)
+            .execute(_id.toString(), user)
             .then((result) => {
                 if (result.isLeft()) {                    
                     const error = result.value
@@ -143,9 +143,9 @@ export class TaskController {
         else {
             return
         }
-        const userId = ((_req as unknown) as CustomRequest).payload.userId
+        const user = ((_req as unknown) as CustomRequest).payload.token.preferred_username
         new ReplaceTasksUseCase(this.repository)
-            .execute(_id, _req.body, userId)
+            .execute(_id, _req.body, user)
             .then((result) => {
                 if (result.isLeft()) {                    
                     const error = result.value

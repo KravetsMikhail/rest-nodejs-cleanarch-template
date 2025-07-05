@@ -12,15 +12,13 @@ import { TaskResponse } from '../domain/types/response'
 export class CreateTasksUseCase implements IUseCase<Promise<TaskResponse>> {
     constructor(private readonly repository: ITaskRepository) { }
 
-    async execute(name: string, userId: number): Promise<TaskResponse> {
-        const _createdBy = userId.toString()
-        const _updatedBy = userId.toString()
+    async execute(name: string, user: string): Promise<TaskResponse> {
         const _name = TaskName.create(name)
         if(_name.isFailure) {
             return left(Result.fail<void, void>(_name.error)) as TaskResponse
         }
         const _nameString = _name.getValue()?.value as string
-        const _search = TaskSearch.create(_nameString, _createdBy, _updatedBy)
+        const _search = TaskSearch.create(_nameString, user, user)
 
         const combinedPropsResult = Result.combine([_name])
 
@@ -31,8 +29,8 @@ export class CreateTasksUseCase implements IUseCase<Promise<TaskResponse>> {
         const _task = TaskEntity.create({
             name: _name?.getValue() as TaskName,
             search: _search.value,
-            createdBy: _createdBy,
-            updatedBy: _updatedBy,
+            createdBy: user,
+            updatedBy: user,
         }, _id)
 
         if (_task.isFailure) {

@@ -13,7 +13,7 @@ import { GetReflectionTypes, ReflectionData } from '../../../../../core/domain/t
 export class ReplaceTasksUseCase implements IUseCase<Promise<TaskResponse>> {
     constructor(private readonly repository: ITaskRepository) { }
 
-    async execute(id: number, updtask: any, userId: number): Promise<TaskResponse> {
+    async execute(id: number, updtask: any, user: string): Promise<TaskResponse> {
         if (!updtask) {
             return left(Result.fail<void, void>("Ошибка! Нет данных")) as TaskResponse
         }
@@ -29,13 +29,12 @@ export class ReplaceTasksUseCase implements IUseCase<Promise<TaskResponse>> {
             return left(Result.fail<void, void>("Ошибка! Не верный или не полный состав данных")) as TaskResponse
         }
 
-        const _updatedBy = userId.toString()
         const _name = TaskName.create(updtask.name)
 
         const _task = TaskEntity.update({
             name: _name?.getValue() as TaskName,
             search: updtask.search as string,
-            updatedBy: _updatedBy,
+            updatedBy: user,
             createdAt: updtask.createdAt,
             createdBy: updtask.createdBy
         }, new UniqueEntityId(id))

@@ -11,17 +11,20 @@ export class Helpers {
     }
 
     public static getFilters(filters: { [key: string]: any }): any {
-        if (!filters) return
+        if (!filters) return       
+        
+        console.log(filters)
+        
         let _where = {
             [Op.and]: Object.entries(filters).map(([param, value]) => ({
                 param,
                 value
             }))
         } as unknown as WhereFilters
-        let _order = filters.order
-        let _sort = filters.sort
-        delete filters.order
-        delete filters.sort
+        let _order = filters._order
+        let _sort = filters._sort
+        delete filters._order
+        delete filters._sort
         let _orderBy = null
         if (_sort) {
             let _ord = OrderByType.asc

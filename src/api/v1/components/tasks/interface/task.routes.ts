@@ -17,6 +17,7 @@ export class TaskRoutesV1 {
         router.get('', controller.getTasks)
         router.get('/:id', controller.getOneTask)
         router.put('/:id', controller.replaceTask)
+        router.patch('/:id', controller.replaceTask)
         //path параметры
         //router.get('/:email/:status', controller.getTasks)
         //body параметры

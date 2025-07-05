@@ -11,10 +11,9 @@ import { TaskResponse } from '../domain/types/response'
 export class DeleteTasksUseCase implements IUseCase<Promise<TaskResponse>> {
     constructor(private readonly repository: ITaskRepository) { }
 
-    async execute(id: string, userId: number): Promise<TaskResponse> {
-        const _deletedBy = userId.toString()
+    async execute(id: string, user: string): Promise<TaskResponse> {
         const _id  = new UniqueEntityId(id)
-        const _deltask = DeletedTaskEntity.delete(_id, _deletedBy)
+        const _deltask = DeletedTaskEntity.delete(_id, user)
 
         if (_deltask.isFailure) {
             return left(Result.fail<void, void>(new Error("Ошибка! Не удалось удалить"))) as TaskResponse
