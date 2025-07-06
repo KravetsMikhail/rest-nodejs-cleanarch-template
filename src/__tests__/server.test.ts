@@ -41,7 +41,8 @@ describe('Server', () => {
             host: 'localhost',
             port: 3000,
             routes: jest.fn() as any,
-            apiPrefix: '/api'
+            apiPrefix: '/api',
+            allowOrig: '*'
         })
     })
 
