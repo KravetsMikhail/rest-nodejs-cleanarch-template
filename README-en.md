@@ -179,7 +179,7 @@ To check and test, you need to run the dockers of the following projects (see th
     node_modules/.bin/db-migrate up --config ./src/config/database.json
     ```
 
-3. Project UI [rest-nodejs-cleanarch-template-ui](https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template-ui). Реализован на REACT, фреймворк [Refine](https://github.com/refinedev/refine)
+3. Project UI [rest-nodejs-cleanarch-template-ui](https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template-ui). Implemented on REACT, a framework [Refine](https://github.com/refinedev/refine)
 
     ```bash
     git clone https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template-ui.git
