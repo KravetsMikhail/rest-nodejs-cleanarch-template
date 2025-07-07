@@ -127,7 +127,7 @@ artifact "Проект" {
 
 Для проверки и тестирования, необходимо  запустить докеры следующих проектов (см. readme каждого проекта):
 
-1. Проект аутентификации [rest-nodejs-cleanarch-template-auth](https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template-auth). Реалзован на [keycloak](https://github.com/keycloak/keycloak).
+1. Проект аутентификации [rest-nodejs-cleanarch-template-auth](https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template-auth). Реализован на [keycloak](https://github.com/keycloak/keycloak).
 
     ```bash
     git clone https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template-auth.git

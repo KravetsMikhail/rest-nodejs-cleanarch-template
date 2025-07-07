@@ -125,7 +125,7 @@ To send events to external services, it is necessary to implement the correspond
 
 To check and test, you need to run the dockers of the following projects (see the readme of each project):
 
-1. Authentication Project [rest-nodejs-cleanarch-template-auth](https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template-auth). Реалзован на [keycloak](https://github.com/keycloak/keycloak).
+1. Authentication Project [rest-nodejs-cleanarch-template-auth](https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template-auth). Implemented on [keycloak](https://github.com/keycloak/keycloak).
 
     ```bash
     git clone https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template-auth.git
