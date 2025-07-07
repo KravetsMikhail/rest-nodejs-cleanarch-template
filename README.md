@@ -11,10 +11,10 @@
 В проекте применяются: миграции БД, версионность API, Docker, Kafka, OpenAPI (Swagger).
 
 В основе проекта лежат принципы чистой (луковой) архитектуры, с такими элементами как: домен, usecase, интерфейс, инфраструктура и доменные события.  
-Спецификой проекта является добавление компонентной части, которая представляет собой набор необходимых бизнес-объектов.  
-Компоненты, в свою очередь, реализованы на чистой архитектуре.  
-Взаимодействие между компнентами осуществляется доменными событиями core/domain/events.  
-Реализованы паттерны: Repository, Domain Events, Circuit Breaker и др.  
+Спецификой проекта является добавление компонентной части, которая представляет собой набор необходимых бизнес-объектов. Компоненты, в свою очередь, реализованы на чистой архитектуре. Взаимодействие между компнентами осуществляется доменными событиями core/domain/events.
+
+Применены паттерны: Repository, Domain Events, Circuit Breaker и др.
+
 Тестирование выполняется с применением фреймворка Jest.
 
 ## Схема проекта
@@ -33,11 +33,9 @@ artifact "Проект" {
                     component "usecase" as usecase1
                     component "infrastructure" as infr1
                 }
-                hexagon "notification" {
-                    component "interface" as intr2
-                    component "domain" as domain2
+                hexagon "notification" {                    
                     component "usecase" as usecase2
-                    component "infrastructure" as infr2
+                    component "subscribers" as subscribers2
                 }
             }
             component "infrastructure"
@@ -121,15 +119,13 @@ artifact "Проект" {
 
 В проекте реализована поддержка доменных событий. Для работы с событиями необходимо использовать интерфейсы и компоненты из **core\domain\events**.
 
-
-
 Для отправки событий внешним сервисам необходимо в **api/v1/infrastructure** реализовать соответствующий сервис. В проекте используется брокер сообщений Kafka.
 
 ## Как запустить проект
 
 ### Запуск в докере
 
-Для проверки и тестирования проекта, необходимо предварительно запустить докеры следующих проектов (см. readme каждого проекта):
+Для проверки и тестирования, необходимо  запустить докеры следующих проектов (см. readme каждого проекта):
 
 1. Проект аутентификации [rest-nodejs-cleanarch-template-auth](https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template-auth). Реалзован на [keycloak](https://github.com/keycloak/keycloak).
 
@@ -141,27 +137,77 @@ artifact "Проект" {
     cd rest-nodejs-cleanarch-template-auth
     ```
 
+    В корневую папку добавляем файл .env (см.  пример в .env.example)
+
+    Запускаем докеры:
+
     ```bash
     docker compose up
     ```
 
-2. Проект UI [rest-nodejs-cleanarch-template-ui](https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template-ui). Реализован на REACT, фреймворк [Refine](https://github.com/refinedev/refine)
+    Затем:
+    - перейти в интерфейс Keycloack <http://localhost:8282>
+    - задать логин и пароль администратора, например admin | admin
+    - выбрать Realm: rest-nodejs-cleanarch-template
+    - добавить пользователя, например user1. Во вкладке Creditials создать пароль пользователя.
 
-    
+2. Проект шаблона ядра на чистой архитектуре [rest-nodejs-cleanarch-template](https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template.git)
 
-### OpenAPI
+    ```bash
+    git clone https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template.git
+    ```
 
-По умолчанию проект запускается на порту 1234.
+    ```bash
+    cd rest-nodejs-cleanarch-template
+    ```
 
-OpenAPI документация доступна по адресу <http://localhost:1234/api-docs/v1/>
+    В корневую папку добавляем файл .env.production.local (см. пример в .env.example)
+
+    Запускаем докеры:
+
+    ```bash
+    docker compose up
+    ```
+
+    Создаем БД (детальное описание смотри ниже):
+
+    ```bash
+    node_modules/.bin/db-migrate db:create test --config ./src/config/database.json
+    ```
+
+    Запускаем миграции:
+
+    ```bash
+    node_modules/.bin/db-migrate up --config ./src/config/database.json
+    ```
+
+3. Проект UI [rest-nodejs-cleanarch-template-ui](https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template-ui). Реализован на REACT, фреймворк [Refine](https://github.com/refinedev/refine)
+
+    ```bash
+    git clone https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template-ui.git
+    ```
+
+    ```bash
+    cd rest-nodejs-cleanarch-template-ui
+    ```
+
+    В корневую папку добавляем файл .env.production.local (см. пример в .env.example)
+
+    Запускаем докеры:
+
+    ```bash
+    docker compose up
+    ```
+
+## OpenAPI
+
+По умоляанию OpenAPI документация доступна по адресу <http://localhost:1234/api-docs/v1/>
 
 ### Запросы к API
 
 Запросы к API можно выполнять с помощью Postman или с помощью curl.
 
 Адрес сервера: <http://localhost:1234/api/v1/>
-
-
 
 ## МИГРАЦИИ БД
 

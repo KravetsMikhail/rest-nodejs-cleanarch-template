@@ -8,11 +8,11 @@ REST API server template on component-based pure architecture
 
 The project is a REST API service template built on component-based pure architecture.
 
-The project uses: database migrations, API versioning, Docker, Kafka, OpenAPI.
+The project uses: database migrations, API versioning, Docker, Kafka, OpenAPI (Swagger).
 
 The project is based on the principles of pure (onion) architecture, with such elements as: domain, usecase, interface, infrastructure and domain events.
-The specificity of the project is the addition of a component part, which is a set of necessary business objects.
-The components, in turn, are implemented on a pure architecture.
+The specificity of the project is the addition of a component part, which is a set of necessary business objects.  
+The components, in turn, are implemented on a pure architecture.  
 Interaction between the components is realized by means of domain events of the parent domain.
 
 ## Project outline
@@ -32,10 +32,8 @@ artifact "Проект" {
                     component "infrastructure" as infr1
                 }
                 hexagon "notification" {
-                    component "interface" as intr2
-                    component "domain" as domain2
                     component "usecase" as usecase2
-                    component "infrastructure" as infr2
+                    component "subscribers" as subscribers2
                 }
             }
             component "infrastructure"
@@ -63,8 +61,6 @@ artifact "Проект" {
 │   └───v1
 │       ├───components
 │       │       ├───notification
-│       │       │        ├───domain
-│       │       │        ├───services
 │       │       │        ├───subscribers
 │       │       │        └───usecases
 │       │       └───tasks
@@ -79,6 +75,7 @@ artifact "Проект" {
 │       │                ├───interface
 │       │                └───usecases
 │       ├───infrastructure
+|       |       ├───kafka
 │       │       ├───oracle
 │       │       └───postgresql
 │       ├───interface
@@ -116,49 +113,100 @@ The **config** directory contains auxiliary components for working with configur
 
 The **.env** file contains the environment variables that are used in the project. All environment variables are described in the **.env.example** file.
 
-## Project Usage
+### Events
 
-### OpenAPI
+The project supports domain events. To work with events, you must use interfaces and components from **core\domain\events**.
+
+To send events to external services, it is necessary to implement the corresponding service in **api/v1/infrastructure**. The project uses the Kafka message broker.
+
+## How to launch a project
+
+### Launch in docker
+
+To check and test, you need to run the dockers of the following projects (see the readme of each project):
+
+1. Authentication Project [rest-nodejs-cleanarch-template-auth](https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template-auth). Реалзован на [keycloak](https://github.com/keycloak/keycloak).
+
+    ```bash
+    git clone https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template-auth.git
+    ```
+
+    ```bash
+    cd rest-nodejs-cleanarch-template-auth
+    ```
+
+    Add the .env file to the root folder (see the example in .env.example)
+
+    Launching dockers:
+
+    ```bash
+    docker compose up
+    ```
+
+    Then:
+    - go to the Keycloack interface <http://localhost:8282>
+    - set the login and password of the administrator, for example admin | admin
+    - select Realm: rest-nodejs-cleanarch-template
+    - add a user, for example user1. In the Credentials tab, create a user password.
+
+2. The design of the core template on a clean architecture [rest-nodejs-cleanarch-template](https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template.git)
+
+    ```bash
+    git clone https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template.git
+    ```
+
+    ```bash
+    cd rest-nodejs-cleanarch-template
+    ```
+
+    Add the .env.production.local file to the root folder (see the example in .env.example)
+
+    Launching dockers:
+
+    ```bash
+    docker compose up
+    ```
+
+    Creating a database (for a detailed description, see below):
+
+    ```bash
+    node_modules/.bin/db-migrate db:create test --config ./src/config/database.json
+    ```
+
+    Launching migrations:
+
+    ```bash
+    node_modules/.bin/db-migrate up --config ./src/config/database.json
+    ```
+
+3. Project UI [rest-nodejs-cleanarch-template-ui](https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template-ui). Реализован на REACT, фреймворк [Refine](https://github.com/refinedev/refine)
+
+    ```bash
+    git clone https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template-ui.git
+    ```
+
+    ```bash
+    cd rest-nodejs-cleanarch-template-ui
+    ```
+
+    Add the .env.production.local file to the root folder (see the example in .env.example)
+
+    Launching dockers:
+
+    ```bash
+    docker compose up
+    ```
+
+## OpenAPI
 
 By default, the project runs on port 1234.
 
 OpenAPI documentation is available at <http://localhost:1234/api-docs/v1/>
 
-### Authentication
-
-The project implements authentication using JWT. For authentication it is necessary to add a header with a request body in JWT Bearer format to all requests.
-
-> [!NOTE]
-> When using Postman, you must add a header with a request body in JWT Bearer format.
->
->- In the Authorization tab, select Auth type - JWT Bearer.
->- In the Algorithm field, select HS256.
->- In the Secret field, select 112233445566
->- In the Payload field enter
->
->```json
->{    
->    "userId": 123,
->    "userName": "Ivanov",
->    "exp": 1762962547
->}
->```
-
 ### API requests
 
-API requests can be made with Postman or with curl.
-
+API requests can be made with Postman or with curl.  
 Server address: <http://localhost:1234/api/v1/>
-
-### Events
-
-The project implements support of domain events. To work with events you should use **domain** and **usecases** components.
-
-In the **domain** component interfaces for working with events are implemented. Services for working with events are implemented in **usecases** component.
-
-To subscribe to events you should use the **subscribers** component. The **subscribers** component implements event subscribers.
-
-To send events to external services you need to use the **infrastructure** component. The **infrastructure** component implements services for sending events. Kafka queue is used in the project.
 
 ## DB MIGRATIONS
 
