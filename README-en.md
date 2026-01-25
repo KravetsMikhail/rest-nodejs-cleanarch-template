@@ -78,6 +78,7 @@ npm run serve
 
 - **Swagger UI**: `http://localhost:1234/api-docs`
 - **Health Check**: `http://localhost:1234/health`
+- **Usage Examples**: [EXAMPLES.md](./EXAMPLES.md)
 
 ## Project outline
 
@@ -364,7 +365,9 @@ src/api/v1/components/{plural}/
 └── usecases/                 # Use cases
 ```
 
-**Documentation:** Detailed description available in `docs/component-generator.md`
+**Documentation:** 
+- Detailed description: `docs/component-generator.md`
+- Practical examples: [EXAMPLES.md](./EXAMPLES.md#создание-нового-компонента)
 
 ### Swagger JSDoc Integration
 
@@ -385,7 +388,9 @@ npm install swagger-jsdoc @types/swagger-jsdoc
 2. Component Generator automatically creates annotations
 3. Documentation available at: `http://localhost:1234/api-docs`
 
-**Documentation:** Detailed description available in `docs/swagger-integration.md`
+**Documentation:** 
+- Detailed description: `docs/swagger-integration.md`
+- Practical examples: [EXAMPLES.md](./EXAMPLES.md#интеграция-с-swagger)
 
 ## DB MIGRATIONS
 

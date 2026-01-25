@@ -76,6 +76,7 @@ npm run serve
 
 - **Swagger UI**: `http://localhost:1234/api-docs`
 - **Health Check**: `http://localhost:1234/health`
+- **Примеры использования**: [EXAMPLES.md](./EXAMPLES.md)
 
 ## Схема проекта
 
@@ -362,7 +363,9 @@ src/api/v1/components/{plural}/
 └── usecases/                 # Use cases
 ```
 
-**Документация:** Подробное описание доступно в `docs/component-generator.md`
+**Документация:** 
+- Подробное описание: `docs/component-generator.md`
+- Практические примеры: [EXAMPLES.md](./EXAMPLES.md#создание-нового-компонента)
 
 ### Swagger JSDoc Integration
 
@@ -383,7 +386,9 @@ npm install swagger-jsdoc @types/swagger-jsdoc
 2. Component Generator автоматически создает аннотации
 3. Документация доступна по адресу: `http://localhost:1234/api-docs`
 
-**Документация:** Подробное описание доступно в `docs/swagger-integration.md`
+**Документация:** 
+- Подробное описание: `docs/swagger-integration.md`
+- Практические примеры: [EXAMPLES.md](./EXAMPLES.md#интеграция-с-swagger)
 
 ## МИГРАЦИИ БД
 
