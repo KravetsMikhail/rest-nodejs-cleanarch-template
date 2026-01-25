@@ -78,7 +78,7 @@ npm run serve
 
 - **Swagger UI**: `http://localhost:1234/api-docs`
 - **Health Check**: `http://localhost:1234/health`
-- **Usage Examples**: [EXAMPLES.md](./EXAMPLES.md)
+- **Examples**: [EXAMPLES-en.md](./EXAMPLES-en.md)
 
 ## Project outline
 
