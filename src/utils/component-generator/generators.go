@@ -16,7 +16,8 @@ func generateEntityFiles(config ComponentConfig, basePath string) {
 	for _, field := range config.TableFields {
 		// Skip system fields that are already handled
 		if field.Name == "name" || field.Name == "created_at" || field.Name == "updated_at" || 
-		   field.Name == "createdby" || field.Name == "updatedby" {
+		   field.Name == "createdby" || field.Name == "updatedby" || 
+		   field.Name == "createdBy" || field.Name == "updatedBy" {
 			continue
 		}
 		
@@ -92,7 +93,7 @@ func generateEntityFiles(config ComponentConfig, basePath string) {
 	content.WriteString("    get updatedBy(): string { return this.props?.updatedBy || \"\" }\n\n")
 	
 	content.WriteString("    @DbType(DbTypes.Date)\n")
-	content.WriteString("    get updatedAt(): Date { return this.props?.updatedAt || new Date() }")
+	content.WriteString("    get updatedAt(): Date { return this.props?.updatedAt || new Date() }\n\n")
 	
 	// Add additional getters
 	for _, getter := range additionalGetters {
@@ -134,16 +135,18 @@ func generateEntityFiles(config ComponentConfig, basePath string) {
 	
 	writeFile(fmt.Sprintf("%s/domain/entities/%s.entity.ts", basePath, singular), content.String())
 
-	idEntityContent := fmt.Sprintf(`import { UniqueEntityId } from '../../../../../../core/domain/types/uniqueentityid'
-import { ValueObject } from '../../../../../../core/domain/types/value.object'
+	idEntityContent := fmt.Sprintf(`import { Entity } from '../../../../../../core/domain/types/entity'
+import { UniqueEntityId } from '../../../../../../core/domain/types/uniqueentityid'
 
-export class %sId extends ValueObject<{ value: UniqueEntityId }> {
-    get value(): UniqueEntityId { return this.props.value }
+export class %sId extends Entity<any> {
+    get id(): UniqueEntityId { return this._id }
 
-    private constructor(props: { value: UniqueEntityId }) { super(props) }
+    private constructor(id?: UniqueEntityId) {
+        super(null, id)
+    }
 
-    public static create(id: UniqueEntityId): %sId {
-        return new %sId({ value: id })
+    public static create(id?: UniqueEntityId): %sId {
+        return new %sId(id)
     }
 }`, singularCap, singularCap, singularCap)
 
@@ -161,7 +164,7 @@ func generateValueObjectFiles(config ComponentConfig, basePath string) {
 	singular := config.SingularName
 	singularCap := capitalize(singular)
 	
-	nameContent := fmt.Sprintf(`import { ValueObject } from '../../../../../../core/domain/types/value.object'
+	nameContent := fmt.Sprintf(`import { ValueObject } from '../../../../../../core/domain/types/valueobject'
 import { Result } from '../../../../../../core/domain/types/result'
 
 export interface %sNameProps { value: string }
@@ -173,10 +176,10 @@ export class %sName extends ValueObject<%sNameProps> {
 
     public static create(name: string): Result<%sName> {
         if (!name || name.trim().length === 0) {
-            return Result.fail<%sName>(new Error('%s name is required'))
+            return Result.fail<%sName, Error>(new Error('%s name is required'))
         }
-        if (name.length > 255) {
-            return Result.fail<%sName>(new Error('%s name must be less than 255 characters'))
+        if (name.length > 100) {
+            return Result.fail<%sName, Error>(new Error('%s name must be less than 100 characters'))
         }
         return Result.ok<%sName>(new %sName({ value: name.trim() }))
     }
@@ -184,8 +187,7 @@ export class %sName extends ValueObject<%sNameProps> {
 
 	writeFile(fmt.Sprintf("%s/domain/valueobjects/%s.name.ts", basePath, singular), nameContent)
 
-	searchContent := fmt.Sprintf(`import { ValueObject } from '../../../../../../core/domain/types/value.object'
-import { Result } from '../../../../../../core/domain/types/result'
+	searchContent := fmt.Sprintf(`import { ValueObject } from '../../../../../../core/domain/types/valueobject'
 
 export interface %sSearchProps { value: string }
 
@@ -194,13 +196,13 @@ export class %sSearch extends ValueObject<%sSearchProps> {
 
     private constructor(props: %sSearchProps) { super(props) }
 
-    public static create(name: string, createdBy?: string, updatedBy?: string): Result<%sSearch> {
+    public static create(name: string, createdBy?: string, updatedBy?: string): %sSearch {
         const searchTerms = []
         if (name) searchTerms.push(name.toLowerCase())
         if (createdBy) searchTerms.push(createdBy.toLowerCase())
         if (updatedBy) searchTerms.push(updatedBy.toLowerCase())
         const searchValue = searchTerms.join(" ")
-        return Result.ok<%sSearch>(new %sSearch({ value: searchValue }))
+        return new %sSearch({ value: searchValue })
     }
 }`, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap)
 
