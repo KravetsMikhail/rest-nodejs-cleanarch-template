@@ -208,6 +208,56 @@ OpenAPI documentation is available at <http://localhost:1234/api-docs/v1/>
 API requests can be made with Postman or with curl.  
 Server address: <http://localhost:1234/api/v1/>
 
+## DEVELOPMENT TOOLS
+
+### Component Generator
+
+The project includes a console component generator in Go that automatically creates the structure for new API components following the Clean Architecture pattern.
+
+**Location:** `src/utils/component-generator/`
+
+**Key Features:**
+- Automatic generation of complete component structure (entities, value objects, events, repositories, controllers, use cases)
+- Support for generating fields from SQL migrations
+- Automatic OpenAPI documentation generation
+- Follows Clean Architecture pattern
+- Automatic creation of `@DbType` decorators for ORM
+
+**Usage:**
+```bash
+cd src/utils/component-generator
+
+# Basic component generation
+./component-generator.exe generate --singular product --plural products --version v1
+
+# Generation with fields from SQL migration
+./component-generator.exe generate --singular product --plural products --migration migrations/001_create_products.sql
+```
+
+**Supported SQL Types:**
+- `INTEGER/INT/SERIAL` → `number`
+- `VARCHAR/TEXT/CHAR` → `string`
+- `BOOLEAN/BOOL` → `boolean`
+- `DATE/TIMESTAMP` → `Date`
+- `DECIMAL/NUMERIC/FLOAT/DOUBLE` → `number`
+
+**Generated Structure:**
+```
+src/api/v1/components/{plural}/
+├── domain/
+│   ├── entities/           # Entity classes
+│   ├── valueobjects/        # Value Objects
+│   ├── events/             # Domain events
+│   ├── repositories/        # Repository interfaces
+│   ├── datasources/         # Data source interfaces
+│   └── types/               # Response types
+├── infrastructure/           # Data source implementations
+├── interface/                # Controllers and routes
+└── usecases/                 # Use cases
+```
+
+**Documentation:** Detailed description available in `src/utils/component-generator/README.md`
+
 ## DB MIGRATIONS
 
 ### 1. PostgreSql

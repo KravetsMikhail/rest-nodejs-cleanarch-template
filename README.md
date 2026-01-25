@@ -201,13 +201,63 @@ artifact "Проект" {
 
 ## OpenAPI
 
-По умоляанию OpenAPI документация доступна по адресу <http://localhost:1234/api-docs/v1/>
+По умолчанию OpenAPI документация доступна по адресу <http://localhost:1234/api-docs/v1/>
 
 ### Запросы к API
 
 Запросы к API можно выполнять с помощью Postman или с помощью curl.
 
 Адрес сервера: <http://localhost:1234/api/v1/>
+
+## ИНСТРУМЕНТЫ РАЗРАБОТКИ
+
+### Component Generator
+
+В проекте включен консольный генератор компонентов на Go, который автоматически создает структуру для новых API компонентов по паттерну Clean Architecture.
+
+**Расположение:** `src/utils/component-generator/`
+
+**Основные возможности:**
+- Автоматическая генерация полной структуры компонента (entities, value objects, events, repositories, controllers, use cases)
+- Поддержка генерации полей из SQL миграций
+- Автоматическая генерация OpenAPI документации
+- Следование паттерну Clean Architecture
+- Автоматическое создание декораторов `@DbType` для ORM
+
+**Использование:**
+```bash
+cd src/utils/component-generator
+
+# Базовая генерация компонента
+./component-generator.exe generate --singular product --plural products --version v1
+
+# Генерация с полями из SQL миграции
+./component-generator.exe generate --singular product --plural products --migration migrations/001_create_products.sql
+```
+
+**Поддерживаемые SQL типы:**
+- `INTEGER/INT/SERIAL` → `number`
+- `VARCHAR/TEXT/CHAR` → `string`
+- `BOOLEAN/BOOL` → `boolean`
+- `DATE/TIMESTAMP` → `Date`
+- `DECIMAL/NUMERIC/FLOAT/DOUBLE` → `number`
+
+**Сгенерированная структура:**
+```
+src/api/v1/components/{plural}/
+├── domain/
+│   ├── entities/           # Entity классы
+│   ├── valueobjects/        # Value Objects
+│   ├── events/             # Доменные события
+│   ├── repositories/        # Интерфейсы репозиториев
+│   ├── datasources/         # Интерфейсы источников данных
+│   └── types/               # Типы ответов
+├── infrastructure/           # Реализации источников данных
+├── interface/                # Контроллеры и маршруты
+└── usecases/                 # Use cases
+```
+
+**Документация:** Подробное описание доступно в `src/utils/component-generator/README.md`
 
 ## МИГРАЦИИ БД
 

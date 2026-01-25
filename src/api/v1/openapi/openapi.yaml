@@ -49,59 +49,162 @@ paths:
             enum:
               - desc
               - asc
-          description: Тип сортировки (по возрастанию или убыванию)
+          required: false
+          description: Направление сортировки результата
           example: desc
       responses:
         '200':
-          description: Выполнено
+          description: Успешный ответ
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/task'
+                  $ref: '#/components/schemas/Task'
               examples:
-                sample:
-                  $ref: '#/components/examples/tasksExample'
-        '400':
-          description: Ошибка
-          $ref: '#/components/responses/Error400'
-        '401':
-          description: Ошибка авторизации
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          description: Ошибка сервера
+                tasksExample:
+                  summary: Пример ответа на запрос списка задач
+                  value:
+                    - id: 1
+                      name: задача 1
+                      search: задача 1 иванов петров
+                      createdAt: '2024-10-10T10:00:01'
+                      createdBy: Иванов
+                      updateAt: '2024-09-09T09:09:09'
+                      updateBy: Петров
+                    - id: 2
+                      name: задача 2
+                      search: задача 2 сидоров травкин
+                      createdAt: '2024-10-10T10:00:01'
+                      createdBy: Травкин
+                      updateAt: '2024-09-09T09:09:09'
+                      updateBy: Сидоров
     post:
       servers:
         - url: https://roualty.rasu.local/api/v1/
-      summary: Добавление новой задачи
-      description: >-
-        Создает новую задачу из данных тела запроса
+      description: Создание задачи
       tags:
         - tasks
       security:
         - authJWT:
-          - read
+          - write
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/task"
+              $ref: '#/components/schemas/Task'
             examples:
-              sample:
-                $ref: "#/components/examples/taskExample"
+              taskExample:
+                summary: Пример создания задачи
+                value:
+                  name: "задача 1"
+      responses:
+        '201':
+          description: Задача успешно создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+              examples:
+                taskExample:
+                  summary: Пример ответа на создание задачи
+                  value:
+                    id: 1
+                    name: задача 1
+                    search: задача 1 иванов петров
+                    createdAt: '2024-10-10T10:00:01'
+                    createdBy: Иванов
+                    updateAt: '2024-09-09T09:09:09'
+                    updateBy: Петров
+  /tasks/{id}:
+    get:
+      servers:
+        - url: https://roualty.rasu.local/api/v1/
+      description: Получение задачи по ID
+      tags:
+        - tasks
+      security:
+        - authJWT:
+          - read
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Уникальный идентификатор задачи
+          example: 1
       responses:
         '200':
-          description: Выполнено
-        '400':
-          description: Ошибка
-          $ref: '#/components/responses/Error400'
-        '401':
-          description: Ошибка авторизации
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          description: Ошибка сервера
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+              examples:
+                taskExample:
+                  summary: Пример ответа на получение задачи
+                  value:
+                    id: 1
+                    name: задача 1
+                    search: задача 1 иванов петров
+                    createdAt: '2024-10-10T10:00:01'
+                    createdBy: Иванов
+                    updateAt: '2024-09-09T09:09:09'
+                    updateBy: Петров
+        '404':
+          description: Задача не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      servers:
+        - url: https://roualty.rasu.local/api/v1/
+      description: Обновление задачи
+      tags:
+        - tasks
+      security:
+        - authJWT:
+          - write
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Уникальный идентификатор задачи
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+            examples:
+              taskExample:
+                summary: Пример обновления задачи
+                value:
+                  name: "задача 1 (обновленная)"
+      responses:
+        '200':
+          description: Задача успешно обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+              examples:
+                taskExample:
+                  summary: Пример ответа на обновление задачи
+                  value:
+                    id: 1
+                    name: задача 1 (обновленная)
+                    search: задача 1 (обновленная) иванов петров
+                    createdAt: '2024-10-10T10:00:01'
+                    createdBy: Иванов
+                    updateAt: '2024-09-09T09:09:09'
+                    updateBy: Петров
     delete:
       servers:
         - url: https://roualty.rasu.local/api/v1/
@@ -110,93 +213,153 @@ paths:
         - tasks
       security:
         - authJWT:
-          - read
+          - delete
       parameters:
-        - in: query
+        - in: path
           name: id
-          schema:
-            type: number
           required: true
-          description: id задачи
-          example: 123
+          schema:
+            type: integer
+          description: Уникальный идентификатор задачи
+          example: 1
       responses:
-        '200':
-          description: Выполнено
+        '204':
+          description: Задача успешно удалена
+        '404':
+          description: Задача не найдена
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/task'
-              examples:
-                sample:
-                  $ref: '#/components/examples/taskExample'
-        '400':
-          description: Ошибка
-          $ref: '#/components/responses/Error400'
-        '401':
-          description: Ошибка авторизации
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          description: Ошибка сервера
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
-    task:
+    Task:
       type: object
       properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор
+          example: 1
         name:
           type: string
-          nullable: false
+          description: Наименование
+          example: "Пример задачи"
         search:
           type: string
-          nullable: true
+          description: Поисковая строка
+          example: "пример задачи"
         createdAt:
           type: string
           format: date-time
+          description: Дата создания
+          example: '2024-10-10T10:00:01'
         createdBy:
           type: string
-          nullable: false
+          description: Создано кем
+          example: Иванов
         updatedAt:
           type: string
           format: date-time
+          description: Дата обновления
+          example: '2024-09-09T09:09:09'
         updatedBy:
           type: string
-          nullable: false
-      additionalProperties: false
-  securitySchemes:
-    authJWT:
-      type: http
-      description: Авторизация JWT
-      scheme: bearer
-      bearerFormat: JWT
-  examples:
-    taskExample:
-      summary: Пример объекта новой задачи
-      value:
-        id: 1
-        name: задача 1
-        search: задача 1 иванов петров
-        createdAt: '2024-10-10T10:00:01'
-        createdBy: Иванов
-        updateAt: '2024-09-09T09:09:09'
-        updateBy: Петров
-    tasksExample:
-      summary: Пример ответа на запрос списка задач
-      value:
-        - id: 1
-          name: задача 1
-          search: задача 1 иванов петров
-          createdAt: '2024-10-10T10:00:01'
-          createdBy: Иванов
-          updateAt: '2024-09-09T09:09:09'
-          updateBy: Петров
-        - id: 2
-          name: задача 2
-          search: задача 2 сидоров травкин
-          createdAt: '2024-10-10T10:00:01'
-          createdBy: Травкин
-          updateAt: '2024-09-09T09:09:09'
-          updateBy: Сидоров
+          description: Обновлено кем
+          example: Петров
+      required:
+        - name
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+  responses:
+    Unauthorized:
+      description: Ошибка авторизации
+      content:
+        application/json:
+          schema:
+            properties:
+              Error:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+    Error400:
+      description: Ошибка
+      content:
+        application/json:
+          schema:
+            properties:
+              Error:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                  stack:
+                    type: string
+                required:
+                  - code
+                  - message
+components:
+  schemas:
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор
+          example: 1
+        name:
+          type: string
+          description: Наименование
+          example: "Пример задачи"
+        search:
+          type: string
+          description: Поисковая строка
+          example: "пример задачи"
+        createdAt:
+          type: string
+          format: date-time
+          description: Дата создания
+          example: '2024-10-10T10:00:01'
+        createdBy:
+          type: string
+          description: Создано кем
+          example: Иванов
+        updatedAt:
+          type: string
+          format: date-time
+          description: Дата обновления
+          example: '2024-09-09T09:09:09'
+        updatedBy:
+          type: string
+          description: Обновлено кем
+          example: Петров
+      required:
+        - name
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
   responses:
     Unauthorized:
       description: Ошибка авторизации
