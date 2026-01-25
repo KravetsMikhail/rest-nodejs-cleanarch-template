@@ -8,6 +8,13 @@ import { ReplaceTasksUseCase } from '../usecases/update-task.usecase'
 import { CustomRequest } from '../../../../../core/domain/types/custom.request'
 import { Helpers } from '../../../../../core/utils/helpers'
 
+/**
+ * @swagger
+ * tags:
+ *   name: tasks
+ *   description: Operations with tasks
+ */
+
 type QueryParams = {
     id: number
     email: string
@@ -22,6 +29,56 @@ type QueryBody = {
 export class TaskController {
     constructor(private readonly repository: ITaskRepository) { }
 
+    /**
+     * @swagger
+     * /tasks:
+     *   get:
+     *     summary: Get list of tasks
+     *     tags: [tasks]
+     *     security:
+     *       - JWT: [read]
+     *     parameters:
+     *       - in: query
+     *         name: name
+     *         schema:
+     *           type: string
+     *         description: Filter by name
+     *         example: задача1
+     *       - in: query
+     *         name: offset
+     *         schema:
+     *           type: integer
+     *         description: Offset for pagination
+     *         example: 0
+     *       - in: query
+     *         name: limit
+     *         schema:
+     *           type: integer
+     *         description: Limit for pagination
+     *         example: 10
+     *       - in: query
+     *         name: sort
+     *         schema:
+     *           type: string
+     *         description: Sort field
+     *         example: name
+     *       - in: query
+     *         name: order
+     *         schema:
+     *           type: string
+     *           enum: [desc, asc]
+     *         description: Sort order
+     *         example: desc
+     *     responses:
+     *       200:
+     *         description: List of tasks
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 $ref: '#/components/schemas/Task'
+     */
     public getTasks = (
         _req: Request<unknown, unknown, unknown, QueryParams>,
         res: Response<TaskEntity[]>,

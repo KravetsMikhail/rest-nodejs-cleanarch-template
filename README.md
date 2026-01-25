@@ -8,7 +8,7 @@
 
 Проект представляет собой шаблон REST API сервиса, построенный на компонентной чистой архитектуре для реализации DDD (Domain Driven Design).
 
-В проекте применяются: миграции БД, версионность API, Docker, Kafka, OpenAPI (Swagger).
+В проекте применяются: миграции БД, версионность API, Docker, Kafka, OpenAPI (Swagger), swagger-jsdoc.
 
 В основе проекта лежат принципы чистой (луковой) архитектуры, с такими элементами как: домен, usecase, интерфейс, инфраструктура и доменные события.  
 Спецификой проекта является добавление компонентной части, которая представляет собой набор необходимых бизнес-объектов. Компоненты, в свою очередь, реализованы на чистой архитектуре. Взаимодействие между компнентами осуществляется доменными событиями core/domain/events.
@@ -16,6 +16,66 @@
 Применены паттерны: Repository, Domain Events, Circuit Breaker и др.
 
 Тестирование выполняется с применением фреймворка Jest.
+
+## Ключевые возможности
+
+- ✅ **Чистая архитектура** - Component-based DDD подход
+- ✅ **Автоматическая генерация компонентов** - Component Generator
+- ✅ **Swagger документация** - swagger-jsdoc интеграция
+- ✅ **Мульти-база данных** - PostgreSQL и Oracle
+- ✅ **Событийная архитектура** - Domain Events с Kafka
+- ✅ **Версионирование API** - Поддержка нескольких версий
+- ✅ **TypeScript** - Полная типобезопасность
+- ✅ **Тестирование** - Jest фреймворк
+- ✅ **Docker** - Контейнеризация
+
+## Требования
+
+- **Node.js** 18.x или выше
+- **npm** 8.x или выше
+- **Go** 1.19 или выше (для Component Generator)
+- **Docker** и **Docker Compose**
+- **PostgreSQL** или **Oracle** база данных
+
+## Быстрый старт
+
+### 1. Клонирование и установка
+
+```bash
+git clone https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template.git
+cd rest-nodejs-cleanarch-template
+npm install
+```
+
+### 2. Настройка окружения
+
+```bash
+cp .env.example .env
+# Отредактируйте .env файл с вашими настройками
+```
+
+### 3. Сборка генератора компонентов
+
+```bash
+cd src/utils/component-generator
+go build -o component-generator.exe
+```
+
+### 4. Запуск проекта
+
+```bash
+# Разработка
+npm run dev
+
+# Production
+npm run build
+npm run serve
+```
+
+### 5. Доступ к документации
+
+- **Swagger UI**: `http://localhost:1234/api-docs`
+- **Health Check**: `http://localhost:1234/health`
 
 ## Схема проекта
 
@@ -199,21 +259,66 @@ artifact "Проект" {
     docker compose up
     ```
 
-## OpenAPI
+## OpenAPI и Swagger
 
-По умолчанию OpenAPI документация доступна по адресу <http://localhost:1234/api-docs/v1/>
+Проект использует два подхода для документации API:
+
+### 1. Swagger JSDoc (Рекомендуемый подход)
+
+Автоматическая генерация документации из JSDoc комментариев в коде:
+
+- **Swagger UI**: `http://localhost:1234/api-docs`
+- **JSON спецификация**: `http://localhost:1234/api-docs.json`
+- **Автоматическая генерация**: Из комментариев в контроллерах
+- **Component Generator**: Создает контроллеры с готовыми аннотациями
+
+### 2. OpenAPI YAML
+
+Традиционный подход с YAML файлами:
+
+- **Расположение**: `src/api/v1/openapi/openapi.yaml`
+- **Доступ**: `http://localhost:1234/api-docs/v1/`
+- **Ручное редактирование**: При необходимости
+
+### Пример JSDoc аннотаций
+
+```typescript
+/**
+ * @swagger
+ * tags:
+ *   name: tasks
+ *   description: Operations with tasks
+ */
+export class TaskController {
+    /**
+     * @swagger
+     * /tasks:
+     *   get:
+     *     summary: Get list of tasks
+     *     tags: [tasks]
+     *     security:
+     *       - JWT: [read]
+     *     responses:
+     *       200:
+     *         description: List of tasks
+     */
+    public getTasks = (req: Request, res: Response): void => {
+        // Implementation
+    }
+}
+```
 
 ### Запросы к API
 
 Запросы к API можно выполнять с помощью Postman или с помощью curl.
 
-Адрес сервера: <http://localhost:1234/api/v1/>
+Адрес сервера: `http://localhost:1234/api/v1/`
 
 ## ИНСТРУМЕНТЫ РАЗРАБОТКИ
 
 ### Component Generator
 
-В проекте включен консольный генератор компонентов на Go, который автоматически создает структуру для новых API компонентов по паттерну Clean Architecture.
+В проект включен консольный генератор компонентов на Go, который автоматически создает структуру для новых API компонентов по паттерну Clean Architecture.
 
 **Расположение:** `src/utils/component-generator/`
 
@@ -257,7 +362,28 @@ src/api/v1/components/{plural}/
 └── usecases/                 # Use cases
 ```
 
-**Документация:** Подробное описание доступно в `src/utils/component-generator/README.md`
+**Документация:** Подробное описание доступно в `docs/component-generator.md`
+
+### Swagger JSDoc Integration
+
+Для автоматической генерации документации API используется swagger-jsdoc:
+
+**Установка:**
+```bash
+npm install swagger-jsdoc @types/swagger-jsdoc
+```
+
+**Конфигурация:**
+- Файл конфигурации: `src/config/swagger.ts`
+- Интеграция с сервером: `src/server.ts`
+- Автоматическая обработка JSDoc комментариев
+
+**Использование:**
+1. Добавьте JSDoc аннотации в контроллеры
+2. Component Generator автоматически создает аннотации
+3. Документация доступна по адресу: `http://localhost:1234/api-docs`
+
+**Документация:** Подробное описание доступно в `docs/swagger-integration.md`
 
 ## МИГРАЦИИ БД
 

@@ -1,7 +1,7 @@
 import express, { type Router, type Request, type Response, type NextFunction } from 'express'
 import compression from 'compression'
 import rateLimit from 'express-rate-limit'
-import swaggerUi from 'swagger-ui-express'
+//import swaggerUi from 'swagger-ui-express'
 //import * as swaggerDocumentV1 from '../src/openapi/v1/openapi.json'
 
 import { ONE_HUNDRED, ONE_THOUSAND, SIXTY } from './core/constants/constatnts'
@@ -13,10 +13,11 @@ import { Logger } from './core/logger/logger'
 import { PostgresService } from './api/v1/infrastructure/postgresql/postgresql'
 import { OracleService } from './api/v1/infrastructure/oracle/oracledb'
 import { EnvConfig } from './config/env'
+import { setupSwagger } from './config/swagger'
 import serveFavicon = require('serve-favicon')
 import path = require('path')
-import YAML from 'yaml'
-import fs from 'fs'
+//import YAML from 'yaml'
+//import fs from 'fs'
 import "./core/subscribers"
 import { CircuitBreaker } from './core/utils/circuit-breaker'
 
@@ -126,9 +127,7 @@ export class Server {
     }
 
     private setupSwagger(): void {
-        const file = fs.readFileSync('./dist/api/v1/openapi/openapi.yaml', 'utf8')
-        const swaggerDocumentV1 = YAML.parse(file)
-        this.app.use('/api-docs/v1', swaggerUi.serve, swaggerUi.setup(swaggerDocumentV1))
+        setupSwagger(this.app)
     }
 
     private setupErrorHandling(): void {

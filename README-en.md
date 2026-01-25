@@ -6,14 +6,78 @@ REST API server template on component-based pure architecture
 
 ## Project Description
 
-The project is a REST API service template built on component-based pure architecture.
+The project is a REST API service template built on component-based pure architecture for implementing DDD (Domain Driven Design).
 
-The project uses: database migrations, API versioning, Docker, Kafka, OpenAPI (Swagger).
+The project uses: database migrations, API versioning, Docker, Kafka, OpenAPI (Swagger), swagger-jsdoc.
 
 The project is based on the principles of pure (onion) architecture, with such elements as: domain, usecase, interface, infrastructure and domain events.
 The specificity of the project is the addition of a component part, which is a set of necessary business objects.  
 The components, in turn, are implemented on a pure architecture.  
 Interaction between the components is realized by means of domain events of the parent domain.
+
+Applied patterns: Repository, Domain Events, Circuit Breaker and others.
+
+Testing is performed using the Jest framework.
+
+## Key Features
+
+- **Clean Architecture** - Component-based DDD approach
+- **Automatic Component Generation** - Component Generator
+- **Swagger Documentation** - swagger-jsdoc integration
+- **Multi-database** - PostgreSQL and Oracle
+- **Event-driven Architecture** - Domain Events with Kafka
+- **API Versioning** - Support for multiple versions
+- **TypeScript** - Full type safety
+- **Testing** - Jest framework
+- **Docker** - Containerization
+
+## Requirements
+
+- **Node.js** 18.x or higher
+- **npm** 8.x or higher
+- **Go** 1.19 or higher (for Component Generator)
+- **Docker** and **Docker Compose**
+- **PostgreSQL** or **Oracle** database
+
+## Quick Start
+
+### 1. Clone and Install
+
+```bash
+git clone https://github.com/KravetsMikhail/rest-nodejs-cleanarch-template.git
+cd rest-nodejs-cleanarch-template
+npm install
+```
+
+### 2. Environment Setup
+
+```bash
+cp .env.example .env
+# Edit .env file with your settings
+```
+
+### 3. Build Component Generator
+
+```bash
+cd src/utils/component-generator
+go build -o component-generator.exe
+```
+
+### 4. Run Project
+
+```bash
+# Development
+npm run dev
+
+# Production
+npm run build
+npm run serve
+```
+
+### 5. Access Documentation
+
+- **Swagger UI**: `http://localhost:1234/api-docs`
+- **Health Check**: `http://localhost:1234/health`
 
 ## Project outline
 
@@ -197,16 +261,60 @@ To check and test, you need to run the dockers of the following projects (see th
     docker compose up
     ```
 
-## OpenAPI
+## OpenAPI and Swagger
 
-By default, the project runs on port 1234.
+The project uses two approaches for API documentation:
 
-OpenAPI documentation is available at <http://localhost:1234/api-docs/v1/>
+### 1. Swagger JSDoc (Recommended Approach)
 
-### API requests
+Automatic documentation generation from JSDoc comments in code:
 
-API requests can be made with Postman or with curl.  
-Server address: <http://localhost:1234/api/v1/>
+- **Swagger UI**: `http://localhost:1234/api-docs`
+- **JSON Specification**: `http://localhost:1234/api-docs.json`
+- **Automatic Generation**: From comments in controllers
+- **Component Generator**: Creates controllers with ready annotations
+
+### 2. OpenAPI YAML
+
+Traditional approach with YAML files:
+
+- **Location**: `src/api/v1/openapi/openapi.yaml`
+- **Access**: `http://localhost:1234/api-docs/v1/`
+- **Manual Editing**: When necessary
+
+### Example JSDoc Annotations
+
+```typescript
+/**
+ * @swagger
+ * tags:
+ *   name: tasks
+ *   description: Operations with tasks
+ */
+export class TaskController {
+    /**
+     * @swagger
+     * /tasks:
+     *   get:
+     *     summary: Get list of tasks
+     *     tags: [tasks]
+     *     security:
+     *       - JWT: [read]
+     *     responses:
+     *       200:
+     *         description: List of tasks
+     */
+    public getTasks = (req: Request, res: Response): void => {
+        // Implementation
+    }
+}
+```
+
+### API Requests
+
+API requests can be made with Postman or with curl.
+
+Server address: `http://localhost:1234/api/v1/`
 
 ## DEVELOPMENT TOOLS
 
@@ -256,7 +364,28 @@ src/api/v1/components/{plural}/
 └── usecases/                 # Use cases
 ```
 
-**Documentation:** Detailed description available in `src/utils/component-generator/README.md`
+**Documentation:** Detailed description available in `docs/component-generator.md`
+
+### Swagger JSDoc Integration
+
+For automatic API documentation generation, swagger-jsdoc is used:
+
+**Installation:**
+```bash
+npm install swagger-jsdoc @types/swagger-jsdoc
+```
+
+**Configuration:**
+- Configuration file: `src/config/swagger.ts`
+- Server integration: `src/server.ts`
+- Automatic processing of JSDoc comments
+
+**Usage:**
+1. Add JSDoc annotations to controllers
+2. Component Generator automatically creates annotations
+3. Documentation available at: `http://localhost:1234/api-docs`
+
+**Documentation:** Detailed description available in `docs/swagger-integration.md`
 
 ## DB MIGRATIONS
 
