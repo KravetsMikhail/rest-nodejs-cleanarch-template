@@ -11,30 +11,64 @@ func generateUseCaseFiles(config ComponentConfig, basePath string) {
 	createUsecaseContent := fmt.Sprintf(`import { %sEntity } from '../domain/entities/%s.entity'
 import { IUseCase } from '../../../../../core/domain/types/i.usecase'
 import { Result } from '../../../../../core/domain/types/result'
+import { %sResponse } from '../../../../../core/domain/types/response'
 
-export class Create%sUseCase implements IUseCase<Promise<Result<%sEntity, any>>> {
+export class Create%sUseCase implements IUseCase<Promise<%sResponse>> {
     constructor(private readonly repository: any) {}
 
-    async execute(name: string, user: string): Promise<Result<%sEntity, any>> {
+    async execute(name: string, user: string): Promise<%sResponse> {
         // TODO: Implement create logic
-        return Result.ok<%sEntity>({} as %sEntity)
+        return %sResponse.success({} as %sEntity)
     }
-}`, singularCap, singular, singularCap, singularCap, singularCap, singularCap, singularCap)
+}`, singularCap, singular, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap)
 
 	writeFile(fmt.Sprintf("%s/usecases/create-%s.usecase.ts", basePath, singular), createUsecaseContent)
+
+	updateUsecaseContent := fmt.Sprintf(`import { %sEntity } from '../domain/entities/%s.entity'
+import { IUseCase } from '../../../../../core/domain/types/i.usecase'
+import { Result } from '../../../../../core/domain/types/result'
+import { %sResponse } from '../../../../../core/domain/types/response'
+
+export class Update%sUseCase implements IUseCase<Promise<%sResponse>> {
+    constructor(private readonly repository: any) {}
+
+    async execute(id: number, data: Partial<%sEntity>): Promise<%sResponse> {
+        // TODO: Implement update logic
+        return %sResponse.success({} as %sEntity)
+    }
+}`, singularCap, singular, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap)
+
+	writeFile(fmt.Sprintf("%s/usecases/update-%s.usecase.ts", basePath, singular), updateUsecaseContent)
+
+	deleteUsecaseContent := fmt.Sprintf(`import { %sEntity } from '../domain/entities/%s.entity'
+import { IUseCase } from '../../../../../core/domain/types/i.usecase'
+import { Result } from '../../../../../core/domain/types/result'
+import { %sResponse } from '../../../../../core/domain/types/response'
+
+export class Delete%sUseCase implements IUseCase<Promise<%sResponse>> {
+    constructor(private readonly repository: any) {}
+
+    async execute(id: number): Promise<%sResponse> {
+        // TODO: Implement delete logic
+        return %sResponse.success({} as %sEntity)
+    }
+}`, singularCap, singular, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap)
+
+	writeFile(fmt.Sprintf("%s/usecases/delete-%s.usecase.ts", basePath, singular), deleteUsecaseContent)
 
 	getUsecaseContent := fmt.Sprintf(`import { %sEntity } from '../domain/entities/%s.entity'
 import { IUseCase } from '../../../../../core/domain/types/i.usecase'
 import { Result } from '../../../../../core/domain/types/result'
+import { %sResponse } from '../../../../../core/domain/types/response'
 
-export class Get%sUseCase implements IUseCase<Promise<Result<%sEntity[], any>>> {
+export class Get%sUseCase implements IUseCase<Promise<%sResponse>> {
     constructor(private readonly repository: any) {}
 
-    async execute(options?: any): Promise<Result<%sEntity[], any>> {
+    async execute(options?: any): Promise<%sResponse> {
         // TODO: Implement get all logic
-        return Result.ok<%sEntity[]>([])
+        return %sResponse.success([] as %sEntity[])
     }
-}`, singularCap, singular, singularCap, singularCap, singularCap, singularCap)
+}`, singularCap, singular, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap)
 
 	writeFile(fmt.Sprintf("%s/usecases/get-%s.usecase.ts", basePath, singular), getUsecaseContent)
 }

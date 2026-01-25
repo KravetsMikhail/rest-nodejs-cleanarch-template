@@ -14,7 +14,13 @@ func generateEntityFiles(config ComponentConfig, basePath string) {
 	var additionalGetters []string
 	
 	for _, field := range config.TableFields {
-		fieldName := capitalize(field.Name)
+		// Skip system fields that are already handled
+		if field.Name == "name" || field.Name == "created_at" || field.Name == "updated_at" || 
+		   field.Name == "createdby" || field.Name == "updatedby" || 
+		   field.Name == "createdBy" || field.Name == "updatedBy" {
+			continue
+		}
+		
 		tsType := mapSQLTypeToTypeScript(field.Type)
 		dbType := mapSQLTypeToDbTypes(field.Type)
 		
@@ -22,83 +28,81 @@ func generateEntityFiles(config ComponentConfig, basePath string) {
 		propLine := fmt.Sprintf("    %s%s: %s,", field.Name, getOptionalSuffix(field.Nullable), tsType)
 		additionalProps = append(additionalProps, propLine)
 		
-		// Add getter
+		// Add getter with camelCase name (convert snake_case to camelCase)
+		camelFieldName := toCamelCase(field.Name)
 		getterLine := fmt.Sprintf(`    
     @DbType(%s)
-    get %s(): %s { return this.props.%s }`, dbType, fieldName, tsType, field.Name)
+    get %s(): %s { return this.props.%s || %s }`, 
+			dbType, camelFieldName, tsType, field.Name, getDefaultValue(tsType))
 		additionalGetters = append(additionalGetters, getterLine)
 	}
 	
-	// Build entity content step by step
-	var entityContent strings.Builder
+	// Build entity content
+	var content strings.Builder
 	
-	// Imports
-	imports := fmt.Sprintf(`import { UniqueEntityId } from '../../../../../../core/domain/types/uniqueentityid'
-import { ValidationError } from '../../../../../../core/errors/validation.error'
-import { AggregateRoot } from '../../../../../../core/domain/types/aggregate.root'
-import { %sName } from '../valueobjects/%s.name'
-import { %sSearch } from '../valueobjects/%s.search'
-import { Result } from '../../../../../../core/domain/types/result'
-import { Guard } from '../../../../../../core/domain/types/guard'
-import { I%sCreatedEventProps, %sCreatedEvent } from '../events/%s.created.events'
-import { %sDeletedEvent } from '../events/%s.deleted.events'
-import { %sUpdatedEvent } from '../events/%s.updated.events'
-import { DbTypes, DbType, ID } from '../../../../../../core/domain/types/reflections'
-
-`, singularCap, singular, singularCap, singular,
-		singularCap, singularCap, singular, singularCap, singular,
-		singularCap, singular, singularCap, singular)
-	entityContent.WriteString(imports)
+	// Write imports separately
+	content.WriteString("import { UniqueEntityId } from '../../../../../../core/domain/types/uniqueentityid'\n")
+	content.WriteString("import { ValidationError } from '../../../../../../core/errors/validation.error'\n")
+	content.WriteString("import { AggregateRoot } from '../../../../../../core/domain/types/aggregate.root'\n")
+	content.WriteString(fmt.Sprintf("import { %sName } from '../valueobjects/%s.name'\n", singularCap, singular))
+	content.WriteString(fmt.Sprintf("import { %sSearch } from '../valueobjects/%s.search'\n", singularCap, singular))
+	content.WriteString("import { Result } from '../../../../../../core/domain/types/result'\n")
+	content.WriteString("import { Guard } from '../../../../../../core/domain/types/guard'\n")
+	content.WriteString(fmt.Sprintf("import { I%sCreatedEventProps, %sCreatedEvent } from '../events/%s.created.events'\n", singularCap, singularCap, singular))
+	content.WriteString(fmt.Sprintf("import { %sDeletedEvent } from '../events/%s.deleted.events'\n", singularCap, singular))
+	content.WriteString(fmt.Sprintf("import { %sUpdatedEvent } from '../events/%s.updated.events'\n", singularCap, singular))
+	content.WriteString("import { DbTypes, DbType, ID } from '../../../../../../core/domain/types/reflections'\n\n")
 	
 	// Interface
-	entityContent.WriteString(fmt.Sprintf(`export interface I%sProps {
-    name: %sName,
-    search: string,
-    createdBy?: string,
-    createdAt?: Date,
-    updatedBy?: string,
-    updatedAt?: Date`, singularCap, singularCap))
+	content.WriteString(fmt.Sprintf("export interface I%sProps {\n", singularCap))
+	content.WriteString(fmt.Sprintf("    name: %sName,\n", singularCap))
+	content.WriteString("    search: string,\n")
+	content.WriteString("    createdBy?: string,\n")
+	content.WriteString("    createdAt?: Date,\n")
+	content.WriteString("    updatedBy?: string,\n")
+	content.WriteString("    updatedAt?: Date")
 	
 	// Add additional properties
 	for _, prop := range additionalProps {
-		entityContent.WriteString("\n")
-		entityContent.WriteString(prop)
+		content.WriteString("\n")
+		content.WriteString(prop)
 	}
 	
-	entityContent.WriteString("\n}\n\n")
+	content.WriteString("\n}\n\n")
 	
 	// Class
-	classContent := fmt.Sprintf(`export class %sEntity extends AggregateRoot<I%sProps> {
-    @ID @DbType(DbTypes.Number)
-    get id(): UniqueEntityId { return this._id }
-    
-    @DbType(DbTypes.String)
-    get name(): %sName { return this.props.name }
-    
-    @DbType(DbTypes.String)
-    get search(): %sSearch { 
-        return %sSearch.create(this.props.name.value, this.props?.createdBy, this.props?.updatedBy)
-    }
-    
-    @DbType(DbTypes.String)
-    get createdBy(): string { return this.props?.createdBy || "" }
-    
-    @DbType(DbTypes.Date)
-    get createdAt(): Date { return this.props?.createdAt || new Date() }
-    
-    @DbType(DbTypes.String)
-    get updatedBy(): string { return this.props?.updatedBy || "" }
-    
-    @DbType(DbTypes.Date)
-    get updatedAt(): Date { return this.props?.updatedAt || new Date() }`, singularCap, singularCap, singularCap, singularCap, singularCap)
-	entityContent.WriteString(classContent)
+	content.WriteString(fmt.Sprintf("export class %sEntity extends AggregateRoot<I%sProps> {\n", singularCap, singularCap))
+	content.WriteString("    @ID @DbType(DbTypes.Number)\n")
+	content.WriteString("    get id(): UniqueEntityId { return this._id }\n\n")
+	
+	content.WriteString("    @DbType(DbTypes.String)\n")
+	content.WriteString(fmt.Sprintf("    get name(): %sName { return this.props.name }\n\n", singularCap))
+	
+	content.WriteString("    @DbType(DbTypes.String)\n")
+	content.WriteString(fmt.Sprintf("    get search(): %sSearch { \n", singularCap))
+	content.WriteString(fmt.Sprintf("        return %sSearch.create(this.props.name.value, this.props?.createdBy, this.props?.updatedBy)\n", singularCap))
+	content.WriteString("    }\n\n")
+	
+	content.WriteString("    @DbType(DbTypes.String)\n")
+	content.WriteString("    get createdBy(): string { return this.props?.createdBy || \"\" }\n\n")
+	
+	content.WriteString("    @DbType(DbTypes.Date)\n")
+	content.WriteString("    get createdAt(): Date { return this.props?.createdAt || new Date() }\n\n")
+	
+	content.WriteString("    @DbType(DbTypes.String)\n")
+	content.WriteString("    get updatedBy(): string { return this.props?.updatedBy || \"\" }\n\n")
+	
+	content.WriteString("    @DbType(DbTypes.Date)\n")
+	content.WriteString("    get updatedAt(): Date { return this.props?.updatedAt || new Date() }\n\n")
 	
 	// Add additional getters
 	for _, getter := range additionalGetters {
-		entityContent.WriteString(getter)
+		content.WriteString(getter)
 	}
 	
-	constructorContent := fmt.Sprintf(`
+	// Constructor and create method
+	entityVarName := toCamelCase(singular) + "Entity"
+	constructorTemplate := fmt.Sprintf(`
 
     private constructor(props: I%sProps, id?: UniqueEntityId) {
         super(props, id)
@@ -115,32 +119,34 @@ import { DbTypes, DbType, ID } from '../../../../../../core/domain/types/reflect
             )
         }
         
-        const i%s = { %s: new %sEntity({ ...props }, id) } as I%sCreatedEventProps
+        const %s = new %sEntity({ ...props }, id)
+        const eventProps = { %s: %s } as I%sCreatedEventProps
 
         if (isCreateEvent) {
-            i%s.%s.addDomainEvent(new %sCreatedEvent(i%s))
+            %s.addDomainEvent(new %sCreatedEvent(eventProps))
         }
 
-        return Result.ok<%sEntity>(i%s.%s)
+        return Result.ok<%sEntity>(%s)
     }
 }`, singularCap, singularCap, singularCap, singularCap,
-		singular, singularCap, singularCap, singularCap,
-		singularCap, singularCap, singularCap, singularCap,
-		singularCap, singularCap, singularCap, singularCap)
-	entityContent.WriteString(constructorContent)
+		entityVarName, singularCap, singular, entityVarName, singularCap,
+		entityVarName, singularCap, singularCap, entityVarName)
+	content.WriteString(constructorTemplate)
+	
+	writeFile(fmt.Sprintf("%s/domain/entities/%s.entity.ts", basePath, singular), content.String())
 
-	writeFile(fmt.Sprintf("%s/domain/entities/%s.entity.ts", basePath, singular), entityContent.String())
+	idEntityContent := fmt.Sprintf(`import { Entity } from '../../../../../../core/domain/types/entity'
+import { UniqueEntityId } from '../../../../../../core/domain/types/uniqueentityid'
 
-	idEntityContent := fmt.Sprintf(`import { UniqueEntityId } from '../../../../../../core/domain/types/uniqueentityid'
-import { ValueObject } from '../../../../../../core/domain/types/value.object'
+export class %sId extends Entity<any> {
+    get id(): UniqueEntityId { return this._id }
 
-export class %sId extends ValueObject<{ value: UniqueEntityId }> {
-    get value(): UniqueEntityId { return this.props.value }
+    private constructor(id?: UniqueEntityId) {
+        super(null, id)
+    }
 
-    private constructor(props: { value: UniqueEntityId }) { super(props) }
-
-    public static create(id: UniqueEntityId): %sId {
-        return new %sId({ value: id })
+    public static create(id?: UniqueEntityId): %sId {
+        return new %sId(id)
     }
 }`, singularCap, singularCap, singularCap)
 
@@ -158,7 +164,7 @@ func generateValueObjectFiles(config ComponentConfig, basePath string) {
 	singular := config.SingularName
 	singularCap := capitalize(singular)
 	
-	nameContent := fmt.Sprintf(`import { ValueObject } from '../../../../../../core/domain/types/value.object'
+	nameContent := fmt.Sprintf(`import { ValueObject } from '../../../../../../core/domain/types/valueobject'
 import { Result } from '../../../../../../core/domain/types/result'
 
 export interface %sNameProps { value: string }
@@ -170,10 +176,10 @@ export class %sName extends ValueObject<%sNameProps> {
 
     public static create(name: string): Result<%sName> {
         if (!name || name.trim().length === 0) {
-            return Result.fail<%sName>(new Error('%s name is required'))
+            return Result.fail<%sName, Error>(new Error('%s name is required'))
         }
-        if (name.length > 255) {
-            return Result.fail<%sName>(new Error('%s name must be less than 255 characters'))
+        if (name.length > 100) {
+            return Result.fail<%sName, Error>(new Error('%s name must be less than 100 characters'))
         }
         return Result.ok<%sName>(new %sName({ value: name.trim() }))
     }
@@ -181,8 +187,7 @@ export class %sName extends ValueObject<%sNameProps> {
 
 	writeFile(fmt.Sprintf("%s/domain/valueobjects/%s.name.ts", basePath, singular), nameContent)
 
-	searchContent := fmt.Sprintf(`import { ValueObject } from '../../../../../../core/domain/types/value.object'
-import { Result } from '../../../../../../core/domain/types/result'
+	searchContent := fmt.Sprintf(`import { ValueObject } from '../../../../../../core/domain/types/valueobject'
 
 export interface %sSearchProps { value: string }
 
@@ -191,15 +196,38 @@ export class %sSearch extends ValueObject<%sSearchProps> {
 
     private constructor(props: %sSearchProps) { super(props) }
 
-    public static create(name: string, createdBy?: string, updatedBy?: string): Result<%sSearch> {
+    public static create(name: string, createdBy?: string, updatedBy?: string): %sSearch {
         const searchTerms = []
         if (name) searchTerms.push(name.toLowerCase())
         if (createdBy) searchTerms.push(createdBy.toLowerCase())
         if (updatedBy) searchTerms.push(updatedBy.toLowerCase())
         const searchValue = searchTerms.join(" ")
-        return Result.ok<%sSearch>(new %sSearch({ value: searchValue }))
+        return new %sSearch({ value: searchValue })
     }
 }`, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap)
 
 	writeFile(fmt.Sprintf("%s/domain/valueobjects/%s.search.ts", basePath, singular), searchContent)
+}
+
+func getDefaultValue(tsType string) string {
+	switch tsType {
+	case "string":
+		return `""`
+	case "number":
+		return `0`
+	case "boolean":
+		return `false`
+	case "Date":
+		return `new Date()`
+	default:
+		return `null`
+	}
+}
+
+func toCamelCase(s string) string {
+	parts := strings.Split(s, "_")
+	for i := 1; i < len(parts); i++ {
+		parts[i] = capitalize(parts[i])
+	}
+	return strings.Join(parts, "")
 }
