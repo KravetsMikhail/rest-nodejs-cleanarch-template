@@ -41,13 +41,13 @@ export class %sUpdatedEvent implements IDomainEvent {
 	writeFile(fmt.Sprintf("%s/domain/events/%s.updated.events.ts", basePath, singular), updatedEventContent)
 
 	deletedEventContent := fmt.Sprintf(`import { IDomainEvent } from '../../../../../../core/domain/events/domain.event'
-import { Deleted%sEntity } from '../entities/%s.entity'
+import { %sEntity } from '../entities/%s.entity'
 
 export class %sDeletedEvent implements IDomainEvent {
     public dateTimeOccurred: Date
-    public %s: Deleted%sEntity
+    public %s: %sEntity
 
-    constructor(%s: Deleted%sEntity) {
+    constructor(%s: %sEntity) {
         this.dateTimeOccurred = new Date()
         this.%s = %s
     }

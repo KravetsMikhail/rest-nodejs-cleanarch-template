@@ -100,6 +100,7 @@ func generateEntityFiles(config ComponentConfig, basePath string) {
 	}
 	
 	// Constructor and create method
+	entityVarName := toCamelCase(singular) + "Entity"
 	constructorTemplate := fmt.Sprintf(`
 
     private constructor(props: I%sProps, id?: UniqueEntityId) {
@@ -117,21 +118,19 @@ func generateEntityFiles(config ComponentConfig, basePath string) {
             )
         }
         
-        const %sEntity = new %sEntity({ ...props }, id)
-        const eventProps = { %s: %sEntity } as I%sCreatedEventProps
+        const %s = new %sEntity({ ...props }, id)
+        const eventProps = { %s: %s } as I%sCreatedEventProps
 
         if (isCreateEvent) {
-            %sEntity.addDomainEvent(new %sCreatedEvent(eventProps))
+            %s.addDomainEvent(new %sCreatedEvent(eventProps))
         }
 
-        return Result.ok<%sEntity>(%sEntity)
+        return Result.ok<%sEntity>(%s)
     }
 }`, singularCap, singularCap, singularCap, singularCap,
-		singular, singularCap, singular, singularCap, singularCap,
-		singular, singularCap, singular, singularCap, singularCap)
+		entityVarName, singularCap, singular, entityVarName, singularCap,
+		entityVarName, singularCap, singularCap, entityVarName)
 	content.WriteString(constructorTemplate)
-
-	content.WriteString("}\n")
 	
 	writeFile(fmt.Sprintf("%s/domain/entities/%s.entity.ts", basePath, singular), content.String())
 
