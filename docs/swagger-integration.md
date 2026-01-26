@@ -26,9 +26,9 @@ const options: swaggerJsdoc.Options = {
   definition: {
     openapi: '3.0.1',
     info: {
-      title: 'REST API for Royalty',
+      title: 'REST API template',
       version: 'v1',
-      description: 'API documentation for Royalty management system',
+      description: 'API documentation for template',
     },
     servers: [
       {

@@ -1,12 +1,12 @@
 openapi: 3.0.1
 info:
-  title: REST API for Royalty
+  title: REST API for template
   version: v1
 paths:
   /tasks:
     get:
       servers:
-        - url: https://roualty.rasu.local/api/v1/
+        - url: https://localhost:1234/api/v1/
       description: Список задач
       tags:
         - tasks
@@ -81,7 +81,7 @@ paths:
                       updateBy: Сидоров
     post:
       servers:
-        - url: https://roualty.rasu.local/api/v1/
+        - url: https://localhost:1234/api/v1/
       description: Создание задачи
       tags:
         - tasks
@@ -120,7 +120,7 @@ paths:
   /tasks/{id}:
     get:
       servers:
-        - url: https://roualty.rasu.local/api/v1/
+        - url: https://localhost:1234/api/v1/
       description: Получение задачи по ID
       tags:
         - tasks
@@ -161,7 +161,7 @@ paths:
                 $ref: '#/components/schemas/Error'
     put:
       servers:
-        - url: https://roualty.rasu.local/api/v1/
+        - url: https://localhost:1234/api/v1/
       description: Обновление задачи
       tags:
         - tasks
@@ -207,7 +207,7 @@ paths:
                     updateBy: Петров
     delete:
       servers:
-        - url: https://roualty.rasu.local/api/v1/
+        - url: https://localhost:1234/api/v1/
       description: Удаление задачи
       tags:
         - tasks

@@ -7,9 +7,9 @@ const options: swaggerJsdoc.Options = {
   definition: {
     openapi: '3.0.1',
     info: {
-      title: 'REST API for Royalty',
+      title: 'REST API for template',
       version: 'v1',
-      description: 'API documentation for Royalty management system',
+      description: 'API documentation for template',
     },
     servers: [
       {
@@ -17,7 +17,7 @@ const options: swaggerJsdoc.Options = {
         description: 'Development server',
       },
       {
-        url: 'https://roualty.rasu.local/api/v1',
+        url: 'https://localhost:1234/api/v1',
         description: 'Production server',
       },
     ],
@@ -52,7 +52,7 @@ export const swaggerUiOptions: swaggerUi.SwaggerUiOptions = {
     .swagger-ui .info { margin: 20px 0 }
     .swagger-ui .scheme-container { margin: 20px 0 }
   `,
-  customSiteTitle: 'Royalty API Documentation',
+  customSiteTitle: 'API Documentation',
 };
 
 export const setupSwagger = (app: Express): void => {
