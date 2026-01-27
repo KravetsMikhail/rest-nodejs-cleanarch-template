@@ -40,7 +40,7 @@ go build -o component-generator.exe
 ### With SQL Migration
 
 ```bash
-./component-generator.exe generate --singular product --plural products --migration migration.sql
+./component-generator.exe generate --singular product --plural products --migration ../../../migrations/migration.sql
 ```
 
 ### Command Options
@@ -50,7 +50,7 @@ go build -o component-generator.exe
 | `--singular` | Yes | Singular name of the entity | `product` |
 | `--plural` | Yes | Plural name of the entity | `products` |
 | `--version` | No | API version (default: v1) | `v1` |
-| `--migration` | No | Path to SQL migration file | `migration.sql` |
+| `--migration` | No | Path to SQL migration file | `../../../migrations/migration.sql` |
 
 ## Generated Structure
 
@@ -361,7 +361,7 @@ CREATE TABLE categories (
 EOF
 
 # 2. Generate component
-./component-generator.exe generate --singular category --plural categories --migration migration.sql
+./component-generator.exe generate --singular category --plural categories --migration ../../../migrations/migration.sql
 
 # 3. Build project
 npm run build
@@ -502,7 +502,7 @@ export class CategoryController {
 
 ```bash
 # Single command generates everything
-./component-generator.exe generate --singular product --plural products --migration migration.sql
+./component-generator.exe generate --singular product --plural products --migration ../../../migrations/migration.sql
 ```
 
 ### Benefits

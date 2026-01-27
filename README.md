@@ -339,7 +339,7 @@ cd src/utils/component-generator
 ./component-generator.exe generate --singular product --plural products --version v1
 
 # Генерация с полями из SQL миграции
-./component-generator.exe generate --singular product --plural products --migration migrations/001_create_products.sql
+./component-generator.exe generate --singular product --plural products --migration ../../../migrations/001_create_products.sql
 ```
 
 **Поддерживаемые SQL типы:**

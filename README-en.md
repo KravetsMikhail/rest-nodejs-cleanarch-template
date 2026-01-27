@@ -340,7 +340,7 @@ cd src/utils/component-generator
 ./component-generator.exe generate --singular product --plural products --version v1
 
 # Generation with fields from SQL migration
-./component-generator.exe generate --singular product --plural products --migration migrations/001_create_products.sql
+./component-generator.exe generate --singular product --plural products --migration ../../../migrations/001_create_products.sql
 ```
 
 **Supported SQL Types:**

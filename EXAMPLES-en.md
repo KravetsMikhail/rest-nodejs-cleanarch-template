@@ -38,7 +38,7 @@ CREATE TABLE products (
 
 ```bash
 cd src/utils/component-generator
-./component-generator.exe generate --singular product --plural products --migration migrations/001_create_products.sql
+./component-generator.exe generate --singular product --plural products --migration ../../../migrations/001_create_products.sql
 ```
 
 #### 3. Generation Result
@@ -296,7 +296,7 @@ CREATE TABLE categories (
 ```
 
 ```bash
-./component-generator.exe generate --singular category --plural categories --migration migrations/002_create_categories.sql
+./component-generator.exe generate --singular category --plural categories --migration ../../../migrations/002_create_categories.sql
 ```
 
 ## Working with Database Migrations
@@ -1126,7 +1126,7 @@ CREATE TABLE orders (
 EOF
 
 # Generate component
-./component-generator.exe generate --singular order --plural orders --migration migrations/001_create_orders.sql
+./component-generator.exe generate --singular order --plural orders --migration ../../../migrations/001_create_orders.sql
 
 # Run migrations
 cd ../../..

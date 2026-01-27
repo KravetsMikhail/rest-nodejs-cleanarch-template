@@ -30,7 +30,7 @@ export class %sName extends ValueObject<%sNameProps> {
         }
         return Result.ok<%sName>(new %sName({ value: name.trim() }))
     }
-}`, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap)
+}`, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap)
 
 	WriteFile(fmt.Sprintf("%s/domain/valueobjects/%s.name.ts", basePath, singular), nameContent)
 
