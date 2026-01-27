@@ -1,15 +1,32 @@
-package main
+package interfaceapi
 
 import (
 	"fmt"
+	"os"
 	"strings"
+
+	"component-generator/internal/model"
 )
 
-func generateInterfaceFiles(config ComponentConfig, basePath string) {
+// local helpers
+func capitalize(s string) string {
+	return strings.Title(s)
+}
+
+func writeFile(path, content string) {
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		fmt.Printf("Error writing file %s: %v\n", path, err)
+	} else {
+		fmt.Printf("Created file: %s\n", path)
+	}
+}
+
+// GenerateInterfaceFiles generates controller and routes with Swagger JSDoc.
+func GenerateInterfaceFiles(config model.ComponentConfig, basePath string) {
 	singular := config.SingularName
 	singularCap := capitalize(singular)
-	
 	plural := config.PluralName
+
 	var controllerContent strings.Builder
 	controllerContent.WriteString("import { Request, Response } from 'express'\n")
 	controllerContent.WriteString(fmt.Sprintf("import { %sEntity } from '../domain/entities/%s.entity'\n\n", singularCap, singular))
@@ -108,3 +125,4 @@ export class %sRoutes {
 
 	writeFile(fmt.Sprintf("%s/interface/%s.routes.ts", basePath, singular), routesContent)
 }
+

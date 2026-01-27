@@ -84,42 +84,45 @@ CREATE TABLE products (
 );
 ```
 
-**Сгенерированные поля в entity:**
+**Сгенерированные поля в entity (на основе миграции):**
 ```typescript
 export interface IProductProps {
-    name: ProductName,
-    search: string,
-    createdBy?: string,
-    createdAt?: Date,
-    updatedBy?: string,
-    updatedAt?: Date,
-    description?: string,
-    price: number,
-    category_id?: number,
-    is_active?: boolean,
-    stock_quantity?: number,
+    name: string
+    description?: string
+    price: number
+    category_id?: number
+    is_active?: boolean
+    stock_quantity?: number
+    created_at?: Date
+    updated_at?: Date
+    createdby?: string
+    updatedby?: string
 }
 ```
 
-**Сгенерированные getters:**
+**Сгенерированные getters (для каждого поля из миграции):**
 ```typescript
 export class ProductEntity extends AggregateRoot<IProductProps> {
-    // ... стандартные поля
-    
+    @ID @DbType(DbTypes.Number)
+    get id(): UniqueEntityId { return this._id }
+
     @DbType(DbTypes.String)
-    get Description(): string { return this.props.description }
-    
+    get name(): string { return this.props.name || "" }
+
+    @DbType(DbTypes.String)
+    get description(): string { return this.props.description || "" }
+
     @DbType(DbTypes.Number)
-    get Price(): number { return this.props.price }
-    
+    get price(): number { return this.props.price || 0 }
+
     @DbType(DbTypes.Number)
-    get Category_id(): number { return this.props.category_id }
-    
+    get category_id(): number { return this.props.category_id || 0 }
+
     @DbType(DbTypes.Boolean)
-    get Is_active(): boolean { return this.props.is_active }
-    
+    get is_active(): boolean { return this.props.is_active || false }
+
     @DbType(DbTypes.Number)
-    get Stock_quantity(): number { return this.props.stock_quantity }
+    get stock_quantity(): number { return this.props.stock_quantity || 0 }
 }
 ```
 
@@ -192,24 +195,38 @@ src/api/{version}/components/{plural}/
 
 ```
 component-generator/
-├── main.go                    # Основной файл приложения
-├── go.mod                     # Модуль Go
-├── go.sum                     # Зависимости
-├── generators.go              # Генераторы сущностей и value objects
-├── generators_events.go       # Генераторы событий
-├── generators_repository.go   # Генераторы репозиториев
-├── generators_infrastructure.go # Генераторы инфраструктуры
-├── generators_interface.go    # Генераторы контроллеров и маршрутов
-├── generators_usecase.go      # Генераторы use cases
-└── README.md                  # Этот файл
+├── main.go                      # CLI-приложение (cobra)
+├── go.mod                       # Модуль Go
+├── go.sum                       # Зависимости
+└── internal/
+    ├── model/                   # Модели конфигурации генерации
+    │   └── model.go
+    ├── migration/               # Парсер SQL миграций и маппинг типов
+    │   └── parser.go
+    └── generator/               # Генераторы по слоям Clean Architecture
+        ├── service.go           # Оркестратор генерации
+        ├── domain/
+        │   ├── entity.go        # Entity + id-entity
+        │   ├── valueobjects.go  # Value Objects (name/search)
+        │   ├── events.go        # Доменные события
+        │   ├── repository.go    # Репозитории и Datasource интерфейсы
+        │   └── types.go         # Типы ответов
+        ├── infrastructure/
+        │   └── postgres.go      # Datasource для PostgreSQL
+        ├── interfaceapi/
+        │   └── http.go          # Контроллеры и маршруты (Express + Swagger JSDoc)
+        ├── usecase/
+        │   └── usecase.go       # CRUD use cases
+        └── openapi/
+            └── openapi.go       # Информация по интеграции с OpenAPI/Swagger
 ```
 
 ### Добавление новых шаблонов
 
 Для добавления новых шаблонов или модификации существующих:
 
-1. Откройте соответствующий файл `generators_*.go`
-2. Измените шаблоны в функциях `generate*`
+1. Откройте соответствующий файл в `internal/generator/**`
+2. Измените шаблоны в функциях `Generate*`
 3. Пересоберите приложение:
 ```bash
 go build -o component-generator.exe

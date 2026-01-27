@@ -1,21 +1,24 @@
-package main
+package domain
 
 import (
 	"fmt"
 	"strings"
+
+	"component-generator/internal/model"
 )
 
-func generateRepositoryFiles(config ComponentConfig, basePath string) {
+// GenerateRepositoryFiles generates repository interface and implementation.
+func GenerateRepositoryFiles(config model.ComponentConfig, basePath string) {
 	singular := config.SingularName
-	singularCap := capitalize(singular)
-	
+	singularCap := Capitalize(singular)
+
 	interfaceRepoContent := fmt.Sprintf(`import { IRepository } from '../../../../../../core/domain/types/i.repository'
 import { type %sEntity } from '../entities/%s.entity'
 
 export interface I%sRepository extends IRepository<%sEntity, any> {
 }`, singularCap, singular, singularCap, singularCap)
 
-	writeFile(fmt.Sprintf("%s/domain/repositories/i.%s.repository.ts", basePath, singular), interfaceRepoContent)
+	WriteFile(fmt.Sprintf("%s/domain/repositories/i.%s.repository.ts", basePath, singular), interfaceRepoContent)
 
 	var repoContent strings.Builder
 	repoContent.WriteString("import { ID, IFindOptions } from '../../../../../core/domain/types/types'\n")
@@ -32,18 +35,19 @@ export interface I%sRepository extends IRepository<%sEntity, any> {
 	repoContent.WriteString(fmt.Sprintf("    async findOne(id: ID | Partial<%sEntity>, options?: IFindOptions<%sEntity, any> | undefined): Promise<%sEntity> {\n        return await this.datasource.findOne(id)\n    }\n", singularCap, singularCap, singularCap))
 	repoContent.WriteString(fmt.Sprintf("    exist(id: ID | Partial<%sEntity>): Promise<boolean> {\n        throw new Error('Method not implemented.')\n    }\n}\n", singularCap))
 
-	writeFile(fmt.Sprintf("%s/domain/repositories/%s.repository.ts", basePath, singular), repoContent.String())
+	WriteFile(fmt.Sprintf("%s/domain/repositories/%s.repository.ts", basePath, singular), repoContent.String())
 }
 
-func generateDatasourceFiles(config ComponentConfig, basePath string) {
+// GenerateDatasourceFiles generates datasource interface.
+func GenerateDatasourceFiles(config model.ComponentConfig, basePath string) {
 	singular := config.SingularName
-	singularCap := capitalize(singular)
-	
+	singularCap := Capitalize(singular)
+
 	interfaceDsContent := fmt.Sprintf(`import { IDataSource } from '../../../../../../core/domain/types/i.datasource'
 import { type %sEntity } from '../entities/%s.entity'
 
 export interface I%sDatasource extends IDataSource<%sEntity, any> {
 }`, singularCap, singular, singularCap, singularCap)
 
-	writeFile(fmt.Sprintf("%s/domain/datasources/i.%s.datasource.ts", basePath, singular), interfaceDsContent)
+	WriteFile(fmt.Sprintf("%s/domain/datasources/i.%s.datasource.ts", basePath, singular), interfaceDsContent)
 }

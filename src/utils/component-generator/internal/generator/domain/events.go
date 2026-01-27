@@ -1,14 +1,17 @@
-package main
+package domain
 
 import (
 	"fmt"
 	"strings"
+
+	"component-generator/internal/model"
 )
 
-func generateEventFiles(config ComponentConfig, basePath string) {
+// GenerateEventFiles generates created/updated/deleted domain events.
+func GenerateEventFiles(config model.ComponentConfig, basePath string) {
 	singular := config.SingularName
-	singularCap := capitalize(singular)
-	
+	singularCap := Capitalize(singular)
+
 	var createdEventContent strings.Builder
 	createdEventContent.WriteString("import { IDomainEvent } from '../../../../../../core/domain/events/i.domain.event'\n")
 	createdEventContent.WriteString(fmt.Sprintf("import { %sEntity } from '../entities/%s.entity'\n\n", singularCap, singular))
@@ -21,7 +24,7 @@ func generateEventFiles(config ComponentConfig, basePath string) {
 	createdEventContent.WriteString(fmt.Sprintf("        this.%s = props.%s\n", singular, singular))
 	createdEventContent.WriteString("    }\n}\n")
 
-	writeFile(fmt.Sprintf("%s/domain/events/%s.created.events.ts", basePath, singular), createdEventContent.String())
+	WriteFile(fmt.Sprintf("%s/domain/events/%s.created.events.ts", basePath, singular), createdEventContent.String())
 
 	var updatedEventContent strings.Builder
 	updatedEventContent.WriteString("import { IDomainEvent } from '../../../../../../core/domain/events/i.domain.event'\n")
@@ -34,7 +37,7 @@ func generateEventFiles(config ComponentConfig, basePath string) {
 	updatedEventContent.WriteString(fmt.Sprintf("        this.%s = %s\n", singular, singular))
 	updatedEventContent.WriteString("    }\n}\n")
 
-	writeFile(fmt.Sprintf("%s/domain/events/%s.updated.events.ts", basePath, singular), updatedEventContent.String())
+	WriteFile(fmt.Sprintf("%s/domain/events/%s.updated.events.ts", basePath, singular), updatedEventContent.String())
 
 	var deletedEventContent strings.Builder
 	deletedEventContent.WriteString("import { IDomainEvent } from '../../../../../../core/domain/events/i.domain.event'\n")
@@ -47,5 +50,5 @@ func generateEventFiles(config ComponentConfig, basePath string) {
 	deletedEventContent.WriteString(fmt.Sprintf("        this.%s = %s\n", singular, singular))
 	deletedEventContent.WriteString("    }\n}\n")
 
-	writeFile(fmt.Sprintf("%s/domain/events/%s.deleted.events.ts", basePath, singular), deletedEventContent.String())
+	WriteFile(fmt.Sprintf("%s/domain/events/%s.deleted.events.ts", basePath, singular), deletedEventContent.String())
 }
