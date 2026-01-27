@@ -107,24 +107,37 @@ func GenerateEntityFiles(config model.ComponentConfig, basePath string) {
 	entityVarName := toCamelCase(singular) + "Entity"
 	constructorTemplate := fmt.Sprintf(`
 
-    private constructor(props: I%sProps, id?: UniqueEntityId) {
+    private constructor(props: I%[1]sProps, id?: UniqueEntityId) {
         super(props, id)
     }
 
-    public static create(props: I%sProps, id?: UniqueEntityId, isCreateEvent: boolean = true): Result<%sEntity> {
-        const %s = new %sEntity({ ...props }, id)
-        const eventProps = { %s: %s } as I%sCreatedEventProps
+    public static create(props: I%[1]sProps, id?: UniqueEntityId, isCreateEvent: boolean = true): Result<%[1]sEntity> {
+        const %[3]s = new %[1]sEntity({ ...props }, id)
+        const eventProps = { %[2]s: %[3]s } as I%[1]sCreatedEventProps
 
         if (isCreateEvent) {
-            %s.addDomainEvent(new %sCreatedEvent(eventProps))
+            %[3]s.addDomainEvent(new %[1]sCreatedEvent(eventProps))
         }
 
-        return Result.ok<%sEntity>(%s)
+        return Result.ok<%[1]sEntity>(%[3]s)
     }
-}`, singularCap, singularCap, singularCap,
-		entityVarName, singularCap, singular, entityVarName, singularCap,
-		entityVarName, singularCap, singularCap, entityVarName)
+
+    public static update(props: I%[1]sProps, id?: UniqueEntityId): Result<%[1]sEntity> {
+        const %[3]s = new %[1]sEntity({ ...props }, id)
+        %[3]s.addDomainEvent(new %[1]sUpdatedEvent(%[3]s))
+
+        return Result.ok<%[1]sEntity>(%[3]s)
+    }
+
+    public static delete(entity: %[1]sEntity): Result<%[1]sEntity> {
+        entity.addDomainEvent(new %[1]sDeletedEvent(entity))
+        return Result.ok<%[1]sEntity>(entity)
+    }
+`, singularCap, singular, entityVarName)
 	content.WriteString(constructorTemplate)
+
+	// close entity class
+	content.WriteString("}\n")
 
 	WriteFile(fmt.Sprintf("%s/domain/entities/%s.entity.ts", basePath, singular), content.String())
 

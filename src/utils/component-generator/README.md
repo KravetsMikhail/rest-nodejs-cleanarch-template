@@ -47,10 +47,10 @@ go build -o component-generator.exe
 ./component-generator.exe generate --singular product --plural products --version v1
 
 # Создание компонента "products" с генерацией полей из миграции
-./component-generator.exe generate --singular product --plural products --migration migrations/001_create_products.sql
+./component-generator.exe generate --singular product --plural products --migration ../../../migrations/001_create_products.sql
 
 # Создание компонента "categories" для API v2 с миграцией
-./component-generator.exe generate --singular category --plural categories --version v2 --migration migrations/002_create_categories.sql
+./component-generator.exe generate --singular category --plural categories --version v2 --migration ../../../migrations/002_create_categories.sql
 
 # Создание компонента "users" с версией по умолчанию (v1)
 ./component-generator.exe generate --singular user --plural users

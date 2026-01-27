@@ -136,7 +136,7 @@ components:
 The component generator automatically adds Swagger annotations to generated controllers:
 
 ```bash
-./component-generator.exe generate --singular product --plural products --migration migration.sql
+./component-generator.exe generate --singular product --plural products --migration ../../../migrations/migration.sql
 ```
 
 Generated controller includes:

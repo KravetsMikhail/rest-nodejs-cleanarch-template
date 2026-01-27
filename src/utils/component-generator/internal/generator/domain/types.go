@@ -10,22 +10,24 @@ import (
 func GenerateTypeFiles(config model.ComponentConfig, basePath string) {
 	singular := config.SingularName
 	singularCap := Capitalize(singular)
+	pluralCap := Capitalize(config.PluralName)
 
-	responseContent := fmt.Sprintf(`import { %sEntity } from '../entities/%s.entity'
-import { Result, left, right } from '../../../../../../core/domain/types/result'
+	responseContent := fmt.Sprintf(`import { Result, Either, left, right } from '../../../../../../core/domain/types/result'
 import { GenericAppError } from '../../../../../../core/errors/app.error'
+import { %[1]sEntity } from '../entities/%[2]s.entity'
 
-export type %sResponseType = Promise<Result<%sEntity, GenericAppError>>
+export type %[1]sResponse = Either<
+    GenericAppError.UnexpectedError |
+    Result<any>,
+    Result<%[1]sEntity>
+>
 
-export class %sResponse {
-    public static success(result: %sEntity): %sResponseType {
-        return Promise.resolve(right(Result.ok(result)))
-    }
-
-    public static fail(error: GenericAppError): %sResponseType {
-        return Promise.resolve(left(Result.fail(error)))
-    }
-}`, singularCap, singular, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap)
+export type %[3]sResponse = Either<
+    GenericAppError.UnexpectedError |
+    Result<any>,
+    Result<%[1]sEntity[]>
+>
+`, singularCap, singular, pluralCap)
 
 	WriteFile(fmt.Sprintf("%s/domain/types/response.ts", basePath), responseContent)
 }

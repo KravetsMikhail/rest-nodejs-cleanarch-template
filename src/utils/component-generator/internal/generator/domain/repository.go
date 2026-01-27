@@ -21,7 +21,7 @@ export interface I%sRepository extends IRepository<%sEntity, any> {
 	WriteFile(fmt.Sprintf("%s/domain/repositories/i.%s.repository.ts", basePath, singular), interfaceRepoContent)
 
 	var repoContent strings.Builder
-	repoContent.WriteString("import { ID, IFindOptions } from '../../../../../core/domain/types/types'\n")
+	repoContent.WriteString("import { ID, IFindOptions } from '../../../../../../core/domain/types/types'\n")
 	repoContent.WriteString(fmt.Sprintf("import { type I%sDatasource } from '../datasources/i.%s.datasource'\n", singularCap, singular))
 	repoContent.WriteString(fmt.Sprintf("import { %sEntity } from '../entities/%s.entity'\n", singularCap, singular))
 	repoContent.WriteString(fmt.Sprintf("import { type I%sRepository } from './i.%s.repository'\n\n", singularCap, singular))
