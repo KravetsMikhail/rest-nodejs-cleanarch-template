@@ -84,14 +84,6 @@ export class TaskController {
         res: Response<TaskEntity[]>,
         next: NextFunction
     ): void => {
-        // if (_req && _req.query && _req.params && Object.keys(_req.query).length === 0 && _req.query.constructor === Object) {
-        //     console.log("params => ", _req.params)   
-        // } else if (_req && _req.query) {
-        //     console.log("query => ", _req.query)            
-        // }
-        // else {
-        //     return
-        // }
 
         let findOptions = Helpers.getFilters(_req.query)
 

@@ -1,7 +1,7 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import { Express } from 'express';
 import swaggerUi from 'swagger-ui-express';
-import path from 'path';
+import { TaskOpenapiScheme } from '../api/v1/components/tasks/domain/entities/task.openapi';
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -22,6 +22,21 @@ const options: swaggerJsdoc.Options = {
       },
     ],
     components: {
+      schemas: {
+        Task: TaskOpenapiScheme,
+        Error: {
+          type: 'object',
+          properties: {
+            code: {
+              type: 'string',
+            },
+            message: {
+              type: 'string',
+            },
+            required: ['code', 'message'],
+          }
+        },
+      },
       securitySchemes: {
         JWT: {
           type: 'http',
@@ -38,8 +53,7 @@ const options: swaggerJsdoc.Options = {
     ],
   },
   apis: [
-    './src/api/v1/interface/**/*.ts', // Path to the API docs
-    './src/api/v1/openapi/openapi.yaml', // Path to OpenAPI specification
+    './src/api/v1/components/**/interface/**/*.ts', // Path to the API docs
   ],
 };
 
@@ -55,7 +69,7 @@ export const swaggerUiOptions: swaggerUi.SwaggerUiOptions = {
   customSiteTitle: 'API Documentation',
 };
 
-export const setupSwagger = (app: Express): void => {
+export const setupOpenapi = (app: Express): void => {
   // Swagger UI route
   app.use('/api-docs', swaggerUi.serve);
   app.get('/api-docs', swaggerUi.setup(specs, swaggerUiOptions));
