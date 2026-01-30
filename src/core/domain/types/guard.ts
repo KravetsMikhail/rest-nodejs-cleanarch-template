@@ -2,6 +2,7 @@
 export interface IGuardResult {
     succeeded: boolean
     message?: string
+    field?: string
 }
 
 export interface IGuardArgument {
@@ -22,7 +23,7 @@ export class Guard {
 
     public static againstNullOrUndefined(argument: any, argumentName: string): IGuardResult {
         if (argument === null || argument === undefined) {
-            return { succeeded: false, message: `Поле ${argumentName} не может быть пустым или отсутствовать` }
+            return { field: argumentName, succeeded: false, message: `Поле ${argumentName} не может быть пустым или отсутствовать` }
         } else {
             return { succeeded: true }
         }
@@ -30,7 +31,7 @@ export class Guard {
 
     public static againstNullOrUndefinedOrEmpty(argument: any, argumentName: string): IGuardResult {
         if (argument === null || argument === undefined || argument === "") {
-            return { succeeded: false, message: `Поле ${argumentName} не может отсутствовать` }
+            return { field: argumentName, succeeded: false, message: `Поле ${argumentName} не может отсутствовать` }
         } else {
             return { succeeded: true }
         }
@@ -57,6 +58,7 @@ export class Guard {
             return { succeeded: true }
         } else {
             return {
+                field: argumentName,
                 succeeded: false,
                 message: `Поле ${argumentName} не является одним из правильных типов в ${JSON.stringify(validValues)}. Значение "${value}".`
             }
@@ -66,7 +68,7 @@ export class Guard {
     public static inRange(num: number, min: number, max: number, argumentName: string): IGuardResult {
         const isInRange = num >= min && num <= max
         if (!isInRange) {
-            return { succeeded: false, message: `Поле ${argumentName} не находится в пределах диапозона с ${min} по ${max}.` }
+            return { field: argumentName, succeeded: false, message: `Поле ${argumentName} не находится в пределах диапозона с ${min} по ${max}.` }
         } else {
             return { succeeded: true }
         }
@@ -80,7 +82,7 @@ export class Guard {
         }
 
         if (failingResult) {
-            return { succeeded: false, message: `${argumentName} is not within the range.` }
+            return { field: argumentName, succeeded: false, message: `${argumentName} is not within the range.` }
         } else {
             return { succeeded: true }
         }

@@ -15,7 +15,7 @@ export class PostgreTaskDatasource implements ITaskDatasource {
 
     async create(value: Partial<TaskEntity>): Promise<TaskEntity> {
         const _currentDate = new Date().toISOString().replace('T', ' ')
-        let _name = value.name?.value ? value.name.value : "<Нет наименования>"
+        let _name = value.name?.value ? value.name.value : "<empty>"
         let _search = value.search?.value ? value.search.value : ""
         let _createdBy = value?.createdBy ? value.createdBy : ""
         let _updatedBy = value?.updatedBy ? value.updatedBy : ""
@@ -25,9 +25,11 @@ export class PostgreTaskDatasource implements ITaskDatasource {
             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`, values)
         return response.rows[0]
     }
+
     createMany(values: Partial<TaskEntity>[]): Promise<TaskEntity[]> {
         throw new Error('Method not implemented.')
     }
+    
     async update(id: ID, value: Partial<TaskEntity>): Promise<TaskEntity> {
         const _currentDate = new Date().toISOString().replace('T', ' ')
         let _name = value.name?.value ? value.name.value : "<Нет наименования>"
@@ -44,15 +46,18 @@ export class PostgreTaskDatasource implements ITaskDatasource {
         return response.rows[0]
 
     }
+
     async delete(id: ID): Promise<any> {
         const values = [id ? id.toString() : '0']
         const response: QueryResult = await this.postgresService.query(`DELETE FROM ${EnvConfig.postgres.schema}."Task" n 
                                         WHERE n."id"=$1 RETURNING *;`, values)
         return response.rows[0]
     }
+
     // find(value: Partial<TaskEntity>, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
     //     throw new Error('Method not implemented.')
     // }
+
     async find(options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
         let _where = ""
         let _orderBy = ""
@@ -66,10 +71,12 @@ export class PostgreTaskDatasource implements ITaskDatasource {
         const response: QueryResult = await this.postgresService.query(`SELECT * FROM ${EnvConfig.postgres.schema}."Task" ${_where} ${_orderBy} ${_paging}`)
         return response.rows
     }
+
     async findOne(id: Partial<TaskEntity> | ID, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity> {
         const response: QueryResult = await this.postgresService.query(`SELECT * FROM ${EnvConfig.postgres.schema}."Task" WHERE id = ${id}`)
         return response.rows && response.rows.length > 0 ? response.rows[0] : {} as TaskEntity
     }
+    
     exist(id: Partial<TaskEntity> | ID): Promise<boolean> {
         throw new Error('Method not implemented.')
     }

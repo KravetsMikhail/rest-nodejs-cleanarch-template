@@ -1,5 +1,8 @@
 export enum HttpCode {
     OK = 200,
+    CREATED = 201,
+    ACCEPTED = 202,
+    NOCONTENTED = 204,
     BAD_REQUEST = 400,
     UNAUTHORIZED = 401,
     FORBIDDEN = 403,

@@ -56,11 +56,11 @@ const options: swaggerJsdoc.Options = {
 ### Server Integration (`src/server.ts`)
 
 ```typescript
-import { setupSwagger } from './config/swagger';
+import { setupOpenapi } from './config/swagger';
 
 // In Server class
-private setupSwagger(): void {
-    setupSwagger(this.app);
+private setupOpenapi(): void {
+    setupOpenapi(this.app);
 }
 ```
 

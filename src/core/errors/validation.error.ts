@@ -16,4 +16,16 @@ export class ValidationError extends Error {
         this.validationErrors = validationErrors
         Error.captureStackTrace(this)
     }
+
+    toString(): string {
+        let strError = ""
+        if(this.validationErrors.length > 0) {
+            this.validationErrors.forEach(element => {
+                if (element.constraint !== ""){
+                    strError += element.constraint + "; "
+                }
+            })
+        }
+        return strError
+    }
 }

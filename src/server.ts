@@ -1,9 +1,6 @@
 import express, { type Router, type Request, type Response, type NextFunction } from 'express'
 import compression from 'compression'
 import rateLimit from 'express-rate-limit'
-//import swaggerUi from 'swagger-ui-express'
-//import * as swaggerDocumentV1 from '../src/openapi/v1/openapi.json'
-
 import { ONE_HUNDRED, ONE_THOUSAND, SIXTY } from './core/constants/constatnts'
 import { HttpCode } from './core/constants/httpcodes'
 import { ErrorMiddleware } from './core/middlewares/errors/error.middleware'
@@ -13,11 +10,9 @@ import { Logger } from './core/logger/logger'
 import { PostgresService } from './api/v1/infrastructure/postgresql/postgresql'
 import { OracleService } from './api/v1/infrastructure/oracle/oracledb'
 import { EnvConfig } from './config/env'
-import { setupSwagger } from './config/swagger'
+import { setupOpenapi } from './config/openapi'
 import serveFavicon = require('serve-favicon')
 import path = require('path')
-//import YAML from 'yaml'
-//import fs from 'fs'
 import "./core/subscribers"
 import { CircuitBreaker } from './core/utils/circuit-breaker'
 
@@ -126,8 +121,8 @@ export class Server {
         })
     }
 
-    private setupSwagger(): void {
-        setupSwagger(this.app)
+    private setupOpenapi(): void {
+        setupOpenapi(this.app)
     }
 
     private setupErrorHandling(): void {
@@ -192,7 +187,7 @@ export class Server {
             this.setupCORS()
             this.setupStaticFiles()
             this.setupRoutes()
-            this.setupSwagger()
+            this.setupOpenapi()
             this.setupErrorHandling()
 
             this.server = this.app.listen(this.port, () => {
@@ -229,7 +224,7 @@ export class Server {
             this.setupCORS()
             this.setupStaticFiles()
             this.setupRoutes()
-            this.setupSwagger()
+            this.setupOpenapi()
             this.setupErrorHandling()
 
             this.server = this.app.listen(this.port, () => {

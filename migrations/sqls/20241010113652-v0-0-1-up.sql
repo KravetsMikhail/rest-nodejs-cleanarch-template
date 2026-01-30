@@ -4,9 +4,9 @@ CREATE TABLE public."Task"
     id SERIAL,
     name text COLLATE pg_catalog."default" NOT NULL,
     search text COLLATE pg_catalog."default" NOT NULL,
-    "createdBy" character varying(25) COLLATE pg_catalog."default",
+    "createdBy" character varying(250) COLLATE pg_catalog."default",
     "createdAt" timestamp(3) without time zone,
-    "updatedBy" character varying(25) COLLATE pg_catalog."default",
+    "updatedBy" character varying(250) COLLATE pg_catalog."default",
     "updatedAt" timestamp(3) without time zone,
     CONSTRAINT "Task_pkey" PRIMARY KEY (id)
 );

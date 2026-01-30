@@ -67,8 +67,9 @@ export class TaskEntity extends AggregateRoot<ITaskProps> {
         const guardResult = Guard.againstNullOrUndefinedBulk(guardedProps)
 
         if (!guardResult.succeeded) {
+            let field = guardResult.field ? guardResult.field : ""
             return Result.fail<TaskEntity, ValidationError>(
-                new ValidationError([{ fields: ["name"], constraint: guardResult.message as string }])
+                new ValidationError([{ fields: [field], constraint: guardResult.message as string }])
             )
         }
         else {
@@ -94,8 +95,9 @@ export class TaskEntity extends AggregateRoot<ITaskProps> {
         const guardResult = Guard.againstNullOrUndefinedBulk(guardedProps)
 
         if (!guardResult.succeeded) {
+            let field = guardResult.field ? guardResult.field : ""
             return Result.fail<TaskEntity, ValidationError>(
-                new ValidationError([{ fields: ["name"], constraint: guardResult.message as string }])
+                new ValidationError([{ fields: [field], constraint: guardResult.message as string }])
             )
         }
         else {
