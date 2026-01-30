@@ -15,7 +15,7 @@ export class PostgreTaskDatasource implements ITaskDatasource {
 
     async create(value: Partial<TaskEntity>): Promise<TaskEntity> {
         const _currentDate = new Date().toISOString().replace('T', ' ')
-        let _name = value.name?.value ? value.name.value : "<Нет наименования>"
+        let _name = value.name?.value ? value.name.value : "<empty>"
         let _search = value.search?.value ? value.search.value : ""
         let _createdBy = value?.createdBy ? value.createdBy : ""
         let _updatedBy = value?.updatedBy ? value.updatedBy : ""

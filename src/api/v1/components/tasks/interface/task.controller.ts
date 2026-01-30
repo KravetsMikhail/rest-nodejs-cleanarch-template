@@ -173,67 +173,7 @@ export class TaskController {
     ): void => {
         const user = ((_req as unknown) as CustomRequest).payload.token.preferred_username
         new CreateTasksUseCase(this.repository)
-            .execute(_req.body.name, user)
-            .then((result) => {
-                if (result.isLeft()) {                    
-                    const error = result.value
-                    next(error.errorValue())
-                } 
-                return res.json((result as any).value.getValue())                               
-            })
-            .catch((error) => {
-                next(error)
-            })
-    }
-    /**
-     * @swagger
-     * /tasks/{id}:
-     *   delete:
-     *     summary: Delete task
-     *     tags: [tasks]
-     *     security:
-     *       - JWT: [delete]
-     *     parameters:
-     *       - in: path
-     *         name: id
-     *         schema:
-     *           type: integer
-     *         required: true
-     *     responses:
-     *       200:
-     *         description: Tasks deleted successfully
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: array
-     *               items:
-     *                 $ref: "#/components/schemas/Task"
-     *       400:
-     *         description: Error
-     *         $ref: "#/components/responses/Error400"
-     *       401:
-     *         description: Unauthorized
-     *         $ref: "#/components/responses/Unauthorized"
-     *       500:
-     *         description: Internal Server Error
-    */
-    public deleteTask = (
-        _req: Request<any, unknown, unknown, QueryParams>,
-        res: Response<TaskEntity>,
-        next: NextFunction
-    ): void => {
-        let _id = 0
-        if (_req && _req.query && _req.params && Object.keys(_req.query).length === 0 && _req.query.constructor === Object) {
-            _id = _req.params.id
-        } else if (_req && _req.query) {
-            _id = (_req.query as QueryParams).id
-        }
-        else {
-            return
-        }
-        const user = ((_req as unknown) as CustomRequest).payload.token.preferred_username
-        new DeleteTasksUseCase(this.repository)
-            .execute(_id.toString(), user)
+            .execute(_req.body, user)
             .then((result) => {
                 if (result.isLeft()) {                    
                     const error = result.value
@@ -298,6 +238,66 @@ export class TaskController {
         const user = ((_req as unknown) as CustomRequest).payload.token.preferred_username
         new ReplaceTasksUseCase(this.repository)
             .execute(_id, _req.body, user)
+            .then((result) => {
+                if (result.isLeft()) {                    
+                    const error = result.value
+                    next(error.errorValue())
+                } 
+                return res.json((result as any).value.getValue())                               
+            })
+            .catch((error) => {
+                next(error)
+            })
+    }
+    /**
+     * @swagger
+     * /tasks/{id}:
+     *   delete:
+     *     summary: Delete task
+     *     tags: [tasks]
+     *     security:
+     *       - JWT: [delete]
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: integer
+     *         required: true
+     *     responses:
+     *       200:
+     *         description: Tasks deleted successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 $ref: "#/components/schemas/Task"
+     *       400:
+     *         description: Error
+     *         $ref: "#/components/responses/Error400"
+     *       401:
+     *         description: Unauthorized
+     *         $ref: "#/components/responses/Unauthorized"
+     *       500:
+     *         description: Internal Server Error
+    */
+    public deleteTask = (
+        _req: Request<any, unknown, unknown, QueryParams>,
+        res: Response<TaskEntity>,
+        next: NextFunction
+    ): void => {
+        let _id = 0
+        if (_req && _req.query && _req.params && Object.keys(_req.query).length === 0 && _req.query.constructor === Object) {
+            _id = _req.params.id
+        } else if (_req && _req.query) {
+            _id = (_req.query as QueryParams).id
+        }
+        else {
+            return
+        }
+        const user = ((_req as unknown) as CustomRequest).payload.token.preferred_username
+        new DeleteTasksUseCase(this.repository)
+            .execute(_id.toString(), user)
             .then((result) => {
                 if (result.isLeft()) {                    
                     const error = result.value

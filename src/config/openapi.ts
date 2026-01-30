@@ -45,6 +45,57 @@ const options: swaggerJsdoc.Options = {
           description: 'Enter JWT token',
         },
       },
+      responses:{ 
+        Unauthorized: {
+        description: 'Ошибка авторизации',
+        content: {
+          'application/json': {
+            schema: {
+              properties: {
+                Error: {
+                  type: 'object',
+                  properties: {
+                    code: {
+                      type: 'string'
+                    },
+                    message: {
+                      type: 'string'
+                    }
+                  },
+                  required: ['code', 'message']
+                }
+              }
+            }
+          }
+        }
+      },
+      Error400: {
+        description: 'Ошибка',
+        content: {
+          'application/json': {
+            schema: {
+              properties: {
+                Error: {
+                  type: 'object',
+                  properties: {
+                    code: {
+                      type: 'string'
+                    },
+                    message: {
+                      type: 'string'
+                    },
+                    stack: {
+                      type: 'string'
+                    }
+                  },
+                  required: ['code', 'message']
+                }
+              }
+            }
+          }
+        }
+      }
+    }
     },
     security: [
       {
@@ -54,6 +105,7 @@ const options: swaggerJsdoc.Options = {
   },
   apis: [
     './src/api/v1/components/**/interface/**/*.ts', // Path to the API docs
+    './dist/api/v1/components/**/interface/**/*.js'
   ],
 };
 
