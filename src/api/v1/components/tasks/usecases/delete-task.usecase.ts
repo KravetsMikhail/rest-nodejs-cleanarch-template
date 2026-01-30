@@ -16,7 +16,7 @@ export class DeleteTasksUseCase implements IUseCase<Promise<TaskResponse>> {
         const _deltask = DeletedTaskEntity.delete(_id, user)
 
         if (_deltask.isFailure) {
-            return left(Result.fail<void, void>(new Error("Ошибка! Не удалось удалить"))) as TaskResponse
+            return left(Result.fail<void, void>(new Error("Error! Failed to delete"))) as TaskResponse
         }
 
         let deletedtask = {}

@@ -78,6 +78,14 @@ export class TaskController {
      *               type: array
      *               items:
      *                 $ref: '#/components/schemas/Task'
+     *       400:
+     *         description: Error
+     *         $ref: "#/components/responses/Error400"
+     *       401:
+     *         description: Unauthorized
+     *         $ref: "#/components/responses/Unauthorized"
+     *       500:
+     *         description: Internal Server Error
      */
     public getTasks = (
         _req: Request<unknown, unknown, unknown, QueryParams>,
@@ -128,7 +136,36 @@ export class TaskController {
                 next(error)
             })
     }
-
+    /**
+     * @swagger
+     * /tasks:
+     *   post:
+     *     summary: Create new task
+     *     tags: [tasks]
+     *     security:
+     *       - JWT: [write]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: "#/components/schemas/Task"
+     *     responses:
+     *       200:
+     *         description: Task created successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Task'
+     *       400:
+     *         description: Error
+     *         $ref: '#/components/responses/Error400'
+     *       401:
+     *         description: Unauthorized
+     *         $ref: '#/components/responses/Unauthorized'
+     *       500:
+     *         description: Internal Server Error
+     */
     public createTask = (
         _req: Request<unknown, unknown, QueryBody, QueryParams>,
         res: Response<TaskEntity>,
@@ -148,7 +185,38 @@ export class TaskController {
                 next(error)
             })
     }
-
+    /**
+     * @swagger
+     * /tasks/{id}:
+     *   delete:
+     *     summary: Delete task
+     *     tags: [tasks]
+     *     security:
+     *       - JWT: [delete]
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: integer
+     *         required: true
+     *     responses:
+     *       200:
+     *         description: Tasks deleted successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 $ref: "#/components/schemas/Task"
+     *       400:
+     *         description: Error
+     *         $ref: "#/components/responses/Error400"
+     *       401:
+     *         description: Unauthorized
+     *         $ref: "#/components/responses/Unauthorized"
+     *       500:
+     *         description: Internal Server Error
+    */
     public deleteTask = (
         _req: Request<any, unknown, unknown, QueryParams>,
         res: Response<TaskEntity>,
@@ -177,7 +245,42 @@ export class TaskController {
                 next(error)
             })
     }
-
+    /**
+     * @swagger
+     * /tasks/{id}:
+     *   put:
+     *     summary: Update task
+     *     tags: [tasks]
+     *     security:
+     *       - JWT: [write]
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: integer
+     *         required: true
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/Task'
+     *     responses:
+     *       200:
+     *         description: task updated successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Task'
+     *       400:
+     *         description: Error
+     *         $ref: '#/components/responses/Error400'
+     *       401:
+     *         description: Unauthorized
+     *         $ref: '#/components/responses/Unauthorized'
+     *       500:
+     *         description: Internal Server Error
+     */
     public replaceTask = (
         _req: Request<any, unknown, QueryBody, QueryParams>,
         res: Response<TaskEntity>,

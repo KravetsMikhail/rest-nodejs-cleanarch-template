@@ -8,12 +8,28 @@ import { TaskName } from '../domain/valueobjects/task.name'
 import { UniqueEntityId } from '../../../../../core/domain/types/uniqueentityid'
 import { DomainEvents } from '../../../../../core/domain/events/domain.events'
 import { TaskResponse } from '../domain/types/response'
+import { GetReflectionTypes, ReflectionData } from '../../../../../core/domain/types/reflections'
 
 export class CreateTasksUseCase implements IUseCase<Promise<TaskResponse>> {
     constructor(private readonly repository: ITaskRepository) { }
 
-    async execute(name: string, user: string): Promise<TaskResponse> {
-        const _name = TaskName.create(name)
+    async execute(createtask: any, user: string): Promise<TaskResponse> {
+        if (!createtask) {
+            return left(Result.fail<void, void>("Ошибка! Нет данных")) as TaskResponse
+        }
+        let _reflect = GetReflectionTypes(TaskEntity)
+        let _isOk: boolean = true;
+        for (const k of Object.getOwnPropertyNames(createtask)) {
+            if (!(_reflect as ReflectionData[]).find(r => r.field.replace(/_/ig, '').toLowerCase() === k.replace(/_/ig, '').toLowerCase())) {
+                _isOk = false
+                break
+            }
+        }
+        if (!_isOk) {
+            return left(Result.fail<void, void>("Ошибка! Не верный или не полный состав данных")) as TaskResponse
+        }
+
+        const _name = TaskName.create(createtask.name)
         if(_name.isFailure) {
             return left(Result.fail<void, void>(_name.error)) as TaskResponse
         }

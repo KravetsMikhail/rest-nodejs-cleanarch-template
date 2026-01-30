@@ -20,7 +20,7 @@ export class ReplaceTasksUseCase implements IUseCase<Promise<TaskResponse>> {
         let _reflect = GetReflectionTypes(TaskEntity)
         let _isOk: boolean = true;
         for (const k of Object.getOwnPropertyNames(updtask)) {
-            if (!(_reflect as ReflectionData[]).find(r => r.field === k)) {
+            if (!(_reflect as ReflectionData[]).find(r => r.field.replace(/_/ig, '').toLowerCase() === k.replace(/_/ig, '').toLowerCase())) {
                 _isOk = false
                 break
             }
