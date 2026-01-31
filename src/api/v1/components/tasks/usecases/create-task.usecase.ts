@@ -21,8 +21,6 @@ export class CreateTasksUseCase implements IUseCase<Promise<TaskResponse>> {
         let _isOk: boolean = true;
         for (const k of Object.getOwnPropertyNames(createtask)) {
             if (!(_reflect as ReflectionData[]).find(r => r.field.replace(/_/ig, '').toLowerCase() === k.replace(/_/ig, '').toLowerCase())) {
-                console.log(k)
-                console.log(createtask)
                 _isOk = false
                 break
             }

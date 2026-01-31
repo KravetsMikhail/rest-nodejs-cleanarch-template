@@ -54,10 +54,6 @@ export class PostgreTaskDatasource implements ITaskDatasource {
         return response.rows[0]
     }
 
-    // find(value: Partial<TaskEntity>, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
-    //     throw new Error('Method not implemented.')
-    // }
-
     async find(options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
         let _where = ""
         let _orderBy = ""

@@ -17,6 +17,14 @@ Interaction between the components is realized by means of domain events of the 
 
 Applied patterns: Repository, Domain Events, Circuit Breaker and others.
 
+### Circuit Breaker
+
+The project implements the Circuit Breaker pattern to protect against cascading failures when working with external services and databases. Circuit Breaker automatically breaks connections when a threshold number of errors is reached and periodically checks service availability.
+
+**Circuit Breaker Settings:**
+- `CIRCUIT_BREAKER_FAILURE_THRESHOLD` - failure threshold (default: 3)
+- `CIRCUIT_BREAKER_RESET_TIMEOUT` - recovery timeout (default: 10000ms)
+
 Testing is performed using the Jest framework.
 
 ## Key Features
@@ -26,6 +34,7 @@ Testing is performed using the Jest framework.
 - **Swagger Documentation** - swagger-jsdoc integration
 - **Multi-database** - PostgreSQL and Oracle
 - **Event-driven Architecture** - Domain Events with Kafka
+- **Circuit Breaker** - Protection against cascading failures
 - **API Versioning** - Support for multiple versions
 - **TypeScript** - Full type safety
 - **Testing** - Jest framework

@@ -45,4 +45,3 @@ func GenerateOpenAPIFiles(config model.ComponentConfig, basePath string) {
 	fmt.Printf(" *         description: List of %s\n", plural)
 	fmt.Printf(" */\n")
 }
-

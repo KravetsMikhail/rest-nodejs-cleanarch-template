@@ -2,6 +2,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import { Express } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import { TaskOpenapiScheme } from '../api/v1/components/tasks/domain/entities/task.openapi';
+import { EnvConfig } from './env';
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -13,12 +14,12 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: 'http://localhost:1234/api/v1',
-        description: 'Development server',
+        url: `${EnvConfig.protocol}://${EnvConfig.host}:${EnvConfig.port}${EnvConfig.apiPrefix}/v1`,
+        description: `${EnvConfig.nodeEnv === 'production' ? 'Production' : 'Development'} server`,
       },
       {
-        url: 'https://localhost:1234/api/v1',
-        description: 'Production server',
+        url: 'http://localhost:1234/api/v1',
+        description: 'Local development server',
       },
     ],
     components: {
@@ -138,6 +139,6 @@ export const setupOpenapi = (app: Express): void => {
   });
 
   console.log('📚 Swagger documentation available at:');
-  console.log('   - UI: http://localhost:1234/api-docs');
-  console.log('   - JSON: http://localhost:1234/api-docs.json');
+  console.log(`   - UI: ${EnvConfig.protocol}://${EnvConfig.host}:${EnvConfig.port}/api-docs`);
+  console.log(`   - JSON: ${EnvConfig.protocol}://${EnvConfig.host}:${EnvConfig.port}/api-docs.json`);
 };
