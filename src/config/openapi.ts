@@ -17,6 +17,10 @@ const options: swaggerJsdoc.Options = {
         url: `${EnvConfig.protocol}://${EnvConfig.host}:${EnvConfig.port}${EnvConfig.apiPrefix}/v1`,
         description: `${EnvConfig.nodeEnv === 'production' ? 'Production' : 'Development'} server`,
       },
+      {
+        url: 'http://localhost:1234/api/v1',
+        description: 'Local development server',
+      },
     ],
     components: {
       schemas: {
