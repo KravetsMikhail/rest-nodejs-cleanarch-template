@@ -1,0 +1,123 @@
+config:
+  target: 'http://localhost:1234'
+  phases:
+    - duration: 60
+      arrivalRate: 10
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 50
+      name: "Ramp up load"
+    - duration: 300
+      arrivalRate: 100
+      name: "Sustained load"
+    - duration: 120
+      arrivalRate: 200
+      name: "High load"
+    - duration: 60
+      arrivalRate: 500
+      name: "Peak load"
+    - duration: 120
+      arrivalRate: 1000
+      name: "Stress test"
+    - duration: 300
+      arrivalRate: 2000
+      name: "Load to failure"
+
+scenarios:
+  - name: "GET /api/v1/tasks with auth"
+    weight: 40
+    flow:
+      - post:
+          url: "http://localhost:8282/realms/rest-nodejs-cleanarch-template/protocol/openid-connect/token"
+          headers:
+            Content-Type: "application/x-www-form-urlencoded"
+          form:
+            client_id: "rest-nodejs-cleanarch-template-backend"
+            client_secret: "**********"
+            grant_type: "client_credentials"
+          capture:
+            - json: "$.access_token"
+              as: "authToken"
+      - get:
+          url: "/api/v1/tasks"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+  
+  - name: "POST /api/v1/tasks with auth"
+    weight: 30
+    flow:
+      - post:
+          url: "http://localhost:8282/realms/rest-nodejs-cleanarch-template/protocol/openid-connect/token"
+          headers:
+            Content-Type: "application/x-www-form-urlencoded"
+          form:
+            client_id: "rest-nodejs-cleanarch-template-backend"
+            client_secret: "**********"
+            grant_type: "client_credentials"
+          capture:
+            - json: "$.access_token"
+              as: "authToken"
+      - post:
+          url: "/api/v1/tasks"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+            Content-Type: "application/json"
+          json:
+            name: "Load test task {{ $randomString() }}"
+            search: "load test {{ $randomString() }}"
+  
+  - name: "PUT /api/v1/tasks with auth"
+    weight: 20
+    flow:
+      - post:
+          url: "http://localhost:8282/realms/rest-nodejs-cleanarch-template/protocol/openid-connect/token"
+          headers:
+            Content-Type: "application/x-www-form-urlencoded"
+          form:
+            client_id: "rest-nodejs-cleanarch-template-backend"
+            client_secret: "**********"
+            grant_type: "client_credentials"
+          capture:
+            - json: "$.access_token"
+              as: "authToken"
+      - get:
+          url: "/api/v1/tasks"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          capture:
+            - json: "$[0].id"
+              as: "taskId"
+      - put:
+          url: "/api/v1/tasks/{{ taskId }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+            Content-Type: "application/json"
+          json:
+            name: "Updated load test task {{ $randomString() }}"
+            search: "updated load test {{ $randomString() }}"
+  
+  - name: "DELETE /api/v1/tasks with auth"
+    weight: 10
+    flow:
+      - post:
+          url: "http://localhost:8282/realms/rest-nodejs-cleanarch-template/protocol/openid-connect/token"
+          headers:
+            Content-Type: "application/x-www-form-urlencoded"
+          form:
+            client_id: "rest-nodejs-cleanarch-template-backend"
+            client_secret: "**********"
+            grant_type: "client_credentials"
+          capture:
+            - json: "$.access_token"
+              as: "authToken"
+      - get:
+          url: "/api/v1/tasks"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          capture:
+            - json: "$[0].id"
+              as: "taskId"
+      - delete:
+          url: "/api/v1/tasks/{{ taskId }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"

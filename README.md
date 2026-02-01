@@ -458,6 +458,214 @@ npm install swagger-jsdoc @types/swagger-jsdoc
     npm run oraclemigration
 ```
 
+## НАГРУЗОЧНОЕ ТЕСТИРОВАНИЕ
+
+Проект включает в себя готовые конфигурации для нагрузочного тестирования с использованием Artillery. Нагрузочное тестирование позволяет оценить производительность сервера под различными уровнями нагрузки и определить его пропускную способность.
+
+### Подготовка к тестированию
+
+#### 1. Установка Artillery
+
+```bash
+npm install -g artillery
+```
+
+#### 2. Запуск сервера
+
+Убедитесь, что сервер запущен и доступен по адресу `http://localhost:1234`:
+
+```bash
+npm run dev
+```
+
+#### 3. Проверка доступности
+
+```bash
+curl http://localhost:1234/health
+```
+
+### Конфигурации тестов
+
+В проекте подготовлены две основные конфигурации:
+
+#### 1. Тест без аутентификации (`load-test-no-auth.yml`)
+
+Тестирует базовые эндпоинты без JWT аутентификации:
+- Health check: `/health`
+- Root endpoint: `/`
+- Swagger docs: `/api-docs`
+
+#### 2. Тест с JWT аутентификацией (`load-test-with-auth.yml`)
+
+Тестирует защищенные эндпоинты с JWT токенами:
+- Все эндпоинты из первого теста
+- API endpoints: `/api/v1/tasks`
+- Автоматическое получение и использование JWT токенов
+
+### Запуск нагрузочного тестирования
+
+#### Базовый тест (без аутентификации)
+
+```bash
+npx artillery run load-test-no-auth.yml
+```
+
+#### Расширенный тест (с JWT аутентификацией)
+
+```bash
+npx artillery run load-test-with-auth.yml
+```
+
+#### Запуск в фоновом режиме
+
+```bash
+npx artillery run load-test-no-auth.yml &
+```
+
+### Фазы нагрузочного тестирования
+
+Тестирование включает следующие фазы:
+
+1. **Warm Up (60 сек)** - Разогрев сервера при 50 RPS
+2. **Ramp Up (60 сек)** - Постепенное увеличение до 100 RPS
+3. **Sustained Load (180 сек)** - Стабильная нагрузка 200 RPS
+4. **Peak Load (60 сек)** - Пиковая нагрузка 500 RPS
+5. **Stress Test (120 сек)** - Стрессовая нагрузка 1000 RPS
+6. **Load to Failure (300 сек)** - Нагрузка до отказа 2000+ RPS
+
+### Анализ результатов
+
+#### Ключевые метрики
+
+- **Request Rate**: Количество запросов в секунду
+- **Response Time**: Время ответа (min, max, mean, median, p95, p99)
+- **Error Rate**: Процент ошибок
+- **Throughput**: Общая пропускная способность
+
+#### Оптимальные показатели для данного проекта
+
+- **Стабильная нагрузка**: 100-200 RPS
+- **Максимальная стабильная**: 300 RPS  
+- **Пиковая**: до 500 RPS
+- **Критическая**: > 500 RPS (начинается деградация)
+
+#### Пример результатов тестирования
+
+```
+All VUs finished. Total time: 18 minutes, 35 seconds
+
+Summary report:
+http.request_rate: 279/sec
+http.requests: 757061
+http.response_time:
+  min: 0
+  mean: 770.8ms
+  median: 5ms
+  p95: 3328.3ms
+  p99: 4231.1ms
+vusers.completed: 75119
+vusers.failed: 669150
+```
+
+### Рекомендации по оптимизации
+
+#### Настройки сервера для высокой нагрузки
+
+1. **Rate Limiting**: Увеличить лимиты в `src/core/middlewares/rate-limiter.middleware.ts`
+2. **Connection Pool**: Оптимизировать в `src/api/v1/infrastructure/postgresql.datasource.ts`
+3. **JWT Cache**: Настроить кэширование токенов
+4. **Circuit Breaker**: Настроить пороги срабатывания
+
+#### Environment переменные для производительности
+
+```bash
+# Rate limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=50000
+
+# PostgreSQL
+PG_POOL_MAX=100
+PG_POOL_MIN=10
+PG_POOL_IDLE_TIMEOUTMillis=30000
+
+# Circuit Breaker
+CIRCUIT_BREAKER_FAILURE_THRESHOLD=10
+CIRCUIT_BREAKER_RESET_TIMEOUT=30000
+```
+
+### Мониторинг во время тестирования
+
+#### Системные метрики
+
+```bash
+# CPU и память
+htop
+
+# Сетевые соединения
+netstat -an | grep :1234
+
+# Логи сервера
+tail -f logs/app.log
+```
+
+#### Метрики приложения
+
+- Health check endpoint: `/health`
+- Swagger docs: `/api-docs`
+- Application logs в реальном времени
+
+### Создание собственных тестов
+
+#### Пример кастомной конфигурации
+
+```yaml
+config:
+  target: 'http://localhost:1234'
+  phases:
+    - duration: 60
+      arrivalRate: 10
+    - duration: 120
+      arrivalRate: 50
+
+scenarios:
+  - name: "Custom API Test"
+    requests:
+      - get:
+          url: "/api/v1/tasks"
+          headers:
+            Authorization: "Bearer {{ token }}"
+```
+
+#### Запуск кастомного теста
+
+```bash
+artillery run custom-test.yml
+```
+
+### Устранение проблем
+
+#### Распространенные ошибки
+
+1. **ECONNREFUSED** - Сервер не запущен или порт занят
+2. **ETIMEDOUT** - Сервер перегружен, увеличьте таймауты
+3. **Memory leaks** - Проверьте утечки памяти при длительных тестах
+
+#### Решения
+
+```bash
+# Освобождение порта
+netstat -ano | findstr :1234
+taskkill /PID <PID> /F
+
+# Проверка памяти
+node --inspect src/server.ts
+```
+
+### Документация Artillery
+
+- [Официальная документация](https://artillery.io/docs/)
+- [Примеры конфигураций](https://artillery.io/docs/guides/getting-started/writing-your-first-test.html)
+
 ## ТЕСТЫ
 
 Команда запуска тестов

@@ -71,9 +71,15 @@ export class Server {
     private setupRateLimiting(): void {
         this.app.use(
             rateLimit({
-                max: ONE_HUNDRED,
-                windowMs: SIXTY * SIXTY * ONE_THOUSAND,
-                message: 'Too many requests from this IP, please try again in one hour'
+                max: 50000, // Увеличено до 50000 для экстремальных нагрузок
+                windowMs: 15 * 60 * 1000, // 15 минут
+                message: 'Too many requests from this IP, please try again in 15 minutes',
+                standardHeaders: true, // Включаем RateLimit-* headers
+                legacyHeaders: false, // Отключаем X-RateLimit-* headers
+                skip: (req) => {
+                    // Пропускаем rate limiting для health endpoint
+                    return req.path === '/health' || req.path === '/'
+                }
             })
         )
     }

@@ -460,6 +460,214 @@ Command to start migration
     npm run oraclemigration
 ```
 
+## LOAD TESTING
+
+The project includes ready-to-use configurations for load testing using Artillery. Load testing allows you to evaluate server performance under different load levels and determine its throughput capacity.
+
+### Preparation for Testing
+
+#### 1. Install Artillery
+
+```bash
+npm install -g artillery
+```
+
+#### 2. Start the Server
+
+Make sure the server is running and accessible at `http://localhost:1234`:
+
+```bash
+npm run dev
+```
+
+#### 3. Check Availability
+
+```bash
+curl http://localhost:1234/health
+```
+
+### Test Configurations
+
+Two main configurations are prepared in the project:
+
+#### 1. Test without Authentication (`load-test-no-auth.yml`)
+
+Tests basic endpoints without JWT authentication:
+- Health check: `/health`
+- Root endpoint: `/`
+- Swagger docs: `/api-docs`
+
+#### 2. Test with JWT Authentication (`load-test-with-auth.yml`)
+
+Tests protected endpoints with JWT tokens:
+- All endpoints from the first test
+- API endpoints: `/api/v1/tasks`
+- Automatic JWT token acquisition and usage
+
+### Running Load Tests
+
+#### Basic Test (without authentication)
+
+```bash
+npx artillery run load-test-no-auth.yml
+```
+
+#### Extended Test (with JWT authentication)
+
+```bash
+npx artillery run load-test-with-auth.yml
+```
+
+#### Background Mode
+
+```bash
+npx artillery run load-test-no-auth.yml &
+```
+
+### Load Testing Phases
+
+Testing includes the following phases:
+
+1. **Warm Up (60 sec)** - Server warm-up at 50 RPS
+2. **Ramp Up (60 sec)** - Gradual increase to 100 RPS
+3. **Sustained Load (180 sec)** - Stable load at 200 RPS
+4. **Peak Load (60 sec)** - Peak load at 500 RPS
+5. **Stress Test (120 sec)** - Stress load at 1000 RPS
+6. **Load to Failure (300 sec)** - Load to failure at 2000+ RPS
+
+### Results Analysis
+
+#### Key Metrics
+
+- **Request Rate**: Number of requests per second
+- **Response Time**: Response time (min, max, mean, median, p95, p99)
+- **Error Rate**: Percentage of errors
+- **Throughput**: Total throughput capacity
+
+#### Optimal Performance Indicators for This Project
+
+- **Stable Load**: 100-200 RPS
+- **Maximum Stable**: 300 RPS  
+- **Peak**: up to 500 RPS
+- **Critical**: > 500 RPS (degradation begins)
+
+#### Example Test Results
+
+```
+All VUs finished. Total time: 18 minutes, 35 seconds
+
+Summary report:
+http.request_rate: 279/sec
+http.requests: 757061
+http.response_time:
+  min: 0
+  mean: 770.8ms
+  median: 5ms
+  p95: 3328.3ms
+  p99: 4231.1ms
+vusers.completed: 75119
+vusers.failed: 669150
+```
+
+### Optimization Recommendations
+
+#### Server Settings for High Load
+
+1. **Rate Limiting**: Increase limits in `src/core/middlewares/rate-limiter.middleware.ts`
+2. **Connection Pool**: Optimize in `src/api/v1/infrastructure/postgresql.datasource.ts`
+3. **JWT Cache**: Configure token caching
+4. **Circuit Breaker**: Configure trigger thresholds
+
+#### Environment Variables for Performance
+
+```bash
+# Rate limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=50000
+
+# PostgreSQL
+PG_POOL_MAX=100
+PG_POOL_MIN=10
+PG_POOL_IDLE_TIMEOUTMillis=30000
+
+# Circuit Breaker
+CIRCUIT_BREAKER_FAILURE_THRESHOLD=10
+CIRCUIT_BREAKER_RESET_TIMEOUT=30000
+```
+
+### Monitoring During Testing
+
+#### System Metrics
+
+```bash
+# CPU and memory
+htop
+
+# Network connections
+netstat -an | grep :1234
+
+# Server logs
+tail -f logs/app.log
+```
+
+#### Application Metrics
+
+- Health check endpoint: `/health`
+- Swagger docs: `/api-docs`
+- Real-time application logs
+
+### Creating Custom Tests
+
+#### Example Custom Configuration
+
+```yaml
+config:
+  target: 'http://localhost:1234'
+  phases:
+    - duration: 60
+      arrivalRate: 10
+    - duration: 120
+      arrivalRate: 50
+
+scenarios:
+  - name: "Custom API Test"
+    requests:
+      - get:
+          url: "/api/v1/tasks"
+          headers:
+            Authorization: "Bearer {{ token }}"
+```
+
+#### Running Custom Test
+
+```bash
+artillery run custom-test.yml
+```
+
+### Troubleshooting
+
+#### Common Errors
+
+1. **ECONNREFUSED** - Server not running or port occupied
+2. **ETIMEDOUT** - Server overloaded, increase timeouts
+3. **Memory leaks** - Check for memory leaks during long tests
+
+#### Solutions
+
+```bash
+# Free port
+netstat -ano | findstr :1234
+taskkill /PID <PID> /F
+
+# Memory check
+node --inspect src/server.ts
+```
+
+### Artillery Documentation
+
+- [Official Documentation](https://artillery.io/docs/)
+- [Configuration Examples](https://artillery.io/docs/guides/getting-started/writing-your-first-test.html)
+
 ## TESTS
 
 Test Run Command

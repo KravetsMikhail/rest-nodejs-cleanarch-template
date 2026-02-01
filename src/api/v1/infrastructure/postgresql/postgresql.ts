@@ -19,7 +19,13 @@ export class PostgresService {
             host: EnvConfig.postgres.host,
             password: EnvConfig.postgres.pass,
             database: EnvConfig.postgres.name,
-            port: EnvConfig.postgres.port
+            port: EnvConfig.postgres.port,
+            max: 100, // Увеличено до 100 соединений
+            idleTimeoutMillis: 30000, // 30 секунд
+            connectionTimeoutMillis: 2000, // 2 секунды
+            maxUses: 7500, // Переиспользование соединений
+            keepAlive: true, // TCP keep-alive
+            keepAliveInitialDelayMillis: 0, // Немедленный keep-alive
         })
 
         this.pool.on('error', (err) => {

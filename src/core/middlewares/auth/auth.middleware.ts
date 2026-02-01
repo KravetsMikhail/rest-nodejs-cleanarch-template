@@ -5,6 +5,7 @@ import { ErrorMiddleware } from '../errors/error.middleware'
 import { CustomRequest, TokenPayload } from '../../domain/types/custom.request'
 import { Logger } from '../../logger/logger'
 import jwksClient from 'jwks-rsa'
+import { JwtCache } from '../../utils/jwt-cache'
 
 export class AuthMiddleware {
     private static readonly logger = new Logger()
@@ -13,6 +14,7 @@ export class AuthMiddleware {
     private static readonly jwksClient = jwksClient({
         jwksUri: `${this.keycloakDomain}/realms/${this.realmName}/protocol/openid-connect/certs`,
     })
+    private static readonly jwtCache = JwtCache.getInstance()
 
     public static getKey = (header: jwt.JwtHeader, callback: jwt.SigningKeyCallback): void => {
         this.jwksClient.getSigningKey(header.kid, (err, key) => {
@@ -32,6 +34,19 @@ export class AuthMiddleware {
                 resolve: (decoded: JwtPayload) => void,
                 reject: (error: Error) => void
             ) => {
+                // Проверяем кэш сначала
+                const cacheKey = token.substring(0, 50) // Используем часть токена как ключ
+                const cachedPayload = this.jwtCache.getToken(cacheKey)
+                
+                if (cachedPayload) {
+                    try {
+                        const decoded = JSON.parse(cachedPayload)
+                        return resolve(decoded)
+                    } catch (error) {
+                        this.jwtCache.clear()
+                    }
+                }
+
                 const verifyCallback: jwt.VerifyCallback = (
                     error: jwt.VerifyErrors | null,
                     decoded: any
@@ -39,6 +54,8 @@ export class AuthMiddleware {
                     if (error) {
                         return reject(error);
                     }
+                    // Кэшируем успешную верификацию
+                    this.jwtCache.setToken(cacheKey, JSON.stringify(decoded))
                     return resolve(decoded);
                 };
 
