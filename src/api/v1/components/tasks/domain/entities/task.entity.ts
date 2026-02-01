@@ -3,6 +3,7 @@ import { ValidationError, ValidationType } from '../../../../../../core/errors/v
 import { AggregateRoot } from '../../../../../../core/domain/types/aggregate.root'
 import { TaskName } from '../valueobjects/task.name'
 import { TaskSearch } from '../valueobjects/task.search'
+import { TaskStatus } from '../valueobjects/task.status'
 import { Result } from '../../../../../../core/domain/types/result'
 import { Guard } from '../../../../../../core/domain/types/guard'
 import { ITaskCreatedEventProps, TaskCreatedEvent } from '../events/task.created.events'
@@ -13,10 +14,17 @@ import { DbTypes, DbType, ID } from '../../../../../../core/domain/types/reflect
 export interface ITaskProps {
     name: TaskName,
     search: string,
+    status?: TaskStatus,
+    description?: string,
+    comment?: string,
+    projectId?: bigint,
     createdBy?: string,
     createdAt?: Date,
     updatedBy?: string,
-    updatedAt?: Date
+    updatedAt?: Date,
+    isDeleted?: boolean,
+    deletedBy?: string,
+    deletedAt?: Date
 }
 
 export interface IDeletedTaskProps {
@@ -39,6 +47,22 @@ export class TaskEntity extends AggregateRoot<ITaskProps> {
         return TaskSearch.create(this.props.name.value, this.props?.createdBy, this.props?.updatedBy)
     }
     @DbType(DbTypes.String)
+    get status(): TaskStatus {
+        return this.props?.status ? this.props.status : TaskStatus.DRAFT
+    }
+    @DbType(DbTypes.String)
+    get description(): string {
+        return this.props?.description ? this.props.description : ""
+    }
+    @DbType(DbTypes.String)
+    get comment(): string {
+        return this.props?.comment ? this.props.comment : ""
+    }
+    @DbType(DbTypes.Number)
+    get projectId(): bigint {
+        return this.props?.projectId ? this.props.projectId : BigInt(0)
+    }
+    @DbType(DbTypes.String)
     get createdBy(): string {
         return this.props?.createdBy ? this.props.createdBy : ""
     }
@@ -53,6 +77,18 @@ export class TaskEntity extends AggregateRoot<ITaskProps> {
     @DbType(DbTypes.Date)
     get updatedAt(): Date {
         return this.props?.updatedAt ? this.props.updatedAt : new Date()
+    }
+    @DbType(DbTypes.Boolean)
+    get isDeleted(): boolean {
+        return this.props?.isDeleted ? this.props.isDeleted : false
+    }
+    @DbType(DbTypes.String)
+    get deletedBy(): string {
+        return this.props?.deletedBy ? this.props.deletedBy : ""
+    }
+    @DbType(DbTypes.Date)
+    get deletedAt(): Date {
+        return this.props?.deletedAt ? this.props.deletedAt : new Date()
     }
 
     private constructor(props: ITaskProps, id?: UniqueEntityId) {

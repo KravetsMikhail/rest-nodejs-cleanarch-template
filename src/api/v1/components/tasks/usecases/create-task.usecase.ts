@@ -45,6 +45,10 @@ export class CreateTasksUseCase implements IUseCase<Promise<TaskResponse>> {
         const _task = TaskEntity.create({
             name: _name?.getValue() as TaskName,
             search: _search.value,
+            status: createtask.status || 'DRAFT',
+            description: createtask.description || '',
+            comment: createtask.comment || '',
+            projectId: createtask.projectId || BigInt(0),
             createdBy: user,
             updatedBy: user,
         }, _id)

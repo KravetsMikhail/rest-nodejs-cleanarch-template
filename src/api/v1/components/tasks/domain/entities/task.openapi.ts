@@ -16,6 +16,27 @@ export const TaskOpenapiScheme = {
             description: 'Поисковая строка',
             example: "пример задачи"
         },
+        status:{
+            type: 'string',
+            enum: ['DRAFT', 'STARTED', 'INWORK', 'ONPAUSE', 'CANCELED', 'COMPLETED', 'ERROR'],
+            description: 'Статус задачи',
+            example: 'DRAFT'
+        },
+        description:{
+            type: 'string',
+            description: 'Описание задачи',
+            example: 'Подробное описание задачи'
+        },
+        comment:{
+            type: 'string',
+            description: 'Комментарий к задаче',
+            example: 'Дополнительная информация'
+        },
+        projectId:{
+            type: 'integer',
+            description: 'ID проекта',
+            example: 123
+        },
         createdAt:{
             type: 'string',
             format: 'date-time',
@@ -27,6 +48,33 @@ export const TaskOpenapiScheme = {
             description: 'Создано кем',
             example: 'Иванов'
         },
+        updatedAt:{
+            type: 'string',
+            format: 'date-time',
+            description: 'Дата обновления',
+            example: '2024-10-10T10:00:01'
+        },
+        updatedBy:{
+            type: 'string',
+            description: 'Обновлено кем',
+            example: 'Петров'
+        },
+        isDeleted:{
+            type: 'boolean',
+            description: 'Признак удаления',
+            example: false
+        },
+        deletedBy:{
+            type: 'string',
+            description: 'Удалено кем',
+            example: 'Сидоров'
+        },
+        deletedAt:{
+            type: 'string',
+            format: 'date-time',
+            description: 'Дата удаления',
+            example: '2024-10-10T10:00:01'
+        }
     },
     required: ['name']
 }

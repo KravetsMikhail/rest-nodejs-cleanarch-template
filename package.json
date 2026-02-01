@@ -8,6 +8,8 @@
     "dev": "set NODE_ENV=development & concurrently \"tsc --watch\" \"nodemon dist/index.js\"",
     "build": "tsc",
     "serve": "node dist/index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "oraclemigrate": "node src/api/v1/infrastructure/oracle/migration.js"
   },
   "author": "Kravets Mikhail",

@@ -17,12 +17,16 @@ export class PostgreTaskDatasource implements ITaskDatasource {
         const _currentDate = new Date().toISOString().replace('T', ' ')
         let _name = value.name?.value ? value.name.value : "<empty>"
         let _search = value.search?.value ? value.search.value : ""
+        let _status = value.status ? value.status : 'DRAFT'
+        let _description = value.description ? value.description : null
+        let _comment = value.comment ? value.comment : null
+        let _projectId = value.projectId ? value.projectId : null
         let _createdBy = value?.createdBy ? value.createdBy : ""
         let _updatedBy = value?.updatedBy ? value.updatedBy : ""
-        const values = [_name, _search, _createdBy, _updatedBy, _currentDate, _currentDate ]
+        const values = [_name, _search, _status, _description || '', _comment || '', _projectId?.toString() || '', _createdBy, _updatedBy, _currentDate, _currentDate ]
         const response: QueryResult = await this.postgresService.query(`INSERT INTO ${EnvConfig.postgres.schema}."Task"(
-            "name", "search", "createdBy", "updatedBy", "createdAt", "updatedAt")
-            VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`, values)
+            "name", "search", "status", "description", "comment", "projectId", "createdBy", "updatedBy", "createdAt", "updatedAt")
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`, values)
         return response.rows[0]
     }
 
@@ -34,13 +38,17 @@ export class PostgreTaskDatasource implements ITaskDatasource {
         const _currentDate = new Date().toISOString().replace('T', ' ')
         let _name = value.name?.value ? value.name.value : "<Нет наименования>"
         let _search = value.search?.value ? value.search.value : ""
+        let _status = value.status ? value.status : null
+        let _description = value.description ? value.description : null
+        let _comment = value.comment ? value.comment : null
+        let _projectId = value.projectId ? value.projectId : null
         let _createdBy = value?.createdBy ? value.createdBy : ""
         let _updatedBy = value?.updatedBy ? value.updatedBy : ""
         let _createdAt = value?.createdAt ? value.createdAt : _currentDate
 
-        const values = [_name, _search, _createdBy, _updatedBy, _createdAt as string, _currentDate ]
+        const values = [_name, _search, _status || '', _description || '', _comment || '', _projectId?.toString() || '', _createdBy, _updatedBy, _createdAt as string, _currentDate ]
         const response: QueryResult = await this.postgresService.query(`UPDATE ${EnvConfig.postgres.schema}."Task" SET 
-("name", "search", "createdBy", "updatedBy", "createdAt", "updatedAt") = ($1, $2, $3, $4, $5, $6)
+("name", "search", "status", "description", "comment", "projectId", "createdBy", "updatedBy", "createdAt", "updatedAt") = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
  WHERE id=${id} RETURNING *`, values)
  
         return response.rows[0]
@@ -48,9 +56,11 @@ export class PostgreTaskDatasource implements ITaskDatasource {
     }
 
     async delete(id: ID): Promise<any> {
-        const values = [id ? id.toString() : '0']
-        const response: QueryResult = await this.postgresService.query(`DELETE FROM ${EnvConfig.postgres.schema}."Task" n 
-                                        WHERE n."id"=$1 RETURNING *;`, values)
+        const _currentDate = new Date().toISOString().replace('T', ' ')
+        const values = [id ? id.toString() : '0', _currentDate]
+        const response: QueryResult = await this.postgresService.query(`UPDATE ${EnvConfig.postgres.schema}."Task" SET 
+("isDeleted", "deletedAt") = (true, $2)
+                                        WHERE "id"=$1 RETURNING *;`, values)
         return response.rows[0]
     }
 
@@ -59,17 +69,43 @@ export class PostgreTaskDatasource implements ITaskDatasource {
         let _orderBy = ""
         let _paging = ""
                 
+        // Always filter out deleted records
+        _where += ` WHERE "isDeleted" = false`
+        
         if(options){
-            _where = Helpers.getWhereForPostgreSql(TaskEntity, options, EnvConfig.postgres.schema, "Task")
+            // Add status filter if provided and not empty
+            const statusItem = options.where && (options.where as any).AND ? 
+                (options.where as any).AND.find((item: any) => item.param === 'status') : null;
+            
+            if (statusItem && statusItem.value && statusItem.value.trim() !== '') {
+                _where += ` AND status = '${statusItem.value}'`
+            }
+            
+            // Create optionsWithoutStatus without status field for Helpers
+            const optionsWithoutStatus: any = {
+                ...options,
+                where: options.where && (options.where as any).AND ? {
+                    ...options.where,
+                    AND: ((options.where as any).AND as any[]).filter((item: any) => item.param !== 'status')
+                } : options.where
+            }
+            
+            const additionalWhere = Helpers.getWhereForPostgreSql(TaskEntity, optionsWithoutStatus, EnvConfig.postgres.schema, "Task")
+            
+            if (additionalWhere && additionalWhere.trim() !== '') {
+                _where += ` AND ${additionalWhere.replace(/WHERE/gi, '')}`
+            }
+            
             _orderBy = Helpers.getOrderByForPostgreSql(TaskEntity, options, EnvConfig.postgres.schema, "Task")
             _paging = Helpers.getPagingForPostgresSql(options)
         }
+
         const response: QueryResult = await this.postgresService.query(`SELECT * FROM ${EnvConfig.postgres.schema}."Task" ${_where} ${_orderBy} ${_paging}`)
         return response.rows
     }
 
     async findOne(id: Partial<TaskEntity> | ID, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity> {
-        const response: QueryResult = await this.postgresService.query(`SELECT * FROM ${EnvConfig.postgres.schema}."Task" WHERE id = ${id}`)
+        const response: QueryResult = await this.postgresService.query(`SELECT * FROM ${EnvConfig.postgres.schema}."Task" WHERE id = ${id} AND "isDeleted" = false`)
         return response.rows && response.rows.length > 0 ? response.rows[0] : {} as TaskEntity
     }
     

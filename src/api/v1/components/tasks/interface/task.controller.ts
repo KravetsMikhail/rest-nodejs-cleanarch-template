@@ -19,11 +19,19 @@ type QueryParams = {
     id: number
     email: string
     status: string
+    name: string
+    offset: number
+    sort: string
+    order: string
 }
 
 type QueryBody = {
     name: string
     search: string
+    status?: string
+    description?: string
+    comment?: string
+    projectId?: bigint
 }
 
 export class TaskController {
@@ -44,6 +52,13 @@ export class TaskController {
      *           type: string
      *         description: Filter by name
      *         example: задача1
+     *       - in: query
+     *         name: status
+     *         schema:
+     *           type: string
+     *           enum: [DRAFT, STARTED, INWORK, ONPAUSE, CANCELED, COMPLETED, ERROR]
+     *         description: Filter by task status
+     *         example: DRAFT
      *       - in: query
      *         name: offset
      *         schema:
@@ -150,6 +165,13 @@ export class TaskController {
      *         application/json:
      *           schema:
      *             $ref: "#/components/schemas/Task"
+     *           example:
+     *             name: "Новая задача"
+     *             search: "новая задача"
+     *             status: "DRAFT"
+     *             description: "Описание новой задачи"
+     *             comment: "Комментарий к задаче"
+     *             projectId: 123
      *     responses:
      *       200:
      *         description: Task created successfully
@@ -205,6 +227,13 @@ export class TaskController {
      *         application/json:
      *           schema:
      *             $ref: '#/components/schemas/Task'
+     *           example:
+     *             name: "Обновленная задача"
+     *             search: "обновленная задача"
+     *             status: "INWORK"
+     *             description: "Обновленное описание задачи"
+     *             comment: "Обновленный комментарий"
+     *             projectId: 456
      *     responses:
      *       200:
      *         description: task updated successfully
