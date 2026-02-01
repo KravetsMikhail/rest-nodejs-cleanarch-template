@@ -1,0 +1,43 @@
+config:
+  target: 'http://localhost:1234'
+  phases:
+    - duration: 60
+      arrivalRate: 10
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 50
+      name: "Ramp up load"
+    - duration: 300
+      arrivalRate: 100
+      name: "Sustained load"
+    - duration: 120
+      arrivalRate: 200
+      name: "High load"
+    - duration: 60
+      arrivalRate: 500
+      name: "Peak load"
+    - duration: 120
+      arrivalRate: 1000
+      name: "Stress test"
+    - duration: 300
+      arrivalRate: 2000
+      name: "Load to failure"
+
+scenarios:
+  - name: "GET /health (no auth)"
+    weight: 50
+    flow:
+      - get:
+          url: "/health"
+  
+  - name: "GET / (no auth)"
+    weight: 30
+    flow:
+      - get:
+          url: "/"
+  
+  - name: "GET /api-docs (no auth)"
+    weight: 20
+    flow:
+      - get:
+          url: "/api-docs"
