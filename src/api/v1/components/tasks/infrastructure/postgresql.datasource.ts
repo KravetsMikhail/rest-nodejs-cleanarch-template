@@ -23,10 +23,26 @@ export class PostgreTaskDatasource implements ITaskDatasource {
         let _projectId = value.projectId ? value.projectId : null
         let _createdBy = value?.createdBy ? value.createdBy : ""
         let _updatedBy = value?.updatedBy ? value.updatedBy : ""
-        const values = [_name, _search, _status, _description || '', _comment || '', _projectId?.toString() || '', _createdBy, _updatedBy, _currentDate, _currentDate ]
+
+        // Build dynamic INSERT query based on provided fields
+        let fields = ["name", "search", "status", "description", "comment", "createdBy", "updatedBy", "createdAt", "updatedAt"]
+        let values = [_name, _search, _status, _description || '', _comment || '', _createdBy, _updatedBy, _currentDate, _currentDate]
+        let placeholders = []
+
+        // Add projectId only if it's not null and not empty
+        if (_projectId !== null && _projectId !== undefined && _projectId.toString().trim() !== '') {
+            fields.splice(5, 0, "projectId")
+            values.splice(5, 0, _projectId.toString())
+        }
+
+        // Generate placeholders
+        for (let i = 1; i <= values.length; i++) {
+            placeholders.push(`$${i}`)
+        }
+
         const response: QueryResult = await this.postgresService.query(`INSERT INTO ${EnvConfig.postgres.schema}."Task"(
-            "name", "search", "status", "description", "comment", "projectId", "createdBy", "updatedBy", "createdAt", "updatedAt")
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`, values)
+            "${fields.join('", "')}")
+            VALUES (${placeholders.join(', ')}) RETURNING *`, values)
         return response.rows[0]
     }
 
@@ -46,13 +62,26 @@ export class PostgreTaskDatasource implements ITaskDatasource {
         let _updatedBy = value?.updatedBy ? value.updatedBy : ""
         let _createdAt = value?.createdAt ? value.createdAt : _currentDate
 
-        const values = [_name, _search, _status || '', _description || '', _comment || '', _projectId?.toString() || '', _createdBy, _updatedBy, _createdAt as string, _currentDate ]
-        const response: QueryResult = await this.postgresService.query(`UPDATE ${EnvConfig.postgres.schema}."Task" SET 
-("name", "search", "status", "description", "comment", "projectId", "createdBy", "updatedBy", "createdAt", "updatedAt") = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
- WHERE id=${id} RETURNING *`, values)
- 
-        return response.rows[0]
+        // Build dynamic UPDATE query based on provided fields
+        let fields = ["name", "search", "status", "description", "comment", "createdBy", "updatedBy", "createdAt", "updatedAt"]
+        let values = [_name, _search, _status || '', _description || '', _comment || '', _createdBy, _updatedBy, _createdAt as string, _currentDate]
+        let setClauses = []
 
+        // Add projectId only if it's not null and not empty
+        if (_projectId !== null && _projectId !== undefined && _projectId.toString().trim() !== '') {
+            fields.splice(5, 0, "projectId")
+            values.splice(5, 0, _projectId.toString())
+        }
+
+        // Generate SET clauses
+        for (let i = 0; i < fields.length; i++) {
+            setClauses.push(`"${fields[i]}" = $${i + 1}`)
+        }
+
+        const response: QueryResult = await this.postgresService.query(`UPDATE ${EnvConfig.postgres.schema}."Task" SET 
+${setClauses.join(', ')} WHERE id=${id} RETURNING *`, values)
+
+        return response.rows[0]
     }
 
     async delete(id: ID): Promise<any> {

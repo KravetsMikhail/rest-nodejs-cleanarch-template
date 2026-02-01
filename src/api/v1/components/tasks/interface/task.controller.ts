@@ -27,7 +27,6 @@ type QueryParams = {
 
 type QueryBody = {
     name: string
-    search: string
     status?: string
     description?: string
     comment?: string
@@ -167,7 +166,6 @@ export class TaskController {
      *             $ref: "#/components/schemas/Task"
      *           example:
      *             name: "Новая задача"
-     *             search: "новая задача"
      *             status: "DRAFT"
      *             description: "Описание новой задачи"
      *             comment: "Комментарий к задаче"
@@ -229,7 +227,6 @@ export class TaskController {
      *             $ref: '#/components/schemas/Task'
      *           example:
      *             name: "Обновленная задача"
-     *             search: "обновленная задача"
      *             status: "INWORK"
      *             description: "Обновленное описание задачи"
      *             comment: "Обновленный комментарий"

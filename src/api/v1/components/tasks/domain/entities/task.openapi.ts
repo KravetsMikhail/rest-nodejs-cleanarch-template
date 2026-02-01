@@ -11,11 +11,6 @@ export const TaskOpenapiScheme = {
             description: 'Наименование',
             example: "Пример задачи"
         },
-        search:{
-            type: 'string',
-            description: 'Поисковая строка',
-            example: "пример задачи"
-        },
         status:{
             type: 'string',
             enum: ['DRAFT', 'STARTED', 'INWORK', 'ONPAUSE', 'CANCELED', 'COMPLETED', 'ERROR'],
