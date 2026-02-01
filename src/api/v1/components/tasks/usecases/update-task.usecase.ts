@@ -34,6 +34,10 @@ export class ReplaceTasksUseCase implements IUseCase<Promise<TaskResponse>> {
         const _task = TaskEntity.update({
             name: _name?.getValue() as TaskName,
             search: updtask.search as string,
+            status: updtask.status,
+            description: updtask.description,
+            comment: updtask.comment,
+            projectId: updtask.projectId ? BigInt(updtask.projectId) : BigInt(0),
             updatedBy: user,
             createdAt: updtask.createdAt,
             createdBy: updtask.createdBy
