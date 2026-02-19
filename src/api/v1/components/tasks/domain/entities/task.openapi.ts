@@ -73,3 +73,41 @@ export const TaskOpenapiScheme = {
     },
     required: ['name']
 }
+
+/** Pagination object for list responses */
+export const PaginationScheme = {
+    type: 'object',
+    required: ['total', 'offset', 'limit'],
+    properties: {
+        total: {
+            type: 'integer',
+            description: 'Общее количество строк без учёта offset и limit',
+            example: 42
+        },
+        offset: {
+            type: 'integer',
+            description: 'Смещение (параметр запроса)',
+            example: 0
+        },
+        limit: {
+            type: 'integer',
+            description: 'Лимит строк на страницу (параметр запроса)',
+            example: 10
+        }
+    }
+}
+
+/** Response GET list with pagination: data + pagination */
+export const TaskListResponseScheme = {
+    type: 'object',
+    required: ['data', 'pagination'],
+    properties: {
+        data: {
+            type: 'array',
+            items: { $ref: '#/components/schemas/Task' }
+        },
+        pagination: {
+            $ref: '#/components/schemas/Pagination'
+        }
+    }
+}

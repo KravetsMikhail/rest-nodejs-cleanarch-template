@@ -1,7 +1,7 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import { Express } from 'express';
 import swaggerUi from 'swagger-ui-express';
-import { TaskOpenapiScheme } from '../api/v1/components/tasks/domain/entities/task.openapi';
+import { TaskOpenapiScheme, TaskListResponseScheme, PaginationScheme } from '../api/v1/components/tasks/domain/entities/task.openapi';
 import { EnvConfig } from './env';
 
 const options: swaggerJsdoc.Options = {
@@ -25,6 +25,8 @@ const options: swaggerJsdoc.Options = {
     components: {
       schemas: {
         Task: TaskOpenapiScheme,
+        Pagination: PaginationScheme,
+        TaskListResponse: TaskListResponseScheme,
         Error: {
           type: 'object',
           properties: {

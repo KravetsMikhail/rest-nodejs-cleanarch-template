@@ -159,17 +159,23 @@ export class Delete%[1]sUseCase implements IUseCase<Promise<%[1]sResponse>> {
 
 	domain.WriteFile(fmt.Sprintf("%s/usecases/delete-%s.usecase.ts", basePath, singular), deleteUsecaseContent)
 
-	getUsecaseContent := fmt.Sprintf(`import { %[1]sEntity } from '../domain/entities/%[2]s.entity'
+	getUsecaseContent := fmt.Sprintf(`import { IFindOptions, IPagination } from '../../../../../core/domain/types/types'
+import { %[1]sEntity } from '../domain/entities/%[2]s.entity'
 import { IUseCase } from '../../../../../core/domain/types/i.usecase'
 import { Result, left, right } from '../../../../../core/domain/types/result'
 import { %[3]sResponse } from '../domain/types/response'
+import { GenericAppError } from '../../../../../core/errors/app.error'
 
 export class Get%[1]sUseCase implements IUseCase<Promise<%[3]sResponse>> {
     constructor(private readonly repository: any) {}
 
-    async execute(options?: any): Promise<%[3]sResponse> {
-        // TODO: Implement get all logic
-        return right(Result.ok([] as %[1]sEntity[])) as %[3]sResponse
+    async execute(findOptions?: IFindOptions<%[1]sEntity, any>): Promise<%[3]sResponse> {
+        try {
+            const { data, pagination } = await this.repository.findAndCount(findOptions)
+            return right(Result.ok<{ data: %[1]sEntity[], pagination: IPagination }>({ data, pagination })) as %[3]sResponse
+        } catch (err) {
+            return left(new GenericAppError.UnexpectedError(err)) as %[3]sResponse
+        }
     }
 }`, singularCap, singular, pluralCap)
 

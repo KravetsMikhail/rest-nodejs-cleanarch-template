@@ -2,7 +2,7 @@ import { type ITaskDatasource } from '../domain/datasources/i.task.datasource'
 import { TaskEntity } from '../domain/entities/task.entity'
 import { OracleService } from '../../../infrastructure/oracle/oracledb'
 import { EnvConfig } from '../../../../../config/env'
-import { ID, IFindOptions } from '../../../../../core/domain/types/types'
+import { ID, IFindOptions, IPagination } from '../../../../../core/domain/types/types'
 
 export class OracleTaskDatasource implements ITaskDatasource {
     private readonly oracleService: OracleService
@@ -45,9 +45,18 @@ END;`, values)
     }
 
     async find(options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
+        const { data } = await this.findAndCount(options)
+        return data
+    }
+
+    async findAndCount(options?: IFindOptions<TaskEntity, any> | undefined): Promise<{ data: TaskEntity[], pagination: IPagination }> {
         const _query = 'SELECT * FROM TASKS'
         const response = await this.oracleService.query(_query, [])
-        return response.rows
+        const rows = response.rows ?? []
+        const offset = options?.offset ?? 0
+        const limit = options?.limit ?? 10000
+        const pagination: IPagination = { total: rows.length, offset, limit }
+        return { data: rows, pagination }
     }
 
     findOne(id: Partial<TaskEntity> | ID, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity> {
