@@ -68,11 +68,13 @@ export class Helpers {
                 if (_opt && _opt.AND) {
                     let _finder: WhereFilterParams[] = []
                     _opt.AND.map(o => {
-                        let _param = o["param"] && !o["param"].includes("_like") ? o["param"] 
-                                        : o["param"] && o["param"].includes("_like") ? o["param"].split("_")[0] : ""
-                        let _f = _reflect?.find(r => r.field == _param)
+                        const rawParam = o["param"] || ""
+                        const { baseParam, operator } = Helpers.parseParamOperator(rawParam)
+                        let _f = _reflect?.find(r => r.field == baseParam)
                         if (_f) {
-                            _finder.push(new WhereFilterParams(_param, o["value"], _f.type))
+                            const wpf = new WhereFilterParams(baseParam, o["value"], _f.type)
+                            ;(wpf as any).operator = operator
+                            _finder.push(wpf)
                         }
                     })
                     if (_finder) {
@@ -80,26 +82,48 @@ export class Helpers {
                         if (_finder && _finder.length > 0) {
                             result += "where "
                             for (let i = 0; i < _finder.length; i++) {
+                                const col = `${dbScheme ? dbScheme + "." : ""}"${table}"."${_finder[i].param}"`
+                                const val = _finder[i].value
+                                const op = (_finder[i] as any).operator || "eq"
+
                                 switch (_finder[i].dbtype) {
                                     case "String":
-                                        result += `${dbScheme ? dbScheme + "." : ""}"${table}"."${_finder[i].param}" LIKE('%${_finder[i].value}%')`
+                                        if (op === "like") {
+                                            result += `${col} ILIKE '%${Helpers.escapeSQL(val)}%'`
+                                        } else {
+                                            result += `${col} = '${Helpers.escapeSQL(val)}'`
+                                        }
                                         break
                                     case "Number":
-                                        result += `${dbScheme ? dbScheme + "." : ""}"${table}"."${_finder[i].param}" = ${_finder[i].value}`
+                                    case "BigInt":
+                                        result += `${col} ${Helpers.sqlOperator(op)} ${val}`
                                         break
                                     case "Boolean":
-                                        let val: boolean = /^true$/i.test(_finder[i].value)
-                                        result += `${dbScheme ? dbScheme + "." : ""}"${table}"."${_finder[i].param}" = ${val ? "True" : "False"}`
+                                        const boolVal: boolean = /^true$/i.test(val)
+                                        result += `${col} = ${boolVal ? "True" : "False"}`
                                         break
                                     case "ID":
-                                        //РЕАЛИЗОВАТЬ
+                                        result += `${col} ${Helpers.sqlOperator(op)} ${val}`
                                         break
                                     case "Date":
-                                        //РЕАЛИЗОВАТЬ
+                                        const dateVal = Helpers.formatDateForSQL(val)
+                                        result += `${col} ${Helpers.sqlOperator(op)} '${dateVal}'`
                                         break
                                     case "JSON":
-                                        //РЕАЛИЗОВАТЬ
+                                        if (op === "contains") {
+                                            result += `${col} @> '${Helpers.escapeSQL(val)}'::jsonb`
+                                        } else if (op === "key") {
+                                            const [jsonKey, jsonVal] = val.split(":")
+                                            result += `${col}->>'${Helpers.escapeSQL(jsonKey)}' = '${Helpers.escapeSQL(jsonVal || "")}'`
+                                        } else {
+                                            result += `${col}::text ILIKE '%${Helpers.escapeSQL(val)}%'`
+                                        }
                                         break
+                                    case "Array":
+                                        result += `'${Helpers.escapeSQL(val)}' = ANY(${col})`
+                                        break
+                                    default:
+                                        result += `${col} = '${Helpers.escapeSQL(val)}'`
                                 }
                                 if (i < _finder.length - 1) {
                                     result += " AND "
@@ -113,6 +137,45 @@ export class Helpers {
         }
         console.log(result)
         return result
+    }
+
+    private static parseParamOperator(param: string): { baseParam: string, operator: string } {
+        const suffixes = ["_gte", "_lte", "_gt", "_lt", "_like", "_contains", "_key", "_ne"]
+        for (const suffix of suffixes) {
+            if (param.endsWith(suffix)) {
+                return {
+                    baseParam: param.slice(0, -suffix.length),
+                    operator: suffix.slice(1)
+                }
+            }
+        }
+        return { baseParam: param, operator: "eq" }
+    }
+
+    private static sqlOperator(op: string): string {
+        switch (op) {
+            case "gte": return ">="
+            case "lte": return "<="
+            case "gt": return ">"
+            case "lt": return "<"
+            case "ne": return "<>"
+            case "eq":
+            default: return "="
+        }
+    }
+
+    private static escapeSQL(value: string): string {
+        if (!value) return ""
+        return value.replace(/'/g, "''")
+    }
+
+    private static formatDateForSQL(value: string): string {
+        if (!value) return ""
+        const date = new Date(value)
+        if (isNaN(date.getTime())) {
+            return Helpers.escapeSQL(value)
+        }
+        return date.toISOString().replace("T", " ").replace("Z", "")
     }
 
     public static getOrderByForPostgreSql(model: any, options: IFindOptions<any, any>, dbScheme: string | undefined, table: string): string {

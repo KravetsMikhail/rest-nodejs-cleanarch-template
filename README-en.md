@@ -326,6 +326,93 @@ API requests can be made with Postman or with curl.
 
 Server address: `http://localhost:1234/api/v1/`
 
+### Query Parameters
+
+#### Pagination
+
+| Parameter | Type | Description | Example |
+|-----------|------|-------------|---------|
+| `offset` | integer | Offset from the beginning of the list | `?offset=10` |
+| `limit` | integer | Number of records per page | `?limit=20` |
+
+**Response format with pagination:**
+```json
+{
+  "data": [...],
+  "pagination": {
+    "total": 150,
+    "offset": 10,
+    "limit": 20
+  }
+}
+```
+
+#### Sorting
+
+| Parameter | Type | Description | Example |
+|-----------|------|-------------|---------|
+| `_sort` | string | Field(s) to sort by (comma-separated) | `?_sort=name,createdAt` |
+| `_order` | string | Sort direction: `asc` or `desc` | `?_order=desc` |
+
+**Example:** `?_sort=createdAt&_order=desc` — sort by creation date descending.
+
+#### Filtering
+
+Filters are specified via query parameters. Comparison operators are supported through suffixes:
+
+| Suffix | SQL Operator | Description | Example |
+|--------|--------------|-------------|---------|
+| (none) | `=` | Exact match | `?status=DRAFT` |
+| `_like` | `ILIKE '%...%'` | Substring search (case-insensitive) | `?name_like=task` |
+| `_gte` | `>=` | Greater than or equal | `?createdAt_gte=2024-01-01` |
+| `_lte` | `<=` | Less than or equal | `?price_lte=1000` |
+| `_gt` | `>` | Greater than | `?age_gt=18` |
+| `_lt` | `<` | Less than | `?date_lt=2024-12-31` |
+| `_ne` | `<>` | Not equal | `?status_ne=CANCELED` |
+| `_contains` | `@>` (JSONB) | JSON contains value | `?metadata_contains={"active":true}` |
+| `_key` | `->>'key'` | Search by JSON key (format: `key:value`) | `?config_key=theme:dark` |
+
+#### Supported Data Types
+
+| Type | Behavior | Supported Operators |
+|------|----------|---------------------|
+| **String** | `ILIKE` for `_like`, exact match otherwise | `_like`, `=`, `_ne` |
+| **Number** | Numeric comparison | `=`, `_gte`, `_lte`, `_gt`, `_lt`, `_ne` |
+| **BigInt** | Same as Number | `=`, `_gte`, `_lte`, `_gt`, `_lt`, `_ne` |
+| **ID** | Numeric comparison (for identifiers) | `=`, `_gte`, `_lte`, `_gt`, `_lt`, `_ne` |
+| **Boolean** | Converts `true/false` to SQL | `=` |
+| **Date** | Auto-formatted to ISO, date comparison | `=`, `_gte`, `_lte`, `_gt`, `_lt` |
+| **JSON** | PostgreSQL JSONB operators | `_contains`, `_key`, `_like` |
+| **Array** | Check if value exists in array (`= ANY()`) | `=` |
+
+#### Complex Query Examples
+
+**Filter by status and date range:**
+```
+GET /tasks?status=INWORK&createdAt_gte=2024-01-01&createdAt_lte=2024-06-30
+```
+
+**Search by name with sorting and pagination:**
+```
+GET /tasks?name_like=important&_sort=createdAt&_order=desc&limit=10&offset=0
+```
+
+**Filter by price range:**
+```
+GET /products?price_gte=100&price_lte=500&_sort=price&_order=asc
+```
+
+**Filter by JSON metadata:**
+```
+GET /items?metadata_contains={"category":"electronics"}
+GET /settings?config_key=language:en
+```
+
+**Exclude specific status:**
+```
+GET /tasks?status_ne=CANCELED&_sort=updatedAt&_order=desc
+```
+
 ## DEVELOPMENT TOOLS
 
 ### Component Generator
