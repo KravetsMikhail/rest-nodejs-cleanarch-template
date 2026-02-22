@@ -263,12 +263,13 @@ export class ProductController {
 }
 ```
 
-### Swagger Integration
+### Swagger / OpenAPI Integration
 
-- **Automatic Processing**: swagger-jsdoc automatically generates OpenAPI from JSDoc comments
-- **UI Access**: Available at `http://localhost:1234/api-docs`
-- **JSON Spec**: Available at `http://localhost:1234/api-docs.json`
-- **Schema Management**: Managed in `src/api/v1/openapi/openapi.yaml`
+- **JSDoc**: Controllers include `@swagger` annotations; swagger-jsdoc builds the OpenAPI spec from them.
+- **Schema file**: Generator creates `domain/entities/{singular}.openapi.ts` with `{Entity}OpenapiScheme`. Register it in `src/config/openapi.ts`: add the import and add `{Entity}: {Entity}OpenapiScheme` to `definition.components.schemas`.
+- **API discovery**: In `src/config/openapi.ts` the `apis` pattern is `dist/api/v1/components/<name>/interface/*.js` (one level of `*`; do not use `**` in that config).
+- **JSDoc warning**: Do not use the sequence `*/` inside JSDoc comment text (e.g. use `<path>` instead of `*` in path examples), or the comment will close early and cause syntax errors.
+- **UI**: `http://localhost:1234/api-docs` · **JSON**: `http://localhost:1234/api-docs.json`
 
 ## Generated Components
 
