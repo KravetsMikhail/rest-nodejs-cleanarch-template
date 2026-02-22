@@ -135,7 +135,6 @@ export class Helpers {
                 break
             }
         }
-        console.log(result)
         return result
     }
 
