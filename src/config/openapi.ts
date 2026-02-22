@@ -1,9 +1,14 @@
+import path from 'path';
 import swaggerJsdoc from 'swagger-jsdoc';
 import { Express } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import { TaskOpenapiScheme } from '../api/v1/components/tasks/domain/entities/task.openapi';
 import { EnvConfig } from './env';
 
+/**
+ * Glob without ** so swagger-jsdoc's bundled glob (v7) doesn't hit the Symbol bug with minimatch 10.
+ * Pattern: components/<one-level>/interface/<files>.js (e.g. tasks/interface/task.controller.js).
+ */
 const options: swaggerJsdoc.Options = {
   definition: {
     openapi: '3.0.1',
@@ -104,10 +109,7 @@ const options: swaggerJsdoc.Options = {
       },
     ],
   },
-  apis: [
-    './src/api/v1/components/**/interface/**/*.ts', // Path to the API docs
-    './dist/api/v1/components/**/interface/**/*.js'
-  ],
+  apis: [path.join(process.cwd(), 'dist', 'api', 'v1', 'components', '*', 'interface', '*.js').split(path.sep).join('/')],
 };
 
 export const specs = swaggerJsdoc(options);

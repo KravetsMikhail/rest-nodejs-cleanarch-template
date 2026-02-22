@@ -218,7 +218,7 @@ component-generator/
         ├── usecase/
         │   └── usecase.go       # CRUD use cases
         └── openapi/
-            └── openapi.go       # Информация по интеграции с OpenAPI/Swagger
+            └── openapi.go       # Генерация {singular}.openapi.ts и инструкции по регистрации в src/config/openapi.ts
 ```
 
 ### Добавление новых шаблонов
@@ -253,6 +253,7 @@ go build -o component-generator.exe
 - Шаблоны созданы для следования паттерну Clean Architecture
 - Имена файлов и классов автоматически адаптируются под переданные параметры
 - Поддерживаются любые версии API (v1, v2, v3, и т.д.)
+- **OpenAPI**: после генерации зарегистрируйте схему в `src/config/openapi.ts` (импорт и добавление в `definition.components.schemas`); в JSDoc не используйте последовательность `*/` в тексте комментария
 
 ## Лицензия
 
