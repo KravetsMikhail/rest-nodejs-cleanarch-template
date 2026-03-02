@@ -5,6 +5,7 @@ import { GetTasksUseCase, GetOneTaskUseCase } from '../usecases/get-task.usecase
 import { CreateTasksUseCase } from '../usecases/create-task.usecase'
 import { DeleteTasksUseCase } from '../usecases/delete-task.usecase'
 import { ReplaceTasksUseCase } from '../usecases/update-task.usecase'
+import { type IPagination } from '../../../../../core/domain/types/types'
 import { CustomRequest } from '../../../../../core/domain/types/custom.request'
 import { Helpers } from '../../../../../core/utils/helpers'
 
@@ -85,13 +86,11 @@ export class TaskController {
      *         example: desc
      *     responses:
      *       200:
-     *         description: List of tasks
+     *         description: List of tasks with total count for pagination
      *         content:
      *           application/json:
      *             schema:
-     *               type: array
-     *               items:
-     *                 $ref: '#/components/schemas/Task'
+     *               $ref: '#/components/schemas/TaskListResponse'
      *       400:
      *         description: Error
      *         $ref: "#/components/responses/Error400"
@@ -103,7 +102,7 @@ export class TaskController {
      */
     public getTasks = (
         _req: Request<unknown, unknown, unknown, QueryParams>,
-        res: Response<TaskEntity[]>,
+        res: Response<{ data: TaskEntity[], pagination: IPagination }>,
         next: NextFunction
     ): void => {
 

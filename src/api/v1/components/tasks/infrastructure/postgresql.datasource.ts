@@ -3,7 +3,7 @@ import { TaskEntity, ITaskProps } from '../domain/entities/task.entity'
 import { PostgresService } from '../../../infrastructure/postgresql/postgresql'
 import { EnvConfig } from '../../../../../config/env'
 import { QueryResult } from 'pg'
-import { ID, IFindOptions } from '../../../../../core/domain/types/types'
+import { ID, IFindOptions, IPagination } from '../../../../../core/domain/types/types'
 import { Helpers } from '../../../../../core/utils/helpers'
 
 export class PostgreTaskDatasource implements ITaskDatasource {
@@ -94,22 +94,30 @@ ${setClauses.join(', ')} WHERE id=${id} RETURNING *`, values)
     }
 
     async find(options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
+        const { data } = await this.findAndCount(options)
+        return data
+    }
+
+    async findAndCount(options?: IFindOptions<TaskEntity, any> | undefined): Promise<{ data: TaskEntity[], pagination: IPagination }> {
         let _where = ""
         let _orderBy = ""
         let _paging = ""
-                
+
+        const offset = options?.offset ?? 0
+        const limit = options?.limit ?? 10000
+
         // Always filter out deleted records
         _where += ` WHERE "isDeleted" = false`
-        
-        if(options){
+
+        if (options) {
             // Add status filter if provided and not empty
-            const statusItem = options.where && (options.where as any).AND ? 
-                (options.where as any).AND.find((item: any) => item.param === 'status') : null;
-            
+            const statusItem = options.where && (options.where as any).AND ?
+                (options.where as any).AND.find((item: any) => item.param === 'status') : null
+
             if (statusItem && statusItem.value && statusItem.value.trim() !== '') {
                 _where += ` AND status = '${statusItem.value}'`
             }
-            
+
             // Create optionsWithoutStatus without status field for Helpers
             const optionsWithoutStatus: any = {
                 ...options,
@@ -118,19 +126,23 @@ ${setClauses.join(', ')} WHERE id=${id} RETURNING *`, values)
                     AND: ((options.where as any).AND as any[]).filter((item: any) => item.param !== 'status')
                 } : options.where
             }
-            
+
             const additionalWhere = Helpers.getWhereForPostgreSql(TaskEntity, optionsWithoutStatus, EnvConfig.postgres.schema, "Task")
-            
+
             if (additionalWhere && additionalWhere.trim() !== '') {
                 _where += ` AND ${additionalWhere.replace(/WHERE/gi, '')}`
             }
-            
+
             _orderBy = Helpers.getOrderByForPostgreSql(TaskEntity, options, EnvConfig.postgres.schema, "Task")
             _paging = Helpers.getPagingForPostgresSql(options)
         }
 
+        const countResult: QueryResult = await this.postgresService.query(`SELECT COUNT(*)::int AS total FROM ${EnvConfig.postgres.schema}."Task" ${_where}`)
+        const total = Number((countResult.rows[0] as { total: number }).total ?? 0)
+
         const response: QueryResult = await this.postgresService.query(`SELECT * FROM ${EnvConfig.postgres.schema}."Task" ${_where} ${_orderBy} ${_paging}`)
-        return response.rows
+        const pagination: IPagination = { total, offset, limit }
+        return { data: response.rows, pagination }
     }
 
     async findOne(id: Partial<TaskEntity> | ID, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity> {
