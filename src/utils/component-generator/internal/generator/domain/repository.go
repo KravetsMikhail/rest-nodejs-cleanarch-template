@@ -12,16 +12,18 @@ func GenerateRepositoryFiles(config model.ComponentConfig, basePath string) {
 	singular := config.SingularName
 	singularCap := Capitalize(singular)
 
-	interfaceRepoContent := fmt.Sprintf(`import { IRepository } from '../../../../../../core/domain/types/i.repository'
+	interfaceRepoContent := fmt.Sprintf(`import { IFindOptions, IPagination } from '../../../../../../core/domain/types/types'
+import { IRepository } from '../../../../../../core/domain/types/i.repository'
 import { type %sEntity } from '../entities/%s.entity'
 
 export interface I%sRepository extends IRepository<%sEntity, any> {
-}`, singularCap, singular, singularCap, singularCap)
+    findAndCount(options?: IFindOptions<%sEntity, any>): Promise<{ data: %sEntity[], pagination: IPagination }>
+}`, singularCap, singular, singularCap, singularCap, singularCap, singularCap)
 
 	WriteFile(fmt.Sprintf("%s/domain/repositories/i.%s.repository.ts", basePath, singular), interfaceRepoContent)
 
 	var repoContent strings.Builder
-	repoContent.WriteString("import { ID, IFindOptions } from '../../../../../../core/domain/types/types'\n")
+	repoContent.WriteString("import { ID, IFindOptions, IPagination } from '../../../../../../core/domain/types/types'\n")
 	repoContent.WriteString(fmt.Sprintf("import { type I%sDatasource } from '../datasources/i.%s.datasource'\n", singularCap, singular))
 	repoContent.WriteString(fmt.Sprintf("import { %sEntity } from '../entities/%s.entity'\n", singularCap, singular))
 	repoContent.WriteString(fmt.Sprintf("import { type I%sRepository } from './i.%s.repository'\n\n", singularCap, singular))
@@ -32,6 +34,7 @@ export interface I%sRepository extends IRepository<%sEntity, any> {
 	repoContent.WriteString(fmt.Sprintf("    async update(id: ID, newValue: Partial<%sEntity>): Promise<%sEntity> {\n        return await this.datasource.update(id, newValue)\n    }\n", singularCap, singularCap))
 	repoContent.WriteString("    async delete(id: ID): Promise<any> {\n        return await this.datasource.delete(id)\n    }\n")
 	repoContent.WriteString(fmt.Sprintf("    async find(options?: IFindOptions<%sEntity, any> | undefined): Promise<%sEntity[]> {\n        return await this.datasource.find(options)\n    }\n", singularCap, singularCap))
+	repoContent.WriteString(fmt.Sprintf("    async findAndCount(options?: IFindOptions<%sEntity, any> | undefined): Promise<{ data: %sEntity[], pagination: IPagination }> {\n        return await this.datasource.findAndCount(options)\n    }\n", singularCap, singularCap))
 	repoContent.WriteString(fmt.Sprintf("    async findOne(id: ID | Partial<%sEntity>, options?: IFindOptions<%sEntity, any> | undefined): Promise<%sEntity> {\n        return await this.datasource.findOne(id)\n    }\n", singularCap, singularCap, singularCap))
 	repoContent.WriteString(fmt.Sprintf("    exist(id: ID | Partial<%sEntity>): Promise<boolean> {\n        throw new Error('Method not implemented.')\n    }\n}\n", singularCap))
 
@@ -43,11 +46,13 @@ func GenerateDatasourceFiles(config model.ComponentConfig, basePath string) {
 	singular := config.SingularName
 	singularCap := Capitalize(singular)
 
-	interfaceDsContent := fmt.Sprintf(`import { IDataSource } from '../../../../../../core/domain/types/i.datasource'
+	interfaceDsContent := fmt.Sprintf(`import { ID, IFindOptions, IPagination } from '../../../../../../core/domain/types/types'
+import { IDataSource } from '../../../../../../core/domain/types/i.datasource'
 import { type %sEntity } from '../entities/%s.entity'
 
 export interface I%sDatasource extends IDataSource<%sEntity, any> {
-}`, singularCap, singular, singularCap, singularCap)
+    findAndCount(options?: IFindOptions<%sEntity, any> | undefined): Promise<{ data: %sEntity[], pagination: IPagination }>
+}`, singularCap, singular, singularCap, singularCap, singularCap, singularCap)
 
 	WriteFile(fmt.Sprintf("%s/domain/datasources/i.%s.datasource.ts", basePath, singular), interfaceDsContent)
 }

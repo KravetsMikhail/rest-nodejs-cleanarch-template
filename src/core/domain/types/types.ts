@@ -7,6 +7,13 @@ export type ColumnData = string | {
 
 export type ID = string | number
 
+/** Pagination info for list responses (offset/limit from request, total from DB) */
+export interface IPagination {
+    total: number
+    offset: number
+    limit: number
+}
+
 export interface IFindOptions<T, C> {
     where?: Array<keyof T>
     offset?: number

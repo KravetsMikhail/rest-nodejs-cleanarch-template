@@ -1,4 +1,4 @@
-import { ID, IFindOptions } from '../../../../../../core/domain/types/types'
+import { ID, IFindOptions, IPagination } from '../../../../../../core/domain/types/types'
 import { type ITaskDatasource } from '../datasources/i.task.datasource'
 import { TaskEntity } from '../entities/task.entity'
 import { type ITaskRepository } from './i.task.repository'
@@ -23,6 +23,9 @@ export class TaskRepository implements ITaskRepository {
     // }
     async find(options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity[]> {
         return await this.datasource.find(options)
+    }
+    async findAndCount(options?: IFindOptions<TaskEntity, any> | undefined): Promise<{ data: TaskEntity[], pagination: IPagination }> {
+        return await this.datasource.findAndCount(options)
     }
     async findOne(id: ID | Partial<TaskEntity>, options?: IFindOptions<TaskEntity, any> | undefined): Promise<TaskEntity> {
         return await this.datasource.findOne(id)

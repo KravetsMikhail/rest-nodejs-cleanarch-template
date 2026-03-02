@@ -12,8 +12,9 @@ func GenerateTypeFiles(config model.ComponentConfig, basePath string) {
 	singularCap := Capitalize(singular)
 	pluralCap := Capitalize(config.PluralName)
 
-	responseContent := fmt.Sprintf(`import { Result, Either, left, right } from '../../../../../../core/domain/types/result'
+	responseContent := fmt.Sprintf(`import { Result, Either } from '../../../../../../core/domain/types/result'
 import { GenericAppError } from '../../../../../../core/errors/app.error'
+import { IPagination } from '../../../../../../core/domain/types/types'
 import { %[1]sEntity } from '../entities/%[2]s.entity'
 
 export type %[1]sResponse = Either<
@@ -25,7 +26,7 @@ export type %[1]sResponse = Either<
 export type %[3]sResponse = Either<
     GenericAppError.UnexpectedError |
     Result<any>,
-    Result<%[1]sEntity[]>
+    Result<{ data: %[1]sEntity[], pagination: IPagination }>
 >
 `, singularCap, singular, pluralCap)
 
