@@ -350,10 +350,10 @@ export class TaskController {
 
 | Параметр | Тип | Описание | Пример |
 |----------|-----|----------|--------|
-| `_sort` | string | Поле для сортировки (или несколько через запятую) | `?_sort=name,createdAt` |
-| `_order` | string | Направление сортировки: `asc` или `desc` | `?_order=desc` |
+| `sort` | string | Поле для сортировки (или несколько через запятую) | `?_sort=name,createdAt` |
+| `order` | string | Направление сортировки: `asc` или `desc` | `?order=desc` |
 
-**Пример:** `?_sort=createdAt&_order=desc` — сортировка по дате создания по убыванию.
+**Пример:** `?sort=createdAt&order=desc` — сортировка по дате создания по убыванию.
 
 #### Фильтрация
 
@@ -393,12 +393,12 @@ GET /tasks?status=INWORK&createdAt_gte=2024-01-01&createdAt_lte=2024-06-30
 
 **Поиск по имени с сортировкой и пагинацией:**
 ```
-GET /tasks?name_like=важн&_sort=createdAt&_order=desc&limit=10&offset=0
+GET /tasks?name_like=важн&sort=createdAt&order=desc&limit=10&offset=0
 ```
 
 **Поиск по диапазону цен:**
 ```
-GET /products?price_gte=100&price_lte=500&_sort=price&_order=asc
+GET /products?price_gte=100&price_lte=500&sort=price&order=asc
 ```
 
 **Фильтрация по JSON метаданным:**
@@ -409,7 +409,7 @@ GET /settings?config_key=language:ru
 
 **Исключение определённого статуса:**
 ```
-GET /tasks?status_ne=CANCELED&_sort=updatedAt&_order=desc
+GET /tasks?status_ne=CANCELED&sort=updatedAt&order=desc
 ```
 
 ## ИНСТРУМЕНТЫ РАЗРАБОТКИ

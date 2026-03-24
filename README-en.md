@@ -351,10 +351,10 @@ Server address: `http://localhost:1234/api/v1/`
 
 | Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
-| `_sort` | string | Field(s) to sort by (comma-separated) | `?_sort=name,createdAt` |
-| `_order` | string | Sort direction: `asc` or `desc` | `?_order=desc` |
+| `sort` | string | Field(s) to sort by (comma-separated) | `?sort=name,createdAt` |
+| `order` | string | Sort direction: `asc` or `desc` | `?order=desc` |
 
-**Example:** `?_sort=createdAt&_order=desc` — sort by creation date descending.
+**Example:** `?sort=createdAt&order=desc` — sort by creation date descending.
 
 #### Filtering
 
@@ -394,12 +394,12 @@ GET /tasks?status=INWORK&createdAt_gte=2024-01-01&createdAt_lte=2024-06-30
 
 **Search by name with sorting and pagination:**
 ```
-GET /tasks?name_like=important&_sort=createdAt&_order=desc&limit=10&offset=0
+GET /tasks?name_like=important&sort=createdAt&order=desc&limit=10&offset=0
 ```
 
 **Filter by price range:**
 ```
-GET /products?price_gte=100&price_lte=500&_sort=price&_order=asc
+GET /products?price_gte=100&price_lte=500&sort=price&order=asc
 ```
 
 **Filter by JSON metadata:**
@@ -410,7 +410,7 @@ GET /settings?config_key=language:en
 
 **Exclude specific status:**
 ```
-GET /tasks?status_ne=CANCELED&_sort=updatedAt&_order=desc
+GET /tasks?status_ne=CANCELED&sort=updatedAt&order=desc
 ```
 
 ## DEVELOPMENT TOOLS

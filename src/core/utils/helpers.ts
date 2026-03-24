@@ -15,16 +15,16 @@ export class Helpers {
                
         let _where = {
             [Op.and]: Object.entries(filters)
-            .filter(([param]) => param !== 'limit' && param !== 'offset' && param !== '_order' && param !== '_sort')
+            .filter(([param]) => param !== 'limit' && param !== 'offset' && param !== 'order' && param !== 'sort')
             .map(([param, value]) => ({
                 param,
                 value
             }))
         } as unknown as WhereFilters
-        let _order = filters._order
-        let _sort = filters._sort
-        delete filters._order
-        delete filters._sort
+        let _order = filters.order
+        let _sort = filters.sort
+        delete filters.order
+        delete filters.sort
         let _orderBy = null
         if (_sort) {
             let _ord = OrderByType.asc
