@@ -5,6 +5,8 @@ import { EnvConfig } from '../../../../../config/env'
 import { QueryResult } from 'pg'
 import { ID, IFindOptions, IPagination } from '../../../../../core/domain/types/types'
 import { Helpers } from '../../../../../core/utils/helpers'
+import { v4 as uuidv4 } from 'uuid';
+import { OutboxMessage } from '../../../../../core/domain/types/types'
 
 export class PostgreTaskDatasource implements ITaskDatasource {
     private readonly postgresService: PostgresService
@@ -40,10 +42,55 @@ export class PostgreTaskDatasource implements ITaskDatasource {
             placeholders.push(`$${i}`)
         }
 
-        const response: QueryResult = await this.postgresService.query(`INSERT INTO ${EnvConfig.postgres.schema}."Task"(
-            "${fields.join('", "')}")
-            VALUES (${placeholders.join(', ')}) RETURNING *`, values)
-        return response.rows[0]
+        //Начинаем транзакцию
+        await this.postgresService.query('BEGIN')
+
+        try {
+            //Шаг 1: Создаем объект в основной таблице
+            const response: QueryResult = await this.postgresService.query(`INSERT INTO ${EnvConfig.postgres.schema}."Task"(
+                "${fields.join('", "')}")
+                VALUES (${placeholders.join(', ')}) RETURNING *`, values)
+
+            const task = response.rows[0] as TaskEntity
+
+            //Шаг 2: Создаем запись в Outbox
+            const messageId = uuidv4();
+            const outboxMessage: OutboxMessage = {
+                status: 'pending',
+                aggregateId: task.id.toString(),
+                messageId,
+                messageType: 'TaskCreated',
+                payload: JSON.stringify(task),
+                metadata: JSON.stringify({name: 'tasks', path: '/api/v1/tasks'}),
+                retryCount: 0,
+                createdAt: new Date(),
+            }
+
+            await this.postgresService.query(
+                `INSERT INTO ${EnvConfig.postgres.schema}.outbox_messages
+(status, aggregate_id, message_id, message_type, payload, metadata, rerty_count, created_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+                [
+                    outboxMessage.status,
+                    outboxMessage.aggregateId,
+                    outboxMessage.messageId,
+                    outboxMessage.messageType,
+                    outboxMessage.payload,
+                    outboxMessage.metadata,
+                    outboxMessage.retryCount.toString(),
+                    outboxMessage.createdAt.toISOString().replace('T', ' '),
+                ]
+            )
+
+            //Фиксируем транзакцию
+            await this.postgresService.query('COMMIT')
+
+            return task
+        } catch(error){
+            //Откатываем транзакцию
+            await this.postgresService.query('ROLLBACK')
+            throw error
+        }
     }
 
     createMany(values: Partial<TaskEntity>[]): Promise<TaskEntity[]> {
