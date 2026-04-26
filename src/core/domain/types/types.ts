@@ -67,3 +67,18 @@ export class WhereFilters {
         this.OR = or
     }
 }
+
+export interface OutboxMessage {
+    id?: number;
+    status: 'pending' | 'processing' | 'sent' | 'failed';
+    aggregateId: string;
+    messageId: string;
+    messageType: string;
+    payload: string;
+    metadata: string;
+    retryCount: number;
+    nextRetryDate?: Date;
+    errorDetails?: string;
+    createdAt: Date;
+    updatedAt?: Date;
+}

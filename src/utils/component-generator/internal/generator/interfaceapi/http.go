@@ -56,7 +56,7 @@ func GenerateInterfaceFiles(config model.ComponentConfig, basePath string) {
 	controllerContent.WriteString("     *                 pagination:\n     *                   $ref: '#/components/schemas/Pagination'\n")
 	controllerContent.WriteString("     */\n")
 	controllerContent.WriteString(fmt.Sprintf("    public get%s = (_req: Request, res: Response<{ data: %sEntity[], pagination: IPagination }>): void => {\n", singularCap, singularCap))
-	controllerContent.WriteString("        // TODO: Implement get all logic (use Get%sUseCase and repository.findAndCount)\n", singularCap)
+	controllerContent.WriteString(fmt.Sprintf("        // TODO: Implement get all logic (use Get%sUseCase and repository.findAndCount)\n", singularCap))
 	controllerContent.WriteString("        res.json({ data: [], pagination: { total: 0, offset: 0, limit: 10 } })\n    }\n\n")
 	controllerContent.WriteString("    /**\n     * @swagger\n")
 	controllerContent.WriteString(fmt.Sprintf("     * /%s:\n", plural))
@@ -130,4 +130,3 @@ export class %sRoutes {
 
 	writeFile(fmt.Sprintf("%s/interface/%s.routes.ts", basePath, singular), routesContent)
 }
-
