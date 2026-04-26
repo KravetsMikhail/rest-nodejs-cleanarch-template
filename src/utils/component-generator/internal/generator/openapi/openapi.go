@@ -62,9 +62,17 @@ func buildOpenAPISchemeContent(config model.ComponentConfig, singular, singularC
 		openapiType, format := tsToOpenAPI(tsType)
 		line := fmt.Sprintf("        %s: { type: '%s'", f.Name, openapiType)
 		if format != "" {
-			line += fmt.Sprintf(", format: '%s'", format)
+			line += fmt.Sprintf(`, 
+	format: '%s'`, format)
 		}
-		line += fmt.Sprintf(", description: '%s' },\n", f.Name)
+		if f.Nullable == false {
+			line += `,
+	nullable: false`
+		} else {
+			line += `,
+	nullable: true`
+		}
+		line += fmt.Sprintf(",\ndescription: '%s' },\n", f.Name)
 		b.WriteString(line)
 	}
 	b.WriteString("    },\n")

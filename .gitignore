@@ -168,3 +168,4 @@ Session.vim
 
 # poatgres
 pgdata
+src/utils/component-generator/component-generator

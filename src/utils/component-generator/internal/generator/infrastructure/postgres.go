@@ -45,57 +45,66 @@ func GenerateInfrastructureFiles(config model.ComponentConfig, basePath string) 
 
 	pgContent.WriteString(fmt.Sprintf("    async create(value: Partial<%sEntity>): Promise<%sEntity> {\n", singularCap, singularCap))
 	pgContent.WriteString("        const _currentDate = new Date().toISOString().replace('T', ' ')\n")
-	
+
 	// Generate field mappings and values
 	var fieldNames []string
 	var valuePlaceholders []string
 	var fieldMappings []string
-	
+
 	// Always include system fields
-	fieldNames = append(fieldNames, "\"name\"", "\"search\"", "\"createdBy\"", "\"updatedBy\"", "\"createdAt\"", "\"updatedAt\"")
-	valuePlaceholders = append(valuePlaceholders, "$1", "$2", "$3", "$4", "$5", "$6")
-	fieldMappings = append(fieldMappings, 
-		"let _name = value.name?.value ? value.name.value : \"<empty>\"",
-		"let _search = value.search?.value ? value.search.value : \"\"",
-		"let _createdBy = value?.createdBy ? value.createdBy : \"\"",
-		"let _updatedBy = value?.updatedBy ? value.updatedBy : \"\"")
-	
+	//fieldNames = append(fieldNames, "\"name\"", "\"search\"", "\"createdBy\"", "\"updatedBy\"", "\"createdAt\"", "\"updatedAt\"")
+	//valuePlaceholders = append(valuePlaceholders, "$1", "$2", "$3", "$4", "$5", "$6")
+	// fieldMappings = append(fieldMappings,
+	// 	"let _name = value.name?.value ? value.name.value : \"<empty>\"",
+	// 	"let _search = value.search?.value ? value.search.value : \"\"",
+	// 	"let _createdBy = value?.createdBy ? value.createdBy : \"\"",
+	// 	"let _updatedBy = value?.updatedBy ? value.updatedBy : \"\"")
+
 	// Add additional fields from migration
 	for _, field := range config.TableFields {
-		if field.Name == "name" || field.Name == "created_at" || field.Name == "updated_at" || 
-		   field.Name == "createdby" || field.Name == "updatedby" || 
-		   field.Name == "createdBy" || field.Name == "updatedBy" {
+		// if field.Name == "name" || field.Name == "created_at" || field.Name == "updated_at" ||
+		//    field.Name == "createdby" || field.Name == "updatedby" ||
+		//    field.Name == "createdBy" || field.Name == "updatedBy" {
+		// 	continue
+		// }
+		if field.Name == "id" {
 			continue
 		}
-		
+
 		fieldNames = append(fieldNames, fmt.Sprintf("\"%s\"", field.Name))
 		valuePlaceholders = append(valuePlaceholders, fmt.Sprintf("$%d", len(fieldNames)))
-		camelFieldName := toCamelCase(field.Name)
-		fieldMappings = append(fieldMappings, fmt.Sprintf("let _%s = value.%s ? value.%s : %s", 
-			camelFieldName, camelFieldName, camelFieldName, getDefaultValueForField(field.Type)))
+		// camelFieldName := toCamelCase(field.Name)
+		// fieldMappings = append(fieldMappings, fmt.Sprintf("let _%s = value.%s ? value.%s : %s",
+		// 	camelFieldName, camelFieldName, camelFieldName, getDefaultValueForField(field.Type)))
+		fieldMappings = append(fieldMappings, fmt.Sprintf("let _%s = value.%s ? value.%s : %s",
+			field.Name, field.Name, field.Name, getDefaultValueForField(field.Type)))
 	}
-	
+
 	// Write field mappings
 	for _, mapping := range fieldMappings {
 		pgContent.WriteString(fmt.Sprintf("        %s\n", mapping))
 	}
-	
+
 	// Build values array
 	pgContent.WriteString("        const values = [")
 	var valueVars []string
-	valueVars = append(valueVars, "_name", "_search", "_createdBy", "_updatedBy", "_currentDate", "_currentDate")
+	//valueVars = append(valueVars, "_name", "_search", "_createdBy", "_updatedBy", "_currentDate", "_currentDate")
 	for _, field := range config.TableFields {
-		if field.Name == "name" || field.Name == "created_at" || field.Name == "updated_at" || 
-		   field.Name == "createdby" || field.Name == "updatedby" || 
-		   field.Name == "createdBy" || field.Name == "updatedBy" {
+		// if field.Name == "name" || field.Name == "created_at" || field.Name == "updated_at" ||
+		// 	field.Name == "createdby" || field.Name == "updatedby" ||
+		// 	field.Name == "createdBy" || field.Name == "updatedBy" {
+		// 	continue
+		// }
+		if field.Name == "id" {
 			continue
 		}
-		camelFieldName := toCamelCase(field.Name)
-		valueVars = append(valueVars, fmt.Sprintf("_%s", camelFieldName))
+		//camelFieldName := toCamelCase(field.Name)
+		//valueVars = append(valueVars, fmt.Sprintf("_%s", camelFieldName))
+		valueVars = append(valueVars, fmt.Sprintf("_%s?.toString()", field.Name))
 	}
 	pgContent.WriteString(strings.Join(valueVars, ", "))
 	pgContent.WriteString("]\n")
-	
+
 	// Build SQL
 	pgContent.WriteString(fmt.Sprintf("        const response: QueryResult = await this.postgresService.query(`INSERT INTO ${EnvConfig.postgres.schema}.\"%s\"(\n", tableName))
 	pgContent.WriteString("            " + strings.Join(fieldNames, ", ") + ")\n")
@@ -110,61 +119,72 @@ func GenerateInfrastructureFiles(config model.ComponentConfig, basePath string) 
 
 	pgContent.WriteString(fmt.Sprintf("    async update(id: ID, newValue: Partial<%sEntity>): Promise<%sEntity> {\n", singularCap, singularCap))
 	pgContent.WriteString("        const _currentDate = new Date().toISOString().replace('T', ' ')\n")
-	
+
 	// Generate field mappings and values for update
 	var updateFieldNames []string
 	var updateValuePlaceholders []string
 	var updateFieldMappings []string
-	
+
 	// Always include system fields
-	updateFieldNames = append(updateFieldNames, "\"name\"", "\"search\"", "\"createdBy\"", "\"updatedBy\"", "\"createdAt\"", "\"updatedAt\"")
-	updateValuePlaceholders = append(updateValuePlaceholders, "$1", "$2", "$3", "$4", "$5", "$6")
-	updateFieldMappings = append(updateFieldMappings, 
-		"let _name = newValue.name?.value ? newValue.name.value : \"<empty>\"",
-		"let _search = newValue.search?.value ? newValue.search.value : \"\"",
-		"let _createdBy = newValue?.createdBy ? newValue.createdBy : \"\"",
-		"let _updatedBy = newValue?.updatedBy ? newValue.updatedBy : \"\"")
-	
+	//updateFieldNames = append(updateFieldNames, "\"name\"", "\"search\"", "\"createdBy\"", "\"updatedBy\"", "\"createdAt\"", "\"updatedAt\"")
+	//updateValuePlaceholders = append(updateValuePlaceholders, "$1", "$2", "$3", "$4", "$5", "$6")
+	// updateFieldMappings = append(updateFieldMappings,
+	// 	"let _name = newValue.name?.value ? newValue.name.value : \"<empty>\"",
+	// 	"let _search = newValue.search?.value ? newValue.search.value : \"\"",
+	// 	"let _createdBy = newValue?.createdBy ? newValue.createdBy : \"\"",
+	// 	"let _updatedBy = newValue?.updatedBy ? newValue.updatedBy : \"\"")
+
 	// Add additional fields from migration
 	for _, field := range config.TableFields {
-		if field.Name == "name" || field.Name == "created_at" || field.Name == "updated_at" || 
-		   field.Name == "createdby" || field.Name == "updatedby" || 
-		   field.Name == "createdBy" || field.Name == "updatedBy" {
+		// if field.Name == "name" || field.Name == "created_at" || field.Name == "updated_at" ||
+		// 	field.Name == "createdby" || field.Name == "updatedby" ||
+		// 	field.Name == "createdBy" || field.Name == "updatedBy" {
+		// 	continue
+		// }
+		if field.Name == "id" {
 			continue
 		}
-		
+
 		updateFieldNames = append(updateFieldNames, fmt.Sprintf("\"%s\"", field.Name))
 		updateValuePlaceholders = append(updateValuePlaceholders, fmt.Sprintf("$%d", len(updateFieldNames)))
-		camelFieldName := toCamelCase(field.Name)
-		updateFieldMappings = append(updateFieldMappings, fmt.Sprintf("let _%s = newValue.%s ? newValue.%s : %s", 
-			camelFieldName, camelFieldName, camelFieldName, getDefaultValueForField(field.Type)))
+		// camelFieldName := toCamelCase(field.Name)
+		// updateFieldMappings = append(updateFieldMappings, fmt.Sprintf("let _%s = newValue.%s ? newValue.%s : %s",
+		// 	camelFieldName, camelFieldName, camelFieldName, getDefaultValueForField(field.Type)))
+		updateFieldMappings = append(updateFieldMappings, fmt.Sprintf("let _%s = newValue.%s ? newValue.%s : %s",
+			field.Name, field.Name, field.Name, getDefaultValueForField(field.Type)))
 	}
-	
+
 	// Write field mappings
 	for _, mapping := range updateFieldMappings {
 		pgContent.WriteString(fmt.Sprintf("        %s\n", mapping))
 	}
-	
+
 	// Build values array
 	pgContent.WriteString("        const values = [")
 	var updateValueVars []string
-	updateValueVars = append(updateValueVars, "_name", "_search", "_createdBy", "_updatedBy", "_currentDate", "_currentDate")
+	//updateValueVars = append(updateValueVars, "_name", "_search", "_createdBy", "_updatedBy", "_currentDate", "_currentDate")
 	for _, field := range config.TableFields {
-		if field.Name == "name" || field.Name == "created_at" || field.Name == "updated_at" || 
-		   field.Name == "createdby" || field.Name == "updatedby" || 
-		   field.Name == "createdBy" || field.Name == "updatedBy" {
+		// if field.Name == "name" || field.Name == "created_at" || field.Name == "updated_at" ||
+		// 	field.Name == "createdby" || field.Name == "updatedby" ||
+		// 	field.Name == "createdBy" || field.Name == "updatedBy" {
+		// 	continue
+		// }
+		//camelFieldName := toCamelCase(field.Name)
+		//updateValueVars = append(updateValueVars, fmt.Sprintf("_%s", camelFieldName))
+
+		if field.Name == "id" {
 			continue
 		}
-		camelFieldName := toCamelCase(field.Name)
-		updateValueVars = append(updateValueVars, fmt.Sprintf("_%s", camelFieldName))
+
+		updateValueVars = append(updateValueVars, fmt.Sprintf("_%s?.toString()", field.Name))
 	}
 	pgContent.WriteString(strings.Join(updateValueVars, ", "))
 	pgContent.WriteString("]\n")
-	
+
 	// Build SQL
 	pgContent.WriteString(fmt.Sprintf("        const response: QueryResult = await this.postgresService.query(`UPDATE ${EnvConfig.postgres.schema}.\"%s\" SET \n", tableName))
 	pgContent.WriteString("(" + strings.Join(updateFieldNames, ", ") + ") = (" + strings.Join(updateValuePlaceholders, ", ") + ")\n")
-	pgContent.WriteString(fmt.Sprintf(" WHERE id=${id} RETURNING *`, values)\n"))
+	pgContent.WriteString(" WHERE id=${id} RETURNING *`, values)\n")
 	pgContent.WriteString(fmt.Sprintf("        return response.rows[0] as %sEntity\n", singularCap))
 	pgContent.WriteString("    }\n\n")
 
@@ -209,14 +229,14 @@ func GenerateInfrastructureFiles(config model.ComponentConfig, basePath string) 
 	writeFile(fmt.Sprintf("%s/infrastructure/postgresql.datasource.ts", basePath), pgContent.String())
 }
 
-// Helper functions
-func toCamelCase(s string) string {
-	parts := strings.Split(s, "_")
-	for i := 1; i < len(parts); i++ {
-		parts[i] = capitalize(parts[i])
-	}
-	return strings.Join(parts, "")
-}
+// // Helper functions
+// func toCamelCase(s string) string {
+// 	parts := strings.Split(s, "_")
+// 	for i := 1; i < len(parts); i++ {
+// 		parts[i] = capitalize(parts[i])
+// 	}
+// 	return strings.Join(parts, "")
+// }
 
 func getDefaultValueForField(sqlType string) string {
 	switch {
@@ -232,5 +252,3 @@ func getDefaultValueForField(sqlType string) string {
 		return "null"
 	}
 }
-
-
