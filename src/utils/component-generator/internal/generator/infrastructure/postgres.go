@@ -5,13 +5,9 @@ import (
 	"os"
 	"strings"
 
+	"component-generator/internal/generator/domain"
 	"component-generator/internal/model"
 )
-
-// local helpers (isolated from domain package)
-func capitalize(s string) string {
-	return strings.Title(s)
-}
 
 func writeFile(path, content string) {
 	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
@@ -24,9 +20,9 @@ func writeFile(path, content string) {
 // GenerateInfrastructureFiles generates PostgreSQL datasource implementation.
 func GenerateInfrastructureFiles(config model.ComponentConfig, basePath string) {
 	singular := config.SingularName
-	singularCap := capitalize(singular)
+	singularCap := domain.Capitalize(singular)
 	plural := config.PluralName
-	tableName := capitalize(plural)
+	tableName := plural
 
 	var pgContent strings.Builder
 	pgContent.WriteString(fmt.Sprintf("import { I%sDatasource } from '../domain/datasources/i.%s.datasource'\n", singularCap, singular))

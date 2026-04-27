@@ -26,7 +26,7 @@ export type %[1]sResponse = Either<
 export type %[3]sResponse = Either<
     GenericAppError.UnexpectedError |
     Result<any>,
-    Result<{ data: %[1]sEntity[], pagination: IPagination }>
+    Result<%[1]sEntity[]>
 >
 `, singularCap, singular, pluralCap)
 
