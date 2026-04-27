@@ -137,11 +137,6 @@ func GenerateEntityFiles(config model.ComponentConfig, basePath string) {
 
         return Result.ok<%[1]sEntity>(%[3]s)
     }
-
-    //public static delete(entity: %[1]sEntity): Result<%[1]sEntity> {
-    //    entity.addDomainEvent(new %[1]sDeletedEvent(entity))
-    //    return Result.ok<%[1]sEntity>(entity)
-    //}
 `, singularCap, singular, entityVarName)
 	content.WriteString(constructorTemplate)
 
@@ -160,7 +155,7 @@ func GenerateEntityFiles(config model.ComponentConfig, basePath string) {
         super(props, id)
     }
 
-    public static delete(id: UniqueEntityId, userId: string): Result<Deleted%[1]sEntity> {
+    public static delete(id: UniqueEntityId): Result<Deleted%[1]sEntity> {
         const guardResult = Guard.againstNullOrUndefinedOrEmpty(id, "id")
 
         if (!guardResult.succeeded) {
@@ -198,47 +193,4 @@ func GenerateEntityFiles(config model.ComponentConfig, basePath string) {
 	}`, singularCap, singularCap, singularCap)
 
 	WriteFile(fmt.Sprintf("%s/domain/entities/%sid.entity.ts", basePath, singular), idEntityContent)
-
-	// 	var openapiContent strings.Builder
-
-	// 	openapiContent.WriteString(fmt.Sprintf(`
-	// 	export const %sOpenapiSchema = {
-	// 		type: 'object',
-	// 		properties: {
-	// 			`, singularCap))
-
-	// 	for _, field := range config.TableFields {
-	// 		// skip technical primary key - handled by UniqueEntityId getter
-	// 		if strings.EqualFold(field.Name, "id") {
-	// 			continue
-	// 		}
-	// 		tsType := migration.MapSQLTypeToTypeScript(field.Type)
-	// 		dbType := migration.MapSQLTypeToDbTypes(field.Type)
-	// 		fieldName := field.Name
-
-	// 		getter := fmt.Sprintf(`    %s: {
-	//     type: '%s',
-	// 	`, fieldName, tsType)
-	// 		openapiContent.WriteString(getter)
-
-	// 		if field.Nullable {
-	// 			openapiContent.WriteString("nullable: true")
-	// 		} else {
-	// 			openapiContent.WriteString("nullable: false")
-	// 		}
-
-	// 		if dbType == "date" {
-	// 			openapiContent.WriteString(`,
-	// 	format: 'date-time'
-	// 	},
-	// `)
-	// 		} else {
-	// 			openapiContent.WriteString(`
-	// 	},
-	// `)
-	// 		}
-	// 	}
-	// 	openapiContent.WriteString("}\n\n}\n\n")
-
-	// WriteFile(fmt.Sprintf("%s/domain/entities/%s.openapi.ts", basePath, singular), openapiContent.String())
 }

@@ -5,13 +5,9 @@ import (
 	"os"
 	"strings"
 
+	"component-generator/internal/generator/domain"
 	"component-generator/internal/model"
 )
-
-// local helpers
-func capitalize(s string) string {
-	return strings.Title(s)
-}
 
 func writeFile(path, content string) {
 	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
@@ -24,109 +20,390 @@ func writeFile(path, content string) {
 // GenerateInterfaceFiles generates controller and routes with Swagger JSDoc.
 func GenerateInterfaceFiles(config model.ComponentConfig, basePath string) {
 	singular := config.SingularName
-	singularCap := capitalize(singular)
+	singularCap := domain.Capitalize(singular)
 	plural := config.PluralName
+	pluralCap := domain.Capitalize(plural)
 
 	var controllerContent strings.Builder
-	controllerContent.WriteString("import { Request, Response } from 'express'\n")
-	controllerContent.WriteString(fmt.Sprintf("import { type IPagination } from '../../../../../core/domain/types/types'\n"))
-	controllerContent.WriteString(fmt.Sprintf("import { %sEntity } from '../domain/entities/%s.entity'\n\n", singularCap, singular))
-	controllerContent.WriteString("/**\n * @swagger\n * tags:\n")
-	controllerContent.WriteString(fmt.Sprintf(" *   name: %s\n", plural))
-	controllerContent.WriteString(fmt.Sprintf(" *   description: Operations with %s\n */\n", plural))
-	controllerContent.WriteString(fmt.Sprintf("export class %sController {\n", singularCap))
-	controllerContent.WriteString("    constructor(private readonly repository: any) {}\n\n")
-	controllerContent.WriteString("    /**\n     * @swagger\n")
-	controllerContent.WriteString(fmt.Sprintf("     * /%s:\n", plural))
-	controllerContent.WriteString("     *   get:\n")
-	controllerContent.WriteString(fmt.Sprintf("     *     summary: Get list of %s\n", plural))
-	controllerContent.WriteString(fmt.Sprintf("     *     tags: [%s]\n", plural))
-	controllerContent.WriteString("     *     security:\n     *       - JWT: [read]\n")
-	controllerContent.WriteString("     *     parameters:\n")
-	controllerContent.WriteString("     *       - in: query\n     *         name: name\n     *         schema:\n     *           type: string\n     *         description: Filter by name\n")
-	controllerContent.WriteString(fmt.Sprintf("     *         example: %s1\n", singularCap))
-	controllerContent.WriteString("     *       - in: query\n     *         name: offset\n     *         schema:\n     *           type: integer\n     *         description: Offset for pagination\n     *         example: 0\n")
-	controllerContent.WriteString("     *       - in: query\n     *         name: limit\n     *         schema:\n     *           type: integer\n     *         description: Limit for pagination\n     *         example: 10\n")
-	controllerContent.WriteString("     *     responses:\n     *       200:\n")
-	controllerContent.WriteString(fmt.Sprintf("     *         description: List of %s with pagination\n", plural))
-	controllerContent.WriteString("     *         content:\n     *           application/json:\n     *             schema:\n")
-	controllerContent.WriteString("     *               type: object\n     *               required: [data, pagination]\n     *               properties:\n")
-	controllerContent.WriteString("     *                 data:\n     *                   type: array\n     *                   items:\n")
-	controllerContent.WriteString(fmt.Sprintf("     *                     $ref: '#/components/schemas/%s'\n", singularCap))
-	controllerContent.WriteString("     *                 pagination:\n     *                   $ref: '#/components/schemas/Pagination'\n")
-	controllerContent.WriteString("     */\n")
-	controllerContent.WriteString(fmt.Sprintf("    public get%s = (_req: Request, res: Response<{ data: %sEntity[], pagination: IPagination }>): void => {\n", singularCap, singularCap))
-	controllerContent.WriteString(fmt.Sprintf("        // TODO: Implement get all logic (use Get%sUseCase and repository.findAndCount)\n", singularCap))
-	controllerContent.WriteString("        res.json({ data: [], pagination: { total: 0, offset: 0, limit: 10 } })\n    }\n\n")
-	controllerContent.WriteString("    /**\n     * @swagger\n")
-	controllerContent.WriteString(fmt.Sprintf("     * /%s:\n", plural))
-	controllerContent.WriteString("     *   post:\n")
-	controllerContent.WriteString(fmt.Sprintf("     *     summary: Create a new %s\n", singularCap))
-	controllerContent.WriteString(fmt.Sprintf("     *     tags: [%s]\n", plural))
-	controllerContent.WriteString("     *     security:\n     *       - JWT: [write]\n")
-	controllerContent.WriteString("     *     requestBody:\n     *       required: true\n     *       content:\n     *         application/json:\n     *           schema:\n")
-	controllerContent.WriteString(fmt.Sprintf("     *             $ref: '#/components/schemas/%s'\n", singularCap))
-	controllerContent.WriteString(fmt.Sprintf("     *           example:\n     *             name: \"New %s\"\n", singularCap))
-	controllerContent.WriteString("     *     responses:\n     *       201:\n")
-	controllerContent.WriteString(fmt.Sprintf("     *         description: %s created successfully\n", singularCap))
-	controllerContent.WriteString("     *         content:\n     *           application/json:\n     *             schema:\n")
-	controllerContent.WriteString(fmt.Sprintf("     *               $ref: '#/components/schemas/%s'\n", singularCap))
-	controllerContent.WriteString("     */\n")
-	controllerContent.WriteString(fmt.Sprintf("    public create%s = (_req: Request, res: Response<%sEntity>): void => {\n", singularCap, singularCap))
-	controllerContent.WriteString(fmt.Sprintf("        // TODO: Implement create logic\n        res.json({} as %sEntity)\n    }\n", singularCap))
-	controllerContent.WriteString("\n    /**\n     * @swagger\n")
-	controllerContent.WriteString(fmt.Sprintf("     * /%s/{id}:\n", plural))
-	controllerContent.WriteString("     *   put:\n")
-	controllerContent.WriteString(fmt.Sprintf("     *     summary: Update a %s\n", singularCap))
-	controllerContent.WriteString(fmt.Sprintf("     *     tags: [%s]\n", plural))
-	controllerContent.WriteString("     *     security:\n     *       - JWT: [write]\n")
-	controllerContent.WriteString("     *     parameters:\n")
-	controllerContent.WriteString("     *       - in: path\n     *         name: id\n     *         required: true\n     *         schema:\n     *           type: integer\n")
-	controllerContent.WriteString("     *     requestBody:\n     *       required: true\n     *       content:\n     *         application/json:\n     *           schema:\n")
-	controllerContent.WriteString(fmt.Sprintf("     *             $ref: '#/components/schemas/%s'\n", singularCap))
-	controllerContent.WriteString("     *     responses:\n     *       200:\n")
-	controllerContent.WriteString(fmt.Sprintf("     *         description: %s updated successfully\n", singularCap))
-	controllerContent.WriteString("     *         content:\n     *           application/json:\n     *             schema:\n")
-	controllerContent.WriteString(fmt.Sprintf("     *               $ref: '#/components/schemas/%s'\n", singularCap))
-	controllerContent.WriteString("     */\n")
-	controllerContent.WriteString(fmt.Sprintf("    public update%s = (_req: Request, res: Response<%sEntity>): void => {\n", singularCap, singularCap))
-	controllerContent.WriteString(fmt.Sprintf("        // TODO: Implement update logic\n        res.json({} as %sEntity)\n    }\n", singularCap))
-	controllerContent.WriteString("\n    /**\n     * @swagger\n")
-	controllerContent.WriteString(fmt.Sprintf("     * /%s/{id}:\n", plural))
-	controllerContent.WriteString("     *   delete:\n")
-	controllerContent.WriteString(fmt.Sprintf("     *     summary: Delete a %s\n", singularCap))
-	controllerContent.WriteString(fmt.Sprintf("     *     tags: [%s]\n", plural))
-	controllerContent.WriteString("     *     security:\n     *       - JWT: [delete]\n")
-	controllerContent.WriteString("     *     parameters:\n")
-	controllerContent.WriteString("     *       - in: path\n     *         name: id\n     *         required: true\n     *         schema:\n     *           type: integer\n")
-	controllerContent.WriteString("     *     responses:\n     *       204:\n")
-	controllerContent.WriteString(fmt.Sprintf("     *         description: %s deleted successfully\n", singularCap))
-	controllerContent.WriteString("     */\n")
-	controllerContent.WriteString(fmt.Sprintf("    public delete%s = (_req: Request, res: Response): void => {\n", singularCap))
-	controllerContent.WriteString("        // TODO: Implement delete logic\n        res.status(204).send()\n    }\n}\n")
+
+	controllerContent.WriteString(fmt.Sprintf(`
+import { type NextFunction, type Request, type Response } from 'express'
+import { type I%[2]sRepository } from '../domain/repositories/i.%[1]s.repository'
+import { type %[2]sEntity } from '../domain/entities/%[1]s.entity'
+import { Get%[2]sUseCase, GetOne%[2]sUseCase } from '../usecases/get-%[1]s.usecase'
+import { Create%[2]sUseCase } from '../usecases/create-%[1]s.usecase'
+import { Delete%[2]sUseCase } from '../usecases/delete-%[1]s.usecase'
+import { Update%[2]sUseCase } from '../usecases/update-%[1]s.usecase'
+import { CustomRequest } from '../../../../../core/domain/types/custom.request'
+import { Helpers } from '../../../../../core/utils/helpers'
+
+//***ВНИМАНИЕ!!!*****************************
+//Необходимо руками добавить следующее:
+//в src/config/openapi.ts
+//import { %[2]sOpenapiSchema } from 'src/api/v1/components/%[3]s/domain/entities/%[1]s.openapi';
+//
+//в components: {
+//    schemas: {
+//        %[1]s: %[2]sOpenapiSchema, <= эту строчку
+//    },
+//}
+//
+//в src/api/v1/interface/routes.ts
+//import { %[2]sRoutesV1 } from '../components/%[3]s/interface/%[1]s.routes'
+//
+//router.use('/v1/%[3]s', %[2]sRoutesV1.routes)
+//
+//*******************************************
+
+type QueryParams = {
+    id: number
+    created_at_gte: string
+    created_at_lte: string
+}
+
+type QueryBody = {
+    name: string
+    search: string
+}
+
+/**
+ * @swagger
+ * tags:
+ *   name: %[3]s
+ *   description: Operation with %[3]s
+ */
+export class %[2]sController {
+    constructor(private readonly repository: I%[2]sRepository) { }
+
+    /**
+     * @swagger
+     * /%[3]s:
+     *   get:
+     *     summary: Get list of %[3]s
+     *     tags: [%[3]s]
+     *     security:
+     *       - JWT: [read]
+     *     parameters:
+     *       - in: query
+     *         name: created_at_gte
+     *         schema:
+     *           type: string
+     *         format: date
+     *         description: С даты добавления
+     *         example: 2026-01-01
+     *       - in: query
+     *         name: created_at_lte
+     *         schema:
+     *           type: string
+     *         format: date
+     *         description: По дату добавления
+     *         example: 2028-01-01
+     *       - in: query
+     *         name: offset
+     *         schema:
+     *           type: integer
+     *         description: Offset for pagination
+     *         example: 0
+     *       - in: query
+     *         name: limit
+     *         schema:
+     *           type: integer
+     *         description: Limit for pagination
+     *         example: 10
+     *       - in: query
+     *         name: sort
+     *         schema:
+     *           type: string
+     *         description: Sort field
+     *         example: name
+     *       - in: query
+     *         name: order
+     *         schema:
+     *           type: string
+     *           enum: [desc, asc]
+     *         description: Sort order
+     *         example: desc
+     *     responses:
+     *       200:
+     *         description: List of %[3]s
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 $ref: '#/components/schemas/%[1]s'
+     *       400:
+     *         description: Ошибка
+     *         $ref: "#/components/responses/Error400"
+     *       401:
+     *         description: Ошибка авторизации
+     *         $ref: "#/components/responses/Unauthorized"
+     *       500:
+     *         description: Ошибка сервера
+     */
+    public get%[4]s = (
+        _req: Request<unknown, unknown, unknown, QueryParams>,
+        res: Response<%[2]sEntity[]>,
+        next: NextFunction
+    ): void => {
+        let findOptions = Helpers.getFilters(_req.query)
+
+        new Get%[2]sUseCase(this.repository)
+            .execute(findOptions)
+            .then((result) => {
+                if (result.isLeft()) {
+                    const error = result.value
+                    next(error.errorValue())
+                }
+                return res.json(result.value.getValue())
+            })
+            .catch((error) => {
+                next(error)
+            })
+    }
+
+    public getOne%[2]s = (
+        _req: Request<any, unknown, unknown, QueryParams>,
+        res: Response<%[2]sEntity>,
+        next: NextFunction
+    ): void => {
+        let _id = 0
+        if (_req && _req.query && _req.params && Object.keys(_req.query).length === 0 && _req.query.constructor === Object) {
+            _id = _req.params.id
+        }
+        else {
+            return
+        }
+
+        new GetOne%[2]sUseCase(this.repository)
+            .execute(_id.toString())
+            .then((result) => {
+                if (result.isLeft()) {
+                    const error = result.value
+                    next(error.errorValue())
+                }
+                return res.json((result as any).value.getValue())
+            })
+            .catch((error) => {
+                next(error)
+            })
+    }
+
+    /**
+     * @swagger
+     * /%[3]s:
+     *   post:
+     *     summary: Create new %[1]s
+     *     tags: [%[3]s]
+     *     security:
+     *       - JWT: [write]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/%[1]s'
+     *     responses:
+     *       200:
+     *         description: %[2]s created successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/%[1]s'
+     *       201:
+     *         description: %[2]s created successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/%[1]s'
+     *       400:
+     *         description: Ошибка
+     *         $ref: '#/components/responses/Error400'
+     *       401:
+     *         description: Ошибка авторизации
+     *         $ref: '#/components/responses/Unauthorized'
+     *       500:
+     *         description: Ошибка сервера
+     */
+    public create%[2]s = (
+        _req: Request<unknown, unknown, QueryBody, QueryParams>,
+        res: Response<%[2]sEntity>,
+        next: NextFunction
+    ): void => {
+        const user = ((_req as unknown) as CustomRequest).payload.token.preferred_username
+        new Create%[2]sUseCase(this.repository)
+            .execute(_req.body, user)
+            .then((result) => {
+                if (result.isLeft()) {
+                    const error = result.value
+                    next(error.errorValue())
+                }
+                return res.json((result as any).value.getValue())
+            })
+            .catch((error) => {
+                next(error)
+            })
+    }
+    /**
+     * @swagger
+     * /%[3]s/{id}:
+     *   put:
+     *     summary: Update %[1]s
+     *     tags: [%[3]s]
+     *     security:
+     *       - JWT: [write]
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: integer
+     *         required: true
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/%[1]s'
+     *     responses:
+     *       200:
+     *         description: %[2]s updated successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/%[1]s'
+     *       400:
+     *         description: Ошибка
+     *         $ref: '#/components/responses/Error400'
+     *       401:
+     *         description: Ошибка авторизации
+     *         $ref: '#/components/responses/Unauthorized'
+     *       500:
+     *         description: Ошибка сервера
+     */
+    public update%[2]s = (
+        _req: Request<any, unknown, QueryBody, QueryParams>,
+        res: Response<%[2]sEntity>,
+        next: NextFunction
+    ): void => {
+        let _id = 0
+        if (_req && _req.query && _req.params && Object.keys(_req.query).length === 0 && _req.query.constructor === Object) {
+            _id = _req.params.id
+        } else if (_req && _req.query) {
+            _id = (_req.query as QueryParams).id
+        }
+        else {
+            return
+        }
+        const user = ((_req as unknown) as CustomRequest).payload.token.preferred_username
+        new Update%[2]sUseCase(this.repository)
+            .execute(_id, _req.body)
+            .then((result) => {
+                if (result.isLeft()) {
+                    const error = result.value
+                    next(error.errorValue())
+                }
+                return res.json((result as any).value.getValue())
+            })
+            .catch((error) => {
+                next(error)
+            })
+    }
+    /**
+     * @swagger
+     * /%[3]s/{id}:
+     *   delete:
+     *     summary: Delete %[1]s
+     *     tags: [%[3]s]
+     *     security:
+     *       - JWT: [delete]
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: integer
+     *         required: true
+     *     responses:
+     *       204:
+     *         description: %[2]s deleted successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 $ref: "#/components/schemas/%[1]s"
+     *       400:
+     *         description: Ошибка
+     *         $ref: "#/components/responses/Error400"
+     *       401:
+     *         description: Ошибка авторизации
+     *         $ref: "#/components/responses/Unauthorized"
+     *       500:
+     *         description: Ошибка сервера
+    */
+    public delete%[2]s = (
+        _req: Request<any, unknown, unknown, QueryParams>,
+        res: Response<%[2]sEntity>,
+        next: NextFunction
+    ): void => {
+        let _id = 0
+        if (_req && _req.query && _req.params && Object.keys(_req.query).length === 0 && _req.query.constructor === Object) {
+            _id = _req.params.id
+        } else if (_req && _req.query) {
+            _id = (_req.query as QueryParams).id
+        }
+        else {
+            return
+        }
+        const user = ((_req as unknown) as CustomRequest).payload.token.preferred_username
+        new Delete%[2]sUseCase(this.repository)
+            .execute(_id)
+            .then((result) => {
+                if (result.isLeft()) {
+                    const error = result.value
+                    next(error.errorValue())
+                }
+                return res.json((result as any).value.getValue())
+            })
+            .catch((error) => {
+                next(error)
+            })
+    }
+}
+	`, singular, singularCap, plural, pluralCap))
 
 	writeFile(fmt.Sprintf("%s/interface/%s.controller.ts", basePath, singular), controllerContent.String())
 
 	routesContent := fmt.Sprintf(`import { Router } from 'express'
-import { %sController } from './%s.controller'
+import { %[2]sController } from './%[1]s.controller'
+import { %[2]sRepository } from '../domain/repositories/%[1]s.repository'
+import { PostgreSQL%[2]sDataSource } from '../infrastructure/postgresql.datasource'
+import { EnvConfig, DataSourceType } from '../../../../../config/env'
 
-export class %sRoutes {
-    public router: Router
-    private controller: %sController
+export class %[2]sRoutesV1 {
+    static get routes(): Router {
+        const router = Router()
+        const datasource = %[2]sRoutesV1.getDatasource(EnvConfig.defaultDataSource)
+        const repository = new %[2]sRepository(datasource)
+        const controller = new %[2]sController(repository)
 
-    constructor(repository: any) {
-        this.router = Router()
-        this.controller = new %sController(repository)
-        this.initializeRoutes()
+        router.get('', controller.get%[4]s)
+		router.get('/:id', controller.getOne%[2]s)
+        router.post('/', controller.create%[2]s)
+        router.put('/:id', controller.update%[2]s)
+        router.delete('/:id', controller.delete%[2]s)
+
+        return router
     }
 
-    private initializeRoutes(): void {
-        this.router.get('/', this.controller.get%s)
-        this.router.post('/', this.controller.create%s)
-        this.router.put('/:id', this.controller.update%s)
-        this.router.delete('/:id', this.controller.delete%s)
+    private static getDatasource(type: DataSourceType) {
+        switch (type) {
+            case 'postgres':
+                return new PostgreSQL%[2]sDataSource()
+            default:
+                return new PostgreSQL%[2]sDataSource() // fallback to postgres
+        }
     }
-}`, singularCap, singular, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap, singularCap)
+}`, singular, singularCap, plural, pluralCap)
 
 	writeFile(fmt.Sprintf("%s/interface/%s.routes.ts", basePath, singular), routesContent)
 }

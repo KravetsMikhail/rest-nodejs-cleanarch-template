@@ -45,7 +45,7 @@ func GenerateOpenAPIFiles(config model.ComponentConfig, basePath string) {
 // buildOpenAPISchemeContent returns TypeScript content for the OpenAPI scheme object.
 func buildOpenAPISchemeContent(config model.ComponentConfig, singular, singularCap string) string {
 	var b strings.Builder
-	b.WriteString(fmt.Sprintf("export const %sOpenapiScheme = {\n", singularCap))
+	b.WriteString(fmt.Sprintf("export const %sOpenapiSchema = {\n", singularCap))
 	b.WriteString("    type: 'object',\n")
 	b.WriteString("    properties: {\n")
 
@@ -60,19 +60,20 @@ func buildOpenAPISchemeContent(config model.ComponentConfig, singular, singularC
 	for _, f := range fields {
 		tsType := migration.MapSQLTypeToTypeScript(f.Type)
 		openapiType, format := tsToOpenAPI(tsType)
-		line := fmt.Sprintf("        %s: { type: '%s'", f.Name, openapiType)
+		line := fmt.Sprintf(`        %s: { 
+			type: '%s'`, f.Name, openapiType)
 		if format != "" {
 			line += fmt.Sprintf(`, 
-	format: '%s'`, format)
+			format: '%s'`, format)
 		}
 		if f.Nullable == false {
 			line += `,
-	nullable: false`
+			nullable: false`
 		} else {
 			line += `,
-	nullable: true`
+			nullable: true`
 		}
-		line += fmt.Sprintf(",\ndescription: '%s' },\n", f.Name)
+		line += fmt.Sprintf(",\n			description: '%s' \n		},\n", f.Name)
 		b.WriteString(line)
 	}
 	b.WriteString("    },\n")
