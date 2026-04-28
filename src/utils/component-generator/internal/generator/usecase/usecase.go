@@ -180,7 +180,7 @@ export class Update%[1]sUseCase implements IUseCase<Promise<%[1]sResponse>> {
         let update%[2]s = {} 
 
         try {
-            update%[2]s = await this.repository.create(%[2]s)
+            update%[2]s = await this.repository.update(id, %[2]s)
             DomainEvents.dispatchEventsForAggregate(new UniqueEntityId(id))
         }catch(err){
             return left(new GenericAppError.UnexpectedError(err)) as %[1]sResponse
@@ -225,7 +225,7 @@ export class Delete%[1]sUseCase implements IUseCase<Promise<%[1]sResponse>> {
             return left(new GenericAppError.UnexpectedError(err)) as %[1]sResponse
         }
 
-        return right(Result.ok<%[1]sEntity>({} as %[1]sEntity)) as %[1]sResponse
+        return right(Result.ok<%[1]sEntity>(deleted%[2]s as %[1]sEntity)) as %[1]sResponse
     }
 }`, singularCap, singular))
 
