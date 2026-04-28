@@ -40,7 +40,7 @@ import { Helpers } from '../../../../../core/utils/helpers'
 //***ВНИМАНИЕ!!!*****************************
 //Необходимо руками добавить следующее:
 //в src/config/openapi.ts
-//import { %[2]sOpenapiSchema } from 'src/api/v1/components/%[3]s/domain/entities/%[1]s.openapi';
+//import { %[2]sOpenapiSchema } from '../api/v1/components/%[3]s/domain/entities/%[1]s.openapi';
 //
 //в components: {
 //    schemas: {
